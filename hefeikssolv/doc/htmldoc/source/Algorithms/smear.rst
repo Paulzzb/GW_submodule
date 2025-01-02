@@ -1,0 +1,4 @@
+
+Regularization through partial occupation 
+=========================================
+

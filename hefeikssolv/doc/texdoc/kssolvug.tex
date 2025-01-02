@@ -1,0 +1,2317 @@
+\documentclass[11pt]{book}
+\setlength{\topmargin}{-.5in} 
+\setlength{\textheight}{8.8in}
+\setlength{\textwidth}{6.2in} 
+\setlength{\oddsidemargin}{0.2in}
+\oddsidemargin-.0in
+\evensidemargin-.0in
+\usepackage{amsmath,amssymb,amsfonts,color}
+\usepackage{epsfig, moreverb, graphicx}
+\usepackage[TABTOPCAP,tight]{subfigure}
+\usepackage{epsfig}
+
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{remark}{{\it Remark}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\newcommand{\xij}{x_j^{(i)}}
+\newcommand{\pij}{p_j^{(i)}}
+\newcommand{\exz} {X^{(0)}}
+\newcommand{\exi} {X^{(i)}}
+\newcommand{\exim} {X^{(i-1)}}
+\newcommand{\exip} {X^{(i+1)}}
+\newcommand{\Hz} {H(X^{(0)})}
+\newcommand{\Hi} {H^{(i)}}
+\newcommand{\Him} {H^{(i-1)}}
+\newcommand{\ri} {R^{(i)}}
+\newcommand{\pim} {P^{(i-1)}}
+\newcommand{\Ehat}{\hat{E}}
+\newcommand{\XS}{X^{(0)}}
+\newcommand{\hEtot}{\hat{E}_{total}}
+\newcommand{\rhoi}{\rho^{(i)}}
+
+\newcommand{\rhok}{\rho^{(k)}}
+\newcommand{\muk}{\mu^{(k)}}
+\newcommand{\exk} {X^{(k)}}
+\newcommand{\exkm} {X^{(k-1)}}
+\newcommand{\exkp} {X^{(k+1)}}
+\newcommand{\rhostar} {\rho_{\tiny \ast}}
+\newcommand{\rhoopt} {\rho_{\tiny \mbox{opt}}}
+
+\newcommand{\tK}{\widetilde{K}}
+\newcommand{\tM}{\widetilde{M}}
+\newcommand{\hK}{\widehat{K}}
+\newcommand{\hM}{\widehat{M}}
+\newcommand{\hG}{\widehat{G}}
+\newcommand{\hV}{\widehat{V}}
+\newcommand{\hx}{\widehat{x}}
+\newcommand{\hy}{\widehat{y}}
+\newcommand{\bE}{{\bf E}}
+\newcommand{\bn}{{\bf n}}
+\newcommand{\Rnk}{\mathbb{R}^{n\times k}}
+\newcommand{\Rnn}{\mathbb{R}^{n\times n}}
+\newcommand{\Rkk}{\mathbb{R}^{k\times k}}
+\newcommand{\rhoin}{\rho_{\mbox{in}}}
+\newcommand{\rhout}{\rho_{\mbox{out}}}
+
+\newcommand{\qed}{\hfill \ensuremath{\Box}}
+\def\sss{\scriptstyle}
+
+\newcommand{\ignore}[1]{}
+
+\begin{document}
+\title{KSSOLV User's Guide}
+\author{
+Chao Yang\\
+Juan C. Meza\\
+Computational Research Division\\
+Lawrence Berkeley National Laboratory \\
+Berkeley, CA 94720
+}
+\date{\today}
+\maketitle
+\tableofcontents
+
+\chapter{Introduction} \label{chap:intro}
+KSSOLV is a MATLAB toolbox for solving a class of nonlinear eigenvalue
+problems also known as the Kohn-Sham equations. This type of problem arises 
+from electronic structure calculation which is nowadays an essential tool 
+for studying the microscopic quantum mechanical properties of molecules,
+solids and other nanoscale materials.  Through the density functional theory (DFT) 
+formalism, one can reduce the many-body Schr\"{o}dinger equation used to describe the 
+electron-electron and electron-nuclei interactions within an atomistic
+system to a set of single-electron equations that have far
+fewer degrees of freedom.  These equations are first derived by Kohn and Sham
+in \cite{kohnsham}, and they have the form
+\begin{equation}
+H(\rho) \psi_i = \lambda_i \psi_i, \ \ i = 1, 2, ..., n_e, \label{ev1} 
+\end{equation}
+where $n_e$ is the number of electrons in the system, 
+$\{\psi_i(r)\}$ ($i = 1,2,..., n_e$) is a set of single electron
+wavefunctions that are mutually orthonormal, $\rho(r)$ is the total electron
+charge defined by
+\begin{equation}
+\rho(r) =  \sum_{i=1}^{n_e} | \psi_i(r) |^2,
+\label{chargeden}
+\end{equation}
+and 
+\[
+\lambda_1 \leq \lambda_2 \leq \hdots \leq \lambda_{n_e}
+\] 
+are the $n_e$ smallest eigenvalues of $H(\rho)$, a linear operator 
+that depends on $\rho$.  The operator $H$ is known as the Kohn-Sham 
+Hamiltonian and defined by
+\begin{equation}
+H(\rho) = -\frac{1}{2}\Delta + V_{ion}(r) + \rho \star \frac{1}{|r|}
++ V_{xc}(\rho),
+\label{ksham}
+\end{equation}
+where $\Delta$ is the Laplacian operator, $V_{ion}$ and $V_{xc}$ are known as
+the ionic and exchange-correlation potentials respectively \cite{kohnsham},
+and $\star$ denotes the convolution operator.
+
+The Kohn-Sham equations are the the Euler-Lagrange equations for
+the total energy minimization problem
+\begin{eqnarray}
+\begin{array}{cc}
+\min       & E_{total}^{KS}(\psi_i) \\
+\mbox{s.t} & \psi_i^{\ast}\psi_j = \delta_{i,j},
+\end{array} \label{ksmin}
+\end{eqnarray}
+where
+\begin{equation}
+E_{total}^{KS} = \frac{1}{2}\sum_{i=1}^{n_e} \int_{\Omega} 
+|\nabla \psi_i|^2 dr + \int_{\Omega}\rho  V_{ion} dr
++\frac{1}{2}\int_{\Omega} \int_{\Omega} \frac{\rho(r_1)\rho(r_2)}{|r_1 - r_2|}
+dr_1 dr_2 + E_{xc}(\rho),
+\label{ksetot}
+\end{equation}
+$E_{xc}(\rho)$ is the exchange-correlation energy defined in \cite{kohnsham}. 
+
+After (\ref{ev1}) is discretized, it becomes a set of nonlinear equations 
+that bear similarity to algebraic eigenvalue problems found in standard linear 
+algebra textbook. The main feature that distinguishes the Kohn-Sham equations
+from the standard linear eigenvalue problem is that the matrix operators 
+in these equations are functions of the eigenvectors to be computed.  
+Due to this nonlinear coupling between the matrix operator and
+its eigenvector, the Kohn-Sham equations are much more difficult to
+solve than a standard linear eigenvalue problem.  
+Currently, the most widely used numerical method for solving the 
+this type of problem is the Self Consistent Field (SCF) iteration, 
+which we will examine in detail in Chapter~\ref{chap:methods}. 
+An alternative approach which is designed to minimize the 
+total energy (\ref{ksetot}) directly will also be reviewed there.
+Both methods have been implemented in KSSOLV to allow users to 
+compute the solution to the Kohn-Sham equations associated with various
+molecules and solids.
+
+KSSOLV is designed using the object oriented programming features
+available in MATLAB.  Several classes are created in KSSOLV to 
+define both physical objects such as atoms and molecules and 
+mathematical entities such as wavefunctions and Hamiltonians.
+These classes are defined in a hierarchical fashion so that
+a molecule object can be easily constructed from atom objects.
+The use of objects not only allows users with a minimal physics or 
+chemistry background to quickly assemble a realistic atomistic
+system, but also allows them to develop and compare new numerical 
+methods for solving the Kohn-Sham equations in a user friendly
+environment. 
+
+This user's guide will help users get familiar with various
+features of the toolbox.  It is organized as follows. 
+In next chapter, we will demonstrate how the toolbox
+can be used to set up simple molecular systems and how the
+Kohn-Sham equations associated with these systems can be solved
+by calling the numerical methods currently implemented in KSSOLV.
+In Chapter~\ref{chap:class}, we will take a closer look at
+various classes defined in KSSOLV, and show how KSSOLV
+objects can be created and modified.
+Chapter~\ref{chap:methods} focuses on numerical methods for
+solving the Kohn-Sham equations that have been  implemented 
+in KSSOLV. In particular, we will examine the SCF iteration and
+the DCM algorithm.  We will discuss the importance of using
+the trust region technique to maintain monotonic reduction of the
+total energy function and how charge mixing can be used to
+accelerate and stabilize the convergence of the SCF iteration.
+%The performance of the KSSOLV will be briefly discussed in 
+%Chapter~\ref{chap:perf}.
+
+\chapter{Getting Started} \label{chap:start}
+%
+\section{Download KSSOLV}
+KSSOLV can be downloaded from 
+\begin{verbatim}
+    http://www.crd.lbl.gov/~chao/KSSOLV
+\end{verbatim}
+
+\section{Setting the environmental variable {\tt KSSOLVPATH}}
+Once you retrieve the package, take a look at the README file in the directory
+{\tt kssolv}. The file contains a minimal set of instructions for 
+using the package.
+
+Before running KSSOLV, one should define the environmental variable {\tt
+  KSSOLVPATH}.  If you are running MATLAB under Unix/Linux operating system, this can
+  be done by adding, for example, 
+\begin{verbatim}
+   setenv KSSOLVPATH  /home/cyang/kssolv
+\end{verbatim}
+to your .cshrc if you use {\tt csh}.  If you use {\tt bash}, use
+\begin{verbatim}
+   export KSSOLVPATH=/home/cyang/kssolv
+\end{verbatim}
+
+If you are running MATLAB under Windows, click on {\tt Start->My Computer}, 
+and then click {\tt View system information} on the left ({\tt System Task}) 
+panel. Continue with a click on {\tt Advanced}, followed by a click on 
+{\tt Environmental variables}. If 
+{\tt KSSOLVPATH} is not among the defined environmental variables, click new, 
+type in the variable name KSSOLVPATH, and the directory in which KSSOLV is installed.
+
+\section{Test Problems}
+The package contains a number of test problems that one can experiment
+with.  Each test problem represents a particular molecule or
+periodic system. The system is created in a setup file.  Table~\ref{egtab}
+contains the names of all setup files and a brief description for each
+of them. It also shows the number of electron pairs (occupied states ({\tt nocc})
+for most systems (with the exception of the electron quantum dot example in 
+which {\tt nocc} is the actual number of electrons in the dot).  
+%
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|c|l|} \hline
+ setup file name      &   nocc &  Description \\ \hline
+{\tt c2h6\_setup.m}   &     7  &  an ethane molecule \\
+{\tt co2\_setup.m}    &     8  &  a carbon dioxide molecule\\
+{\tt h2o\_setup.m}    &     4  &  a water molecule \\
+{\tt hnco\_setup.m}   &     8  &  an isocyanic acid molecule \\
+{\tt qdot\_setup.m}   &     8  &  a 8-electron quantum dot confined 
+                                  by an external potential\\
+{\tt si2h4\_setup.m}  &     6  &  a planar singlet silylene molecule \\
+{\tt sibulk\_setup.m} &     4  &  a silicon bulk system \\
+{\tt sih4\_setup.m}   &     4  &  a silane molecule \\
+{\tt ptnio\_setup.m}  &     43 &  a $Pt_2Ni_6O$ molecule \\
+\hline
+\end{tabular}
+\caption{Setup files for examples included in KSSOLV}
+\label{egtab}
+\end{table}
+%
+\section{Setting up an Molecular System}
+To create a new system, a user can simply take one of the existing setup 
+files and modify the construction of the {\tt Molecule} object. A user can 
+also change of the size of the primary cell or the kinetic energy cutoff of 
+the existing setup file to examine the change in the convergence behavior 
+of the numerical method or the quality of the computed solution.
+
+In the following, we will use {\tt sih4\_setup.m} as an example to demonstrate
+how a molecular system can be easily set up in KSSOLV.  The source code
+contained in {\tt sih4\_setup.m} is shown in Figure~\ref{sih4source}.
+
+\subsection{Initialization}
+In KSSOLV, an molecular system is defined by first creating an {\tt Molecule}
+object, an particular instance of the {\tt Molecule} class to be defined in
+Chapter~\ref{chap:class}, using
+\begin{verbatim}
+   mol = Molecule();
+\end{verbatim}
+Here {\tt mol} is a user defined variable name and {\tt Molecule} is a KSSOLV
+keyword. This single line of code creates an empty {\tt Molecule} object
+{\tt mol} with no particular attribute.
+
+\subsection{Specifying the Atom List}  
+Properties of an {\tt Molecular} object are specified by using the {\tt set}
+method associated with the object. For example,
+\begin{verbatim}
+   mol = set(mol,'atomlist', alist); 
+\end{verbatim}
+is used in Figure~\ref{sih4source} to specify the list of atoms contained in
+{\tt mol}.  Here the string {\tt 'atomlist'} is the name of an attribute
+associated with an {\tt Molecule} object predefined by KSSOLV, and {\tt alist}
+is a user defined variable which supplies the actual atom list.  In
+Figure~\ref{sih4source}, the variable {\tt alist} is defined earlier as
+an array of {\tt Atom} objects. Each {\tt Atom} object can be defined by 
+its chemical symbol or atomic number. For example, the silicon atom can 
+be defined by
+\begin{verbatim}
+  a = Atom('Si')
+\end{verbatim}
+or
+\begin{verbatim}
+  a = Atom(14); 
+\end{verbatim}
+Here, {\tt Atom} is a KSSOLV keyword associated with the atom class 
+(see Chapter~\ref{chap:class} for details.)
+
+The atom list array {\tt alist} can also be defined by
+\begin{verbatim}
+    alist(1) = Atom('Si');
+    for j = 2:5
+       alist(j) = Atom('H');
+    end
+\end{verbatim}
+
+\subsection{Specifying the Positions of the Atoms}  
+The position of each atom in the atom list is specified by an $n_a \times 3$
+array ({\tt xyzmat} in Figure~\ref{sih4source}). The $i$th row of this array
+gives the $x,y,z$ coordinates of the $i$th atom in the atom list.  
+This array can be passed to the {\tt mol} object through the {\tt set} 
+method as one can see in Figure~\ref{sih4source}.  The unit of the coordinates
+should be in Bohr (1 Bohr = 0.5291772083 Angstrom).
+
+Although it is perfectly OK to define this array directly, it is sometimes
+more convenient to first define the relative position of each atom
+in a unit (super)cell (of a periodic lattice) specified by three lattice 
+vectors ${\bf c}_1$, ${\bf c}_2$ and ${\bf c}_3$. If we denote the relative 
+displacement of the atom along ${\bf c}_i$ by $\xi_i$, then the 
+absolute $x,y,z$ coordinates of the atom correspond to the
+three components of the row vector
+\[
+r = \xi_1 {\bf c}_1^T +  \xi_2 {\bf c}_2^T +  \xi_3 {\bf c}_3^T
+  = (\xi_1 \: \xi_2 \: \xi_3) C,
+\]
+where
+\begin{equation}
+C = \left(
+\begin{array}{c}
+{\bf c}_1^T \\
+{\bf c}_2^T \\
+{\bf c}_3^T \\
+\end{array}
+\right).
+\label{unitcel}
+\end{equation}
+The $3 \times 3$ matrix $C$ defines a unit supercell in KSSOLV. It can
+be used to set the {\tt 'supercell'} attribute of a {\tt Molecule}
+object.  For example, 
+\begin{verbatim}
+mol = set(mol,'supercell',10*eye(3));
+\end{verbatim}
+sets the unit supercell of {\tt mol} to a $10 \times 10 \times 10$ cube. 
+
+If the relative positions of $n_a$ atoms within a unit supercell
+defined by $C$ are placed in an $n_a \times 3$ array {\tt coefs}, 
+then the absolute coordinates of these atoms can be obtained from
+{\tt coefs*C}.
+
+We should point out that the $(x,y,z)$ coordinates associated with
+the atoms contained in a {\tt Molecule} object can be negative even 
+though the lattice vectors used to specify the unit supercell are usually in 
+$\mathbb{R}^+\times \mathbb{R}^+ \times \mathbb{R}^+$.  Because 
+the unit supercell is assumed to periodically extended throughout
+the entire domain, $(x,y,z)$ is equivalent to 
+$(x+m{\bf c}_1,y+n{\bf c}_2, z+\ell{\bf c}_3)$ for any integer
+$m$, $n$ and $\ell$, i.e., we can always bring an atom into 
+the specified unit supercell if its coordinates are outside of the unit 
+supercell.  For example, if the coordinate of the silicon atom is
+chosen to be $(0,0,0)$, then the atomic positions shown on the left
+side of Figure~\ref{sih4atom} are equivalent to those shown
+on the right side of the figure.
+\begin{figure}[htbp]
+\hfill
+\begin{center}
+\subfigure[Atomic positions outside of the unit supercell]
+{
+    \includegraphics[width=0.3\textwidth]{sih41.png}
+    \label{sih41}
+}
+\subfigure[Atomic positions inside of the unit supercell]
+  {
+    \includegraphics[width=0.3\textwidth]{sih42.png}
+    \label{sih42}
+  }
+\end{center}
+\caption{Equivalent rendering of the atomic positions of Si and H in a
+silane molecule}
+\label{sih4atom}
+\end{figure}
+
+
+\subsection{Kinetic Energy Cutoff}  
+In order to discretize the Kohn-Sham equations with an appropriate number
+of planewave basis functions, one must specify a kinetic energy cutoff
+$E_{cut}$ through 
+\begin{verbatim}
+mol = set(mol,'ecut',cutoff_value);
+\end{verbatim}
+where {\tt cutoff\_value} is a user supplied number in the unit of Rydberg (Ryd).
+
+This energy cutoff defines a maximum magnitude limit for the wave numbers 
+$g_j$ allowed in the planewave expansion of a single-particle wavefunction 
+$\psi(r)$.  That is, when the cutoff is set to $E_{cut}$, $\psi(r)$ is 
+expressed as
+\begin{equation}
+\psi(r) = \sum_{j=1}^{n_g} c_j e^{i g_j^T r},  \label{fexpand}
+\end{equation}
+where $n_g$ is the number of all wave numbers $g_j$ that satisfy
+\begin{equation}
+||g_j ||^2 < 2 E_{cut}, \label{ecut}
+\end{equation}
+
+The frequency cutoff $E_{cut}$ also allows us to determine 
+the minimum number of sampling grid points ($n_1, n_2, n_3$) we need
+to represent $\psi(r)$ in real space without causing aliasing effects
+\cite{kssolv}.
+
+Clearly, the larger the $E_{cut}$ value we use, the larger the number of 
+planewave basis functions and real space sampling grid points are required 
+in the representations of $\psi(r)$. The use of a large number of planewave 
+basis leads to a more accurate finite dimensional approximation to the
+continuous Kohn-Sham equations.  Unfortunately, this also leads to a 
+high computational cost (in term of both time and storage) required to solve 
+the finite dimensional Kohn-Sham equations. 
+
+The optimal choice of $E_{cut}$ is system dependent.  The choice also depends 
+on the pseudopotential function used.  However, for the purpose of
+understanding the numerical method for solving a finite dimensional KS 
+equation, it is sufficient to set $E_{cut}$ to a relatively small number,
+e.g., $E_{cut} = 25 Ryd$.  One can experimenting with different choices
+of $E_{cut}$ to see how the minimum total energy changes as one increase
+the number of plane wave basis in the discretization.
+%
+{\footnotesize
+\begin{figure}[htbp]
+\begin{center}
+\begin{boxedverbatim}
+%
+% 1. construct atoms
+%
+a1 = Atom('Si');
+a2 = Atom('H');
+alist = [a1; a2; a2; a2; a2];
+%
+% 2. set up primitive cell (Bravais lattice)
+%
+C = 10*eye(3);
+%
+% 3. define the coordinates the atoms
+%
+coefs = [
+ 0.0     0.0      0.0
+ 0.161   0.161    0.161
+-0.161  -0.161    0.161
+ 0.161  -0.161   -0.161
+-0.161   0.161   -0.161
+];
+xyzmat = coefs*C';
+%
+% 4. Configure the molecule
+%
+mol = Molecule();
+mol = set(mol,'Blattice',C);
+mol = set(mol,'atomlist',alist);
+mol = set(mol,'xyzlist' ,xyzmat);
+mol = set(mol,'ecut', 25);  % kinetic energy cut off
+mol = set(mol,'name','SiH4');
+\end{boxedverbatim}
+\caption{Setting up the $Silane$ molecule}
+\label{sih4source}
+\end{center}
+\end{figure}
+}
+%
+\subsection{Checking the Attributes of an {\tt Molecule} Object}
+After all attributes of an {\tt Molecule} object {\tt mol} have been
+set, one can view all attributes by simply typing {\tt mol} (without
+semicolon) at the MATLAB prompt without a semicolon at the end. 
+For example, typing {\tt mol} after 
+running {\tt sih4\_setup} gives the output shown in Figure~\ref{sih4display}.
+{\footnotesize
+\begin{figure}[htbp]
+\begin{center}
+\begin{boxedverbatim}
+>> mol
+Molecule: SiH4
+   primitive cell:
+      1.000e+01     0.000e+00     0.000e+00
+      0.000e+00     1.000e+01     0.000e+00
+      0.000e+00     0.000e+00     1.000e+01
+   sampling size: n1 = 32, n2 = 32, n3 = 32
+   atoms and coordinates: 
+       1   Si      0.000e+00      0.000e+00      0.000e+00
+       2    H      1.610e+00      1.610e+00      1.610e+00
+       3    H     -1.610e+00     -1.610e+00      1.610e+00
+       4    H      1.610e+00     -1.610e+00     -1.610e+00
+       5    H     -1.610e+00      1.610e+00     -1.610e+00
+   number of electrons  : 8
+   spin type            : 1
+   kinetic energy cutoff: 2.500e+01
+\end{boxedverbatim}
+\caption{Displaying the attributes of the Silane molecule}
+\label{sih4display}
+\end{center}
+\end{figure}
+}
+
+Note that once the list of atoms is specified, the {\tt Molecule}
+object automatically calculates the number of valence electrons
+contained in the molecular system.  In the case of the $SiH_4$
+molecule, there are 8 valence electrons. Four of them are contributed
+by the Si atom in the 2s and 2p atomic orbitals. The four hydrogen atoms each
+contributes an electron.  Currently, KSSOLV does not distinguish 
+the spin orientations of valence electrons in molecules or solids. 
+This is indicated by the {\tt spin type} attribute in the {\tt Molecule}
+object, which is set to 1 in Figure~\ref{sih4display}.  
+What that means is that for this particular system, electrons 
+are considered in pairs, and the number of occupied states (Kohn-Sham
+wavefunctions) is half of the number of valence electrons.
+
+For systems that do not contain atoms such as electron quantum dots
+that contain electrons confined by an external potential. The number 
+of electrons {\tt nel} must be specified explicitly through a statement 
+like
+\begin{verbatim}
+   mol = set(mol,'nel',4);
+\end{verbatim}
+In this case, one may also set the {\tt spin type} to 2 by 
+\begin{verbatim}
+   mol = set(mol,'nspin',2)
+\end{verbatim}
+so that electrons will not be considered in pairs.
+%
+\section{Solving the Kohn-Sham Equations} \label{sec:solve}
+Once an {\tt Molecule} object is set up properly, computing
+the electron wavefunctions associated with the minimum total
+energy of the molecular system can be performed in KSSOLV by calling 
+one of the functions listed in Table~\ref{methodlist}.  We will
+describe these methods in detail in chapter~\ref{chap:methods}.
+%
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|c|} \hline
+ function       &   Description \\ \hline
+{\tt scf.m}     &   Self consistent field iteration \\
+{\tt chebyscf.m}&   Chebyshev filtered self consistent field iteration \\
+{\tt dcm.m}     &   direct constrained minimization (DCM) \\
+{\tt trdcm.m}   &   direct constrained minimization  \\
+                &   with flexible trust region parameters \\
+{\tt trdcm1.m}  &   direct constrained minimization  \\
+                &   with a fixed trust region parameter \\
+\hline
+\end{tabular}
+\caption{Methods developed for Solving the KS equation in KSSOLV}
+\label{methodlist}
+\end{table}
+%
+
+The simplest way to use the {\tt scf} function which contains an
+implementation of the self-consistent field (SCF) iteration 
+with charge mixing \cite{pulay:80,pulay:82,kerker} acceleration is:
+\begin{verbatim}
+>> [Etotvec, X, vtot, rho] = scf(mol);
+\end{verbatim}
+The function call takes {\tt mol} as its only input and produces the
+following outputs:
+\begin{enumerate}
+\item {\tt Etotvec} is an array of total energies computed at each SCF
+  iteration;
+\item {\tt X} is a {\tt Wavefun} object that contains the approximate
+single-particle wavefunctions returned from the SCF
+calculation. The details on the structure of the {\tt Wavefun} class
+are explained in Chapter~\ref{chap:class};
+\item {\tt vtot} is a 3D array that contains the total potential associated
+with the returned single-particle wavefunctions of the {\tt mol} object.
+\item {\tt rho} is a 3D array that contains the electron charge associate
+with the returned single-particle wavefunctions of the {\tt mol} object.
+\end{enumerate}  
+
+All functions listed in ~\ref{methodlist} allow additional options to be
+passed in through an option structure that can be defined by calling
+the function {\tt setksopt}.  
+
+Calling {\tt setksopt} without any argument simply creates an option
+structure with default parameter settings. For example,
+\begin{verbatim}
+   opts = setksopt;
+\end{verbatim}
+creates an option structure {\tt opt} that contains the following fields
+\begin{verbatim}
+   opts = 
+
+          verbose: 'on'
+       maxscfiter: 10
+       maxdcmiter: 10
+       maxinerscf: 3
+        maxcgiter: 10
+           scftol: 1.0000e-08
+           dcmtol: 1.0000e-08
+            cgtol: 1.0000e-06
+          mixtype: 'anderson'
+           mixdim: 9
+          betamix: 0.8000
+            brank: 1
+               X0: []
+             rho0: []
+\end{verbatim}
+
+Each field can be modified by simply resetting the value of the field 
+through an assignment statement. For example, to change the maximum
+number of SCF iterations allowed, we can simply use
+\begin{verbatim}
+   opts.maxscfiter = 20.
+\end{verbatim}
+This parameter can also be modified by calling {\tt setksopt} again with
+appropriate argument pairs. For example,
+\begin{verbatim}
+   opts = setksopt(opts,'maxscfiter',20);
+\end{verbatim}
+achieves the same effect.  The advantage of calling {\tt setksopt} is
+that the function checks the validity of the structure field and its
+value.
+
+More information about the options and default values for all methods listed
+in Figure~\ref{methodlist} can be found in Chapter~\ref{chap:methods}. 
+
+\section{Understanding the Output from KSSOLV}
+By default, both the SCF and the DCM methods implemented in KSSOLV
+print out a bunch of information on the screen.  A typical SCF run
+produces diagnostic output like the one shown in Figure~\ref{sih4scf}.
+After some initialization, the code uses the either the 
+LOBPCG algorithm \cite{lobpcg} to be described later in section 4 (which is
+the default) or some other subspace iteration based algorithms to solve 
+a sequence of linear eigenvalue problem. In the case of the silane molecule 
+($SiH_4$), there are 4 electron pairs. Thus 4 smallest eigenvalues of a 
+fixed Hamiltonian are approximated at each SCF iteration.  The diagnostic 
+output shows both the eigenvalue approximation and the estimated error 
+associated with these eigenvalues and their corresponding eigenvectors. 
+At the end of each SCF iteration,
+the code also prints out the total energy evaluated at the current
+wavefunction approximation, the residual error associated with 
+eigenvalue and wavefunction approximations (to the solution of 
+the Kohn-Sham equations (\ref{ev1})), and the lack of self-consistency in the
+total potential.
+
+\begin{figure}[htbp]
+\begin{center}
+\begin{boxedverbatim}
+[Etotvec, X, vtot, rho] = scf(mol);
+initialization...
+Beging SCF calculation...
+LOBPCG iter =   1
+eigval( 1) =   7.195e+00, resnrm =   3.277e+00
+eigval( 2) =   7.368e+00, resnrm =   3.347e+00
+eigval( 3) =   7.551e+00, resnrm =   3.233e+00
+eigval( 4) =   7.703e+00, resnrm =   3.239e+00
+
+LOBPCG iter =   2
+eigval( 1) =   5.097e-01, resnrm =   8.297e-01
+eigval( 2) =   6.200e-01, resnrm =   8.719e-01
+eigval( 3) =   6.912e-01, resnrm =   9.045e-01
+eigval( 4) =   9.038e-01, resnrm =   9.130e-01
+...
+SCF iter  1:
+norm(vout-vin) =  5.807e+00
+Total energy   = -5.8719608972592e+00
+ resnrm =   1.857e-02
+ resnrm =   2.161e-02
+ resnrm =   2.161e-02
+ resnrm =   2.162e-02
+...
+\end{boxedverbatim}
+\caption{SCF output}
+\label{sih4scf}
+\end{center}
+\end{figure}
+
+
+\section{Visualizing the Results}
+The electron charge density, total potential and single particle wavefunctions
+can be easily visualized using either the MATLAB's isosurface rendering
+function {\tt isosurface} or the volume rendering function written by Joe Conti, which 
+we also include in KSSOLV.  To see the isosurface of the charge density {\tt
+ rho}, one can simply type
+\begin{verbatim}
+>> isosurface(rho).
+\end{verbatim}
+
+The {\tt scf}, {\tt dcm} and {\tt trdcm} functions in KSSOLV return
+a charge density defined within the specified unit supercell even 
+though the atomic coordinates defined during the initial setup may 
+not lie within that cell.  To see the a charge density in the original 
+atomic coordinates, one may use the MATLAB {\tt fftshift} function first
+to shift density before rendering. That is, one may use
+\begin{verbatim}
+>> isosurface(fftshift(rho))
+\end{verbatim}
+to view the isosurface of the charge density.
+
+Figure~\ref{sih4rho} shows the isosurface rendering of the charge density of
+the $SiH_4$ molecule associated with the atomic positions defined in 
+Figure~\ref{sih4source} and displayed in Figure~\ref{sih41}.
+%
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{sih4_rho.png}
+\end{center}
+\caption{The computed charge density of the $SiH_4$ molecule.}
+\label{sih4rho}
+\end{figure}
+%
+Similarly, one can use
+\begin{verbatim}
+>> view(3);
+>> vol3d('cdata',fftshift(rho));
+\end{verbatim}
+to view a volume rendering of {\tt rho}.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{volsih4.png}
+\end{center}
+\caption{A volume rendering of the computed charge density of the $SiH_4$ molecule.}
+\label{sih4rhovr}
+\end{figure}
+
+\chapter{KSSOLV Classes} \label{chap:class}
+In this chapter, we will describe all classes defined in KSSOLV in 
+detail.  In particular, we will examine the structure of these classes and
+methods that can be invoked. We will also discuss overloaded operators that 
+can be used directly on objects that belong to certain classes.  
+
+In MATLAB, a user-defined class is identified by a directory whose name 
+begins with the '@' symbol.  Therefore, once KSSOLV is installed,
+one should find the following directories in KSSOLV's root directory {\tt kssolv/}:
+\begin{verbatim}
+@Atom/
+@Molecule/
+@Ham/
+@Wavefun/
+@FreqMask/
+\end{verbatim}
+
+Each @-prefixed directory contains an M-file with the same name (excluding 
+the @ symbol).  This M-file is a {\em constructor} that can be used to 
+instantiate a specific KSSOLV object that belongs to a certain class.
+The function defined in this M-file can be called without any input
+argument to create a null object that needs to be refined later by calling 
+the {\tt set} method.  For example, the following call creates a null {\tt Atom}object.
+\begin{verbatim}
+a = Atom();
+\end{verbatim}
+One may also call the constructor with one or a few arguments to initialize 
+the object when it is created.  For example, the following call creates
+an Hamiltonian associated with a predefined {\tt Molecule} object {\tt mol}
+using a predefined charge density {\tt rho}.
+\begin{verbatim}
+H = Ham(mol,rho);
+\end{verbatim}
+
+Each class contains a number of attributes specific to that class. 
+These attributes must be defined properly before an object belonging to that
+class is used.  When these attributes are not initialized upon the initial
+construction, they can be set by using the {\tt set} method defined
+for that class.  For example, if an {\tt Atom} object {\tt a} is created
+by calling the constructor with no input argument (as illustrated above),
+we can use 
+\begin{verbatim}
+a = set(a,'symbol','H'); 
+\end{verbatim}
+to specify that {\tt a} is an hydrogen atom. Here the string 'symbol' 
+is a keyword that represents the name of a specific attribute, which in
+this case refers to the chemical symbol of an atom. The user
+provided string 'H' is a value assigned to that attribute.  
+
+Note that not all attributes of an object need to be set before the
+object can be used in subsequent calculations. Setting some key attributes 
+will ensure that other attributes of the same object are properly set 
+automatically.  In fact, for an {\tt Atom} object, the only attribute
+that needs to be set is either the atomic symbol 'symbol', or the atomic 
+number 'anum'. All other attributes of the atom, which we will examine below, 
+will be defined automatically once 'anum' or 'symbol' is set.
+
+All attributes of an object can be retrieved by using the {\tt get} method
+defined for the class to which the object belongs. For example,
+\begin{verbatim}
+nvel = get(a,'vnum');
+\end{verbatim}
+retrieves the number of valence electrons in atom {\tt a}, and assigns that
+number to the variable {\tt nvel}.
+
+The essential attributes of an object can also be displayed by typing
+the name of object at the MATLAB prompt without a semicolon. 
+For example, typing 
+\begin{verbatim}
+>> a = Atom('Si')
+\end{verbatim}
+shows
+\begin{verbatim}
+atomic symbol: Si
+atomic number: 14
+number of valence electrons: 4
+\end{verbatim}
+
+\section{Atom}
+Atoms are the basic constituents of molecules and solids. Therefore, it
+is natural to define an {\tt Atom} class in KSSOLV so that we can easily 
+create atom objects and use them to construct molecules and bulk systems.
+An atom can be declared in KSSOLV as an {\tt Atom} object using an {\tt Atom} 
+constructor. For example
+\begin{verbatim}
+a = Atom('Si'); 
+\end{verbatim}
+or
+\begin{verbatim}
+a = Atom(14);
+\end{verbatim}
+defines a silicon atom object named {\tt a}.  Note that an atom can be 
+defined by either its chemical symbol or by its atomic number. An 
+atom object contains a number of attributes listed and described
+in Table~\ref{atomattr}. Most of these attributes are properly set
+once the chemical symbol or the atomic number of the atom is initialized.
+They are mainly used by KSSOLV internally to construct ionic pseudopotentials.
+
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|l|c|} \hline
+attribute name &  description          & data type  \\ \hline
+'symbol' & chemical symbol             & string  \\
+'anum'   & atomic number               & integer \\
+'venum'  & number of valence electrons & integer \\
+%'iloc'   &  xxx                        & integer \\
+%'occs'   &  xxx                        & integer \\ 
+%'occd'   &  xxx                        & integer \\
+%'iso'    &  xxx                        & integer \\ 
+%'ic'     &  xxx                        & integer \\
+%'isref'  &  xxx                        & integer \\
+%'ipref'  &  xxx                        & integer \\
+%'idref'  &  xxx                        & integer \\ 
+\hline
+\end{tabular}
+\caption{Attributes of an {\tt Atom} object }
+\label{atomattr}
+\end{table}
+
+All these attributes are accessible through the {\tt get} method defined for
+the {\tt Atom} class. However, a user would rarely need to retrieve attributes
+other than the atomic number and the number of valence electrons.
+
+\section{Molecule}
+The keyword {\tt Molecule} is used in KSSOLV broadly to refer to both
+a single molecule and a periodic (bulk) system.  The {\tt Molecule}
+class is created to encapsulate both the physical attributes of a molecule 
+and the planewave discretization parameters that must be 
+defined before the Kohn-Sham equations associated with a particular 
+{\tt Molecule} object can be solved. 
+
+To create an {\tt Molecule} object, one typically uses
+\begin{verbatim}
+mol = Molecule();
+\end{verbatim}
+to first construct an empty object called {\tt mol} (a user defined variable 
+name). This call simply sets up the required data structure that would be 
+used to describe various attributes of {\tt mol}.
+The actual attributes of {\tt mol} such as the number and type of atoms in 
+this molecule, the size and shape of the supercell that contains the molecule 
+etc. can be defined through the {\tt set} method.
+\begin{verbatim}
+mol = set(mol,attrname,attrvalue);
+\end{verbatim}
+where the input argument {\tt attrname} is a predefined string associated
+with the {\tt Molecule} class that specifies the name of a particular 
+attribute, and {\tt attrvalue} is a user supplied quantity that will 
+be stored in {\tt mol}.  Table~\ref{molattr} lists the all attributes of an 
+{\tt Molecule} object. Some of these attributes such as the name of the
+molecule and the external potential are optional. Some attributes such as 
+the number of sampling grid points {\tt n1}, {\tt n2}, {\tt n3} will be 
+properly initialized after other attributes such as {\tt ecut} are defined.
+%
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|l|l|} \hline
+attribute name &  purpose & value type  \\ \hline
+'name'      & The name of the Molecule & string \\
+'supercell'     & Bravais lattice box      & $3 \times 3$ matrix\\
+'atomlist'  & list of atoms & array of {\tt Atom} objects \\
+'xyzlist'   & list of atomic coordinates & an $n_a \times 3$ matrix \\
+'vol'       & The volume of the primary (super)cell & \\ 
+            & that contains the molecule            & float \\ 
+'natoms'    & number of atoms in the primary cell & integer \\
+'ecut'      & planewave energy cutoff & floating point scalar \\
+'n1'        & the number of sampling points along the $x$-axis & integer \\
+'n2'        & the number of sampling points along the $y$-axis & integer \\
+'n3'        & the number of sampling points along the $y$-axis & integer \\
+'nspin'     & the spin type  & 1 or 2 \\
+'nel'       & the number of valence electrons & integer \\
+'vext'      & external potential & 3D array of size $n1\times n2 \times n3$\\
+\hline
+\end{tabular}
+\caption{Attributes to be set in an {\tt Molecule} object }
+\label{molattr}
+\end{table}
+
+The datatypes associated with most of the attributes are straightforward. A
+few require further explanation.   The {\tt 'supercell'} attribute
+defines the shape and size of the unit supercell that contains 
+the basic atomic constituents of a single molecule or solid.
+In KSSOLV, the super cell is described by a $3 \times 3$ matrix. Each row of 
+this matrix defines a lattice vector emanating from the origin. For example, 
+\begin{verbatim}
+mol = set(mol,'supercell',10*eye(3));
+\end{verbatim}
+sets the unit supercell of {\tt mol} to a $10\times 10 \times 10$ cube 
+whose three basic lattice vectors are parallel to the $x$, $y$ and $z$ 
+axes respectively.  Atomic units (Bohr) are used in the definition of the 
+unit cell.
+
+The 'atomlist' attribute is defined to be an array of {\tt Atom} objects.
+An example of how to construct such an array has been shown in 
+Chapter~\ref{chap:start}.
+The coordinates associated with $n_a$ atoms listed in 'atomlist' must be
+defined in an $n_a \times 3$ array that contains the x, y, z coordinates 
+(in atomic units) for each atom. 
+
+Currently, KSSOLV makes no distinction between the wavefunctions associated 
+with electrons occupying the same orbitals. In this case, the spin type 
+is normally set to {\tt nspin=1}.
+
+However,  KSSOLV can also be used to solve the Kohn-Sham equations for 
+electron-only systems. In this case, electron wavefunctions are not 
+associated with any atoms, and they must be treated differently, which 
+indicated in KSSOLV by setting {\tt nspin} to 2.
+
+\section{Ham}
+A properly defined {\tt Molecule} object {\tt mol} can be used to 
+initialize a KS Hamiltonian.  The initialization can be done by simply 
+calling the constructor
+\begin{verbatim}
+H = Ham(mol);
+\end{verbatim}
+The constructed {\tt Ham} object should contain all information
+one would need to solve the Kohn-Sham equations. 
+Although the KS Hamiltonian $H(X)$ is treated as a matrix in 
+equation (\ref{kseq}), it is not stored as a matrix in KSSOLV. 
+Instead, the {\tt Ham} class keeps $L$, $\hat{V}_{ion}$ and total 
+potential $V_{tot} = \hat{V}_{ion} +\mbox{Diag}(L^{\dagger}\rho)+
+\mbox{Diag}(\mu_{xc}(\rho))$ 
+as separate attributes.  This separation makes it easy to update 
+the Hamiltonian in both the SCF and DCM calculations.  Table~\ref{hamattr}
+shows all other important attributes of an {\tt Ham} object.
+%
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|l|l|} \hline
+attribute name &  purpose & value type  \\ \hline
+'gkk'   & \begin{minipage}[t]{4in}
+          The magnitude square of wave numbers associated with the
+          kinetic energy that satisfy the cutoff constraint (\ref{ecut}) 
+          \end{minipage}
+        & 1D array \\
+'idxnz' & \begin{minipage}[t]{4in}
+          positions of the reciprocal lattice points associated with 
+          all entries of {\tt gkk} within a 3D array 
+          \end{minipage}
+        & 1D array \\
+'vtot'  & total local potential & 3D array \\
+'vion' & local ionic pseudopotential in real space & 3D array \\
+'wqmat'& Fourier representation of the non-local pseudopotential 
+       & \begin{minipage}[t]{.6in} 2D array (matrix)\end{minipage} \\
+'vext' & external potential & 3D array \\ 
+'vnp'  & charge dependent portion of the potential & 3D array \\
+\hline
+\end{tabular}
+\caption{Attributes to be set in an {\tt Molecule} object }
+\label{hamattr}
+\end{table}
+
+The kinetic component of a {\tt Ham} object is represented and stored 
+as a 1D array ({\tt gkk}) of integers that represent the magnitude squares 
+of the wave numbers that satisfy the energy cutoff constraint (\ref{ecut}). 
+These values correspond to the eigenvalues of a Laplacian 
+operator (with periodic boundary conditions) sampled in the reciprocal
+(frequency) space. Only wave numbers (or frequencies)
+that satisfy the kinetic energy cutoff set in {\tt mol} are stored.
+There numbers correspond to reciprocal space lattice points that lie 
+within a sphere with a radius of $\sqrt{2E_{cut}}$.
+The locations of these lattice points in a 3D array of all lattice
+points (including those outside of the cutoff sphere) are kept 
+in a separate array {\tt idxnz} so that wave numbers associated with
+reciprocal space lattice points outside of the kinetic energy cutoff sphere
+are not used or stored.
+
+The local ionic potential $\hat{V}_{ion}$ is also constructed and stored 
+as a 3D array at initialization.  The construction process involves
+loading the atomic pseudopotential stored in the directory {\tt Pseudopot} 
+and summing them up using the scheme suggested by Kleinman and Bylander 
+\cite{kbpseudo}.  KSSOLV provides Troullier-Martins \cite{tmpseudo} atomic 
+pseudopotentials associated with all atoms listed in the first four
+rows of the periodic table. Some elements in higher row of the
+table are also provided.
+
+The determination of both the Hartree and exchange correlation
+potential requires the availability of the charge density $\rho$
+which is in turn a function of the wavefunctions to be computed.
+Since a good approximation to the desired wavefunctions is not available
+at initiation, the initial $\rho$ is computed in KSSOLV by combining
+atomic charge densities associated with each atom in the {\tt mol}
+object \cite{kbpseudo}.
+
+Once a {\tt Ham} object has been defined, one can retrieve various
+attributes of the object through the {\tt get} function, e.g.,
+\begin{verbatim}
+vt = get(H,'vtot');
+\end{verbatim}
+returns the total potential from a {\tt Ham} object named {\tt H}
+and assigns it to a user defined variable {\tt vt}. This potential
+can be used and updated in a subsequent SCF or DCM calculation. An updated
+{\tt vt} can be passed into {\tt H} by using the {\tt set} function
+\begin{verbatim}
+H = set(H,'vtot',vt);
+\end{verbatim}
+
+\section{Wavefun}
+We created a special class {\tt Wavefun} in KSSOLV to specify one
+or a set of wavefunctions rather than representing them by a MATLAB vector
+or matrix.  The rationale for creating such a class is mainly
+to reduce the amount of codes a user would have to write to 
+reshape a 3D array (which is the data structure required for a 3D FFT call)
+into a 1D vector (which is the most convenient data structure
+for linear algebra operations) and vice versa.  Representing 
+a wavefunction as a {\tt Wavefun} object also makes it easy to 
+perform the multiplication of a KS Hamiltonian with a wavefunction
+and basic linear algebra operations between  wavefunctions
+through operator overloading.  
+
+In KSSOLV, a {\tt Wavefun} object stores the Fourier coefficients
+of one or several wavefunctions that are expanded in a planewave 
+basis defined by (\ref{fexpand}).  The object can be constructed 
+using either a noncompact scheme or a compact scheme.  In a noncompact 
+representation, a {\tt Wavefun} object {\tt X} can be constructed 
+through the command
+\begin{verbatim}
+X = Wavefun(psi),
+\end{verbatim}
+where {\tt psi} is a MATLAB 3D array if {\tt X} represents a single
+wavefunction, or a cell array that contains a list of 3D arrays if
+{\tt X} represents a set of wavefunctions.
+
+Under the compact scheme, a {\tt Wavefun} object stores 
+only the Fourier coefficients ($c_{i,j}$) of a truncated expansion of
+a single wavefunction $\psi(r)$ or a set of wavefunctions 
+$\{\psi_i(r)\}_{i=1}^{n_e}$.  These coefficients are associated with wave 
+numbers ($g_j$) that satisfy the cutoff constraint (\ref{ecut}), and stored 
+contiguously as a MATLAB cell array of size $n_g$ by {\tt nocc}, 
+where $n_g$ is the number of these Fourier expansion coefficients, 
+and {\tt nocc} is the number of occupied states (electron pairs).  
+All other Fourier coefficients that may appear in a full planewave 
+expansion are considered zeros, thus never used or stored.  
+Storing the nonzero Fourier expansion coefficients contiguously in 
+a 1D array makes linear algebra operations on {\tt X} more efficient. 
+However, to perform 3D FFT operations on {\tt X}, we must place these 
+coefficients in a 3D array. Hence, in the compact scheme, we must also 
+record the locations of these Fourier coefficients in a 3D array, 
+which are the locations of the reciprocal lattice points associated with 
+the corresponding wave numbers in the planewave basis.  These locations 
+are stored in a separate array which is labeled as the '{\tt idxnz}' 
+attribute of the {\tt Wavefun} object.  Recall that the same strategy 
+is used to store the magnitude squares of the wave numbers and their 
+locations in a 3D array for the {\tt Ham} object.  In signal processing, 
+functions that are expanded by planewaves up to certain frequency or wave 
+number are called {\em bandlimited} functions.  
+
+The size of the 3D array that is used to hold the Fourier coefficients
+when an FFT is performed is specified by the '{\tt n1}', '{\tt n2}' and 
+'{\tt n3}' attributes of the {\tt Wavefun} object.  These numbers also 
+give the dimension of the corresponding wavefunction in real space.  
+They should be the same as those specified in a {\tt mol} object.
+
+The constructor for a {\tt Wavefun} object can be called in a number of
+ways.  In addition to creating a null object by using,
+\begin{verbatim}
+X = Wavefun();
+\end{verbatim}
+we may also create a null object of certain size by using
+\begin{verbatim}
+X = Wavefun(n1,n2,n3);
+\end{verbatim}
+where {\tt n1}, {\tt n2} and {\tt n3} are predefined integers.
+The following use of the constructor creates a {\tt Wavefun} object
+using a noncompact scheme.
+\begin{verbatim}
+X = Wavefun(Q);
+\end{verbatim}
+where {\tt Q} is either a 3D array or a cell array that contains a
+number of 3D arrays. These 3D arrays should contain the Fourier 
+expansion coefficients of one or several wavefunctions.
+
+Finally, a fixed size Wavefun object in compact scheme can be constructed by
+using
+\begin{verbatim}
+X = Wavefun(Q,n1,n2,n3,idxnz);
+\end{verbatim}
+where $Q$ is a 1D array that stores the Fourier expansion coefficients
+continuously and {\tt idxnz} is a 1D array that describes the locations
+of these coefficients in a 3D array of size $n1 \times n2 \times n3$.
+
+In the following section, we will see that all major matrix operations 
+have been overloaded for {\tt Wavefun} objects for both the compact and
+noncompact schemes.  KSSOLV also provides a utility function {\tt genX0}
+that allows one to easily construct initial {\tt Wavefun} objects for the 
+SCF or DCM calculations. To generate a set of random bandlimited 
+wavefunctions using the kinetic energy cutoff specified in a 
+{\tt Molecule} object {\tt mol}, one can simply use the command
+\begin{verbatim}
+X = genX0(mol).
+\end{verbatim}
+
+Converting a {\tt Wavefun} object {\tt X} to a 3D array (or a list of 3D
+arrays) is straightforward when {\tt X} is constructed using a noncompact 
+scheme. The following command
+\begin{verbatim}
+X3D = get(X,'psi')
+\end{verbatim}
+returns the wavefunctions as a cell array {\tt X3D} of 3D arrays. 
+Although rarely needed when using KSSOLV, the following lines of codes show
+how the same conversion can be accomplished for an {\tt X} constructed
+using a compact representation scheme
+\begin{verbatim}
+n1  = get(X,'n1');
+n2  = get(X,'n2');
+n3  = get(X,'n3');
+psi = get(X,'psi');
+idx = get(X,'idxnz');
+X3D = zeros(n1,n2,n3);
+X3D(idx) = psi{1}.
+\end{verbatim}
+
+\section{FreqMask}
+The {\tt FreqMask} class is created to define an object
+that stores the wave numbers (frequencies) that appear
+in (\ref{fexpand}) and their magnitudes. The three components of 
+each wave number $g_j$ are stored in three separate arrays {\tt gkx}, 
+{\tt gky} and {\tt gkz}.  These arrays are attributes of a 
+{\tt FreqMask}.  They are used in the pseudopotential calculation
+({\tt getvion.m}, {\tt getwq.m}) and a number of other KSSOLV functions.
+Only the wave numbers that satisfy the energy cutoff criterion 
+(\ref{ecut}) are defined and stored when a {\tt FreqMask} object
+is constructed.  The number of wave numbers that satisfy (\ref{ecut}) 
+is stored as the attribute {\tt ng}.
+
+A {\tt FreqMask} object can be constructed by calling
+\begin{verbatim}
+   gm = FreqMask(mol).
+\end{verbatim}
+In this case, the energy cutoff defined in the {\tt Molecule} object
+{\tt mol} is used to determine which wave numbers should be set 
+in {\tt gkx}, {\tt gky} and {\tt gkz}. The constructor
+of the object also calculates and stores the magnitude square of 
+each Fourier expansion coefficient that satisfies (\ref{ecut}) 
+in an separate array {\tt gkk}.  Because such a quantity is used 
+frequently in the numerical procedure for solving the Kohn-Sham 
+equations we store it in a {\tt FreqMask} object instead of computing 
+it repeatedly from {\tt gkx}, {\tt gky} and {\tt gkz} each time
+it is used.
+
+Alternatively, one can pass in a different energy cutoff and 
+create a {\tt FreqMask} object by using
+\begin{verbatim}
+   gm = FreqMask(mol,ec),
+\end{verbatim}
+where {\tt ec} is a user provide energy cutoff value.
+
+\section{Operator Overloading}
+Because the Kohn-Sham Hamiltonian $H(X)$ and wavefunction $X$ are viewed
+as matrices in the algorithms to be described in the next chapter, 
+it is desirable to allow {\tt Hamilt} and {\tt Wavefun} objects to be 
+manipulated in KSSOLV as if they are matrices.  This feature is made possible
+in KSSOLV by overloading some basic algebraic operations for
+a {\tt Wavefun} object. These overloaded operations are listed in 
+Table~\ref{wvops}.  One should be careful about the use of 
+some of these operators. For example, since the wavefunctions used in the SCF
+and DCM calculation all have the same dimension, the multiplication
+operator {\tt *} is never used between two {\tt Wavefun}
+objects except when the first {\tt Wavefun} object is transposed
+or conjugate transposed, i.e., it is valid to perform {\tt x'*y}
+or {\tt x.'*y}, and the multiplication returns a standard MATLAB
+matrix object.  The overloaded multiplication operator {\tt *} for 
+{\tt Wavefun} objects allows the second operand to be a standard matrix 
+object with proper dimension. The result of the multiplication is a 
+{\tt Wavefun} object.
+%
+\begin{table}[htbp]
+\center
+\begin{tabular}{|l|l|} \hline
+Operations     &  Description \\ \hline
+{\tt x + y}    & Add two wavefunctions \\
+{\tt x - y}    & Subtract one wavefunction from another \\
+{\tt x * y}    & Multiply two wavefunctions and return a matrix\\
+{\tt x * a}    & Multiply several wavefunctions with a matrix\\
+{\tt x .* y}   & Element-wise multiplication of two wavefunctions\\
+{\tt x .\ y}   & Element-wise division of two wavefunctions\\
+{\tt x'}       & Complex conjugate transpose of a wavefunction\\
+{\tt x.'}      & Transpose of a wavefunction\\
+{\tt [x y]}    & Horizontal concatenation of several wavefunctions\\
+{\tt x(:,i:j)} & Subscripted reference of wavefunctions\\
+\hline
+\end{tabular}
+\caption{Overload operations for {\tt Wavefun} objects in KSSOLV}
+\label{wvops}
+\end{table}
+
+The multiplication operator is also overloaded for the {\tt Hamilt} class
+so that the multiplication of a {\tt Hamilt} object {\tt H} and 
+a {\tt Wavefun} object {\tt X} can be accomplished in KSSOLV
+by a simple expression
+\begin{verbatim}
+Y = H*X,
+\end{verbatim}
+which hides all the complexity of the operation from
+the user.
+
+
+\chapter{KSSOLV Methods} \label{chap:methods}
+In this chapter, we will briefly describe the numerical methods employed in
+KSSOLV to obtain an approximate solution to the Kohn-Sham equations 
+(\ref{ev1}).  We begin by discussing the planewave
+discretization scheme that turns the continuous nonlinear problem 
+into a finite dimensional problem.  The finite dimensional problem 
+is expressed as a matrix nonlinear eigenvalue problem.  We present 
+two different approaches to solving the matrix nonlinear eigenvalue problem 
+in sections~\ref{sec:scf} and \ref{sec:dcm}. 
+
+\section{Planewave Discretization}\label{sec:pwdiscretize}
+To solve the minimization problem (\ref{ksmin}) or the Kohn-Sham equation 
+(\ref{ev1}) numerically, we must first discretize the continuous problem.
+Standard discretization schemes such as finite difference,
+finite elements and other basis expansion (Ritz-Galerkin) methods 
+\cite{ritz} all have been used in practice.  The discretization scheme we have 
+implemented in the current version of KSSOLV is a Ritz type of method that 
+expresses a single electron wavefunction $\psi(r)$ as a linear combination 
+of planewaves $\{e^{-ig_j^Tr}\}$, where $g_j \in \mathbb{R}^3$ ($j =
+1,2,...,K$) are wave numbers (frequency vectors) arranged in a 
+lexicographical order.  
+The planewave basis is a natural choice for studying periodic systems such 
+as solids.  It can also be applied to non-periodic structures (e.g., molecules)
+by embedding these structures in a ficticious supercell \cite{payne:92} that 
+is periodically extended throughout an open domain.  The use of the planewave 
+basis has the additional advantage of making various energy calculations in 
+density functional theory easy to implement.  It is the most convenient 
+choice for developing and testing numerical algorithms for solving 
+the Kohn-Sham equations within the MATLAB environment, partly due to the 
+availability of efficient fast Fourier transform (FFT) functions. 
+
+It is natural to assume that the potential for $R$-periodic atomistic
+systems is a periodic function with a period $R \equiv (R_1, R_2, R_3)$.  
+Consequently, we can
+restrict ourselves to one canonical period often referred to as the primitive
+cell and impose periodic boundary condition on the restricted problem. It
+follows from the {\em Bloch}'s theorem \cite{am:76,bloch} that eigenfunctions of the 
+restricted problem $\psi(r)$ can be periodically extended to the entire domain 
+(to form the eigenfunction of the original Hamiltonian) by using the following formula:
+\begin{equation}
+\psi(r+R) = e^{i k^T R} \psi(r),
+\label{rperiod}
+\end{equation}
+where $k=(k_1,k_2,k_3)$ is a frequency or wave vector that belongs to a primitive cell 
+in the reciprocal space (e.g., the first {\em Brillouin} zone \cite{am:76}). 
+If the $R$-periodic system spans the entire infinite open domain, the set of 
+$k$'s allowed in (\ref{rperiod}) forms a continuum in the first Brillouin zone. 
+That is, each 
+$\psi(r)$ generates an infinite number of eigenfunctions for the periodic 
+structure.  It can be shown that the corresponding eigenvalues form a
+continuous cluster in the spectrum of the original Hamiltonian \cite{am:76}. 
+Such a cluster is often referred to as an energy band in physics.  
+Consequently, the complete set of eigenvectors of $H$ can be indexed by the band
+number $i$ and the Brillouin frequency vector $k$ (often referred to as a
+$k$-point), i.e., $\psi_{i,k}$. 
+In this case, the evaluation of the charge density must first be
+performed at each $k$-point by replacing $\psi_i(r)$ in
+(\ref{chargeden}) with $\psi_{i,k}$ to yield
+\[
+\rho_k = \sum_{i=1}^{n_e}| \psi_{i,k}|^2.
+\]
+The total charge density $\rho(r)$ can then be obtained by integrating over $k$, i.e.,
+\begin{equation}
+\rho(r) = \frac{|\Omega|}{(2\pi)^3}\int_{BZ} \rho_k(r) dk,
+\label{rhointk}
+\end{equation}
+where $|\Omega|$ denotes the volume of the primitive cell in the first
+Brillouin zone.   Furthermore, an integration with respect to $k$ must also 
+be performed for the kinetic energy term in (\ref{ksetot}). 
+
+When the primitive cell (or supercell) in real space is sufficiently large,
+the first Brillouin zone becomes so small that the integration 
+with respect to $k$ can be approximated by a single $k$-point calculation
+in (\ref{rhointk}).
+
+To simplify our exposition, we will, from this point on, assume that a 
+large primitive cell is chosen in the real space so that no integration with
+respect to $k$ is necessary. Hence we will drop the index $k$ in 
+the following discussion and use $\psi(r)$ to represent an $R$-periodic
+single particle wavefunction. The periodic nature of $\psi(r)$ implies that
+it can be represented (under some mild assumptions) by a Fourier series, i.e.,
+\begin{equation}
+\psi(r) = \sum_{j=-\infty}^{\infty} c_{j} e^{i g_j^T r},
+\label{fseries}
+\end{equation}
+where $c_{j}$ is a Fourier coefficient that can be computed from
+\[
+c_{j} = \int_{-R/2}^{R/2} \psi(r) e^{-i g_j^T r} dr.
+\]
+
+In practice, the exact number of terms used in (\ref{fseries}) is determined
+by a kinetic energy cutoff $E_{cut}$. Such a cutoff yields an approximation
+\begin{equation}
+\psi(r) = \sum_{j=1}^{n_g} c_{j} e^{i g_j^T r}, 
+\label{fsumJ}
+\end{equation}
+where $n_g$ is chosen such that 
+\begin{equation}
+||g_j ||^2 < 2 E_{cut},
+\label{ecutoff}
+\end{equation}
+for all $j = 1,2, \ldots , n_g$.   
+%JCM: Need to check this statement
+Although, the value of $n_g$ will depend on many parameters such as the size and type of the system being studied, it is typically an order of magnitude smaller than $n=n_1 \times n_2 \times n_3$. 
+
+Once $E_{cut}$ is chosen, the minimal number of samples of $r$ along each 
+Cartesian coordinate direction ($n_1$, $n_2$, $n_3$) required
+to represent $\psi(r)$ (without the aliasing effect) can be determined from 
+the sampling theorem \cite{nyquist}. That is, we must choose $n_k$ ($k=1,2,3$) 
+sufficiently large so that
+\begin{equation}
+\frac{1}{2}\biggl(\frac{2\pi n_k}{R_k} \biggr) > 2 \sqrt{2E_{cut}}, \label{ecut2}
+\end{equation}
+is satisfied, i.e., $n_k$ must satisfy 
+$n_k > 2R_k \sqrt{2E_{cut}} / \pi$.
+
+We will denote the uniformly sampled $\psi(r)$ by a vector 
+$x \in \mathbb{R}^n$, where $n = n_1n_2n_3$ and the Fourier coefficients $c_{j}$ 
+in (\ref{fsumJ}) by a vector $c \in \mathbb{C}^{n}$ with zero paddings 
+used to ensure the length of $c$ matches that of $x$. If the elements
+of $x$ and $c$ are ordered properly, these two vectors satisfy
+\begin{equation}
+c = F x.  \label{x2c}
+\end{equation}
+where $F \in \mathbb{C}^{n \times n}$ is a discrete Fourier transform 
+matrix \cite{vanloanbook}.
+
+After a sampling grid has been properly defined, the approximation
+to the total energy can be evaluated by replacing the integrals
+in (\ref{ksetot}) with simple summations over the 
+sampling grid.
+
+\section{Pseudopotentials}\label{sec:pseudopot}
+To solve the Kohn-Sham equations numerically, the Fourier series expansion
+(\ref{fseries}) must be truncated to allow a finite number of terms only. If all
+electrons are treated equally, the number of terms required in (\ref{fseries}) 
+will be extremely large.  This is due to the observation that the strong 
+interaction between a nucleus and the inner electrons of an atom, which
+can be attributed to the presence of singularity in $V_{ion}(r)$ at the 
+the nuclei position $\hat{r}_j$, must be accounted for by high frequency 
+planewaves. However, because the inner
+electrons are held tightly to the nuclei, they are not active in terms of
+chemical reactions, and they usually do not contribute to chemical bonding or 
+other types of interaction among different atoms.  On the other hand, the 
+valence electrons (electrons in atomic orbits that are not 
+completely filled) can be represented by a relatively small number of 
+low frequency planewaves. These electrons are the most interesting ones to 
+study because they are responsible for a majority of the physical properties 
+of the atomistic system. Hence, it is natural to focus only on these valence 
+electrons and treat the inner electrons as part of an ionic core. An 
+approximation scheme that formalizes this approach is called the 
+{\em pseudo-potential} approximation \cite{phillips58,pk59,yincohen82}.
+The details of pseudopotential construction and their theoretical properties
+are beyond the scope of this user's guide.  The user should just keep in 
+mind that the use of pseudo-potentials allows us to
+\begin{enumerate}
+\item remove the singularity in $V_{ion}$;
+\item reduce the number of electrons $n_e$ in (\ref{ksetot}) and 
+      (\ref{chargeden}) to the number of valence electrons;
+\item represent the wavefunction associated with a valence electron
+      by a small number of low frequency planewaves.
+\end{enumerate}
+
+In KSSOLV, the ionic pseudopotential experienced by each single particle
+wavefunction is constructed from atomic pseudopotentials that have been
+previously constructed and stored in the {\tt Pseudopot} directory.  After
+a {\tt Molecule} object {\tt mol} has been properly created, the user
+can simply call 
+\begin{verbatim}
+pseudovar = pseudoinit(mol)
+\end{verbatim}
+which returns a MATLAB structure {\tt pseudovar} (user defined
+variable name).  The {\tt pseudovar} contains various pieces of information
+required by KSSOLV to construct the ionic pseudopotential.  In most
+cases, a user does not need know what is stored in {\tt pseudovar}. 
+
+The ionic pseudopotential consists of two components.  One of them
+is a local component $V_{local}(r)$ that operates pointwise on a single
+particle wavefunction $\psi(r)$. The other component is nonlocal. It
+is a projection operator that can be represented as
+\[
+V_{nonlocal}(r) = \frac{1}{\Delta}\sum_{i=1}^{\ell} w_i(r) w_i(r)^{\ast},
+\]
+where $\Delta$ is a normalization factor, and the rank of the 
+projection operator $\ell$ is the total number of quantum number
+triplets $(n,l,m)$ associated with all atoms in the system, where
+$n$ is the major electron shell number of and $(l,m)$ represent a
+angular momentum. 
+
+In KSSOLV, the local ionic potential can be obtained by calling
+function {\tt getvion}, i.e.
+\begin{verbatim}
+vlocal = getvion(pseudovar),
+\end{verbatim}
+where {\tt vlocal} is a 3D array that contains the potential define
+at each real space sampling grid points.  
+
+The nonlocal potential can be computed by calling the function
+{\tt getwq}, i.e.
+\begin{verbatim}
+wqmat = getwq(pseudovar),
+\end{verbatim}
+where {\tt wq} is a $n_g$ by $\ell$ matrix and $n_g$ is the number of
+planewave basis used to represent each single particle wavefunction. 
+
+Both {\tt vlocal} and {\tt wqmat} are computed when a {\tt Ham} object
+is constructed initially using
+\begin{verbatim}
+H = Ham(mol);
+\end{verbatim}
+for some properly defined {\tt Molecule} object {\tt mol}.  These arrays
+are saved as different attributes of {\tt H}.
+
+\section{The finite dimensional Kohn-Sham problem}
+If we let $X \equiv (x_1, x_2, ..., x_{n_e}) \in \mathbb{C}^{n\times n_e}$
+be a matrix that contains $n_e$ discretized wavefunctions, the approximation 
+to the kinetic energy (\ref{ksetot}) can also be expressed by
+\begin{equation}
+\hat{E}_{kin} = \frac{1}{2}\mbox{trace}(X^{\ast} LX),
+\label{ltrace}
+\end{equation}
+where $L$ is a finite-dimensional representation of the Laplacian operator
+in the planewave basis.  Due to the periodic boundary condition imposed 
+in our problem, $L$ is a block circulant matrix with circulant blocks that 
+can be decomposed as
+\begin{equation}
+L = F^{\ast} D_g F,  \label{fdf}
+\end{equation}
+where $F$ is the discrete Fourier transform matrix used in (\ref{x2c}),
+and $D_g$ is a diagonal matrix with $|| g_j || ^2$ on the diagonal 
+\cite{pjdavis}. It follows from (\ref{x2c}) and (\ref{fdf}) that the 
+kinetic energy term (\ref{ltrace} can be evaluated alternatively as
+\[
+\frac{1}{2}\sum_{\ell=1}^{n_e} \sum_{j=1}^{n_g} ||g_{j} c_j^{(\ell)}||^2.
+\]
+
+In the planewave basis, the convolution that appears in the third term 
+of (\ref{ksetot}) may be viewed as the $L^{-1}\rho(X)$, where
+$\rho(X) = \mbox{diag}(XX^{\ast})$. (To simplify notation, we will drop 
+$X$ in $\rho(X)$ in the following.)  However, since 
+$L$ is singular (due to the periodic boundary condition), its inverse 
+does not exist.  Similar singularity issues appear in the planewave 
+representation of the pseudopotential and the calculation
+of the ion-ion interaction energy.  However, it can be shown that the 
+net effects of these singularities cancel out for a system that 
+is electrically neutral \cite{Ihm,pickett}.  Thus, one can
+simply remove these singularities by replacing 
+$L^{-1}\rho$ with $L^{\dagger}\rho$, where $L^{\dagger}$
+is the pseudo-inverse of $L$ defined as
+\[
+L^{\dagger} = F^{\ast} D^{\dagger}_g F,
+\]
+where $D^{\dagger}_g$ is a diagonal matrix whose diagonal entries ($d_j$) are
+\[
+d_j = \left\{
+\begin{array}{cc}
+||g_j||^{-2} & \mbox{if} \ \ g_j \neq 0;  \\   
+0         & \mbox{otherwise}.
+\end{array}
+\right.
+\]
+Consequently, the third term in (\ref{ksetot}), which corresponds
+to an approximation to the Coulomb potential, can be evaluated as 
+\[
+\hat{E}_{coul} = \rho^T L^{\dagger}\rho
+= [F\rho]^{\ast} D^{\dagger}_g [F \rho].
+\]
+However, removing these singularities results 
+in a constant shift of the total energy, for which a compensation must be made.  
+It has been shown in \cite{Ihm} that this compensation can be
+calculated by adding a term $E_{\mbox{{\tiny rep}}}$ that 
+measures the degree of repulsiveness of the local pseudopotential
+with a term that corresponds to the nonsingular part of ion-ion potential 
+energy.  Because the second term can be evaluated efficiently by using a 
+technique originally developed by Ewald \cite{ewald}, it is denoted by 
+$E_{\mbox{{\tiny Ewald}}}$.  Both $E_{\mbox{{\tiny rep}}}$ and 
+$E_{\mbox{{\tiny Ewald}}}$ can be computed 
+once and for all in a DFT calculation.  We will not go into further details 
+of how they are computed since they do not play any role in the algorithms 
+we will examine in this section. In KSSOLV, the $E_{\mbox{{\tiny Ewald}}}$ 
+calculation is performed in the function {\tt getEwald.m} and 
+$E_{\mbox{{\tiny rep}}}$ is calculated in the function {\tt getealpht.m}
+Both functions are call once at the beginning of {\tt scf.m}, {\tt dcm.m},
+{\tt trdcm.m} etc.
+
+To summarize, the use of a planewave basis allows us to define
+a finite-dimensional approximation to the total energy functional 
+(\ref{ksetot}) as 
+\begin{equation}
+\hEtot(X) = \mbox{trace}[X^{\ast}(\frac{1}{2}L + \hat{V}_{ion}) X]
++\frac{1}{2}\rho^T L^{\dagger}\rho + \rho^T \epsilon_{xc}(\rho)
++ E_{\mbox{\tiny Ewald}} + E_{\mbox{\tiny rep}},
+\label{fetot}
+\end{equation}
+where $\hat{V}_{ion}$ denotes the ionic pseudopotentials sampled on 
+the suitably chosen Cartesian grid of size $n_1 \times n_2 \times n_3$.
+
+It is easy to verify that the KKT condition associated with the 
+constrained minimization problem
+\begin{equation}
+\min_{X^{\ast}X=I} \hEtot (X)
+\label{minetot}
+\end{equation}
+is
+\begin{eqnarray}
+H(X) X - X \Lambda_{n_e} &=& 0, \label{kseq} \\
+X^{\ast} X &=& I, \nonumber
+\end{eqnarray}
+where 
+\begin{equation}
+H(X) = L + \hat{V}_{ion} + \mbox{Diag}(L^{\dagger}\rho) + 
+\mbox{Diag}(\mu_{xc}(\rho)),
+\label{kshamat}
+\end{equation}
+$\mu_{xc}(\rho) = d \epsilon_{xc}(\rho) / d \rho$,
+and $\Lambda_{n_e}$ is a $n_e \times n_e$ symmetric matrix of 
+Lagrangian multipliers.  Because $\hEtot(X) = \hEtot(XQ)$
+for any orthogonal matrix $Q \in \mathbb{C}^{n_e \times n_e}$, we
+can always choose a particular $Q$ such that $\Lambda_{n_e}$ is
+diagonal.  In this case, $\Lambda_{n_e}$ contains $n_e$ eigenvalues
+of $H(X)$.  We are interested the $n_e$ smallest eigenvalues and 
+the invariant subspace $X$ associated with these eigenvalues.
+Because the Hamiltonian matrix $H$ depends on the invariant subspace
+to be computed, (\ref{kseq}) is often called a nonlinear 
+eigenvalue problem.
+
+\section{SCF}\label{sec:scf}
+Currently, the most widely used algorithm for solving
+(\ref{kseq}) is the self-consistent field (SCF) iteration which 
+we outline in Figure \ref{algscf} for completeness.
+%
+\begin{figure}[h!]
+\begin{center}
+\fbox{ \parbox{4.8in}{
+\vspace*{.1in}
+{SCF Iteration}\\
+\\
+\begin{tabular}{p{0.5in}p{4.0in}}
+{\bf Input}:  & An initial guess of the wavefunction 
+                $X^{(0)} \in \mathbb{C}^{n \times n_e}$, 
+                pseudopotential; \\
+{\bf Output}: & $X \in \mathbb{C}^{n \times n_e}$ such that 
+                $X^{\ast} X = I_{n_e}$
+                and columns of $X$ spans the invariant subspace
+                associated with the smallest $n_e$ eigenvalues of $H(X)$
+                defined in (\ref{kshamat}). \\
+\\
+{\bf \small 1.} & for $i = 1, 2$, ... until convergence\\
+{\bf \small 2.} & \hspace*{0.2cm} Form $\Hi = H(X^{(i-1)})$;\\
+{\bf \small 3.} & \hspace*{0.2cm} Compute $X^{(i)}$ such that
+                  $\Hi X^{(i)} = X^{(i)} \Lambda^{(i)}$, and
+                  $\Lambda^{(i)}$ \\
+                & \hspace*{0.2cm} contains the $n_e$ smallest eigenvalues
+                  of $\Hi$; \\
+{\bf \small 4.}& end for \\
+\end{tabular} \\
+}}
+\end{center}
+\caption{The SCF iteration} \label{algscf}
+\end{figure}
+
+In \cite{trdcm}, we viewed the SCF iteration as an indirect way to minimize
+$\hat{E}_{total}$ through the minimization of a sequence of quadratic
+surrogate functions of the form
+\begin{equation}
+q(X) = \frac{1}{2} \mbox{trace}(X^{\ast} \Hi X),
+\label{qsur}
+\end{equation}
+on the manifold $X^{\ast}X=I_{n_e}$.  This constrained minimization problem
+is solved in KSSOLV by running a small number of locally optimal
+preconditioned conjugate gradient (LOBPCG) iterations \cite{lobpcg}.
+
+Since the surrogate function share the same gradient with $\hat{E}_{total}$ at
+$X^{(i)}$, i.e.,
+\[
+\nabla \hEtot (X)_{|X=X^{(i)}} 
+= \Hi X^{(i)} = \nabla q(X)_{|X=X^{(i)}},
+\]
+moving along a descent direction associated with $q(X)$ is likely to produce a
+reduction in $\hat{E}_{total}$.  However, because gradient information
+is local, there is no guarantee that the minimizer of $q(X)$, which may 
+be far from $\exi$, will yield a lower $\hEtot$ value. This observation
+partially explains why SCF often fails to converge. It also suggests
+at least two ways to improve the convergence of SCF.
+
+\subsection{Charge mixing}
+One possible improvement is to replace the simple gradient-matching 
+surrogate $q(X)$ with another quadratic function whose minimizer is 
+more likely to yield a reduction in $\hEtot$.  In practice, this alternative 
+quadratic function is often constructed by replacing the charge density 
+$\rhoi$ in (\ref{kshamat}) with a linear combination of $m$ previously
+computed charge densities, i.e.,
+\begin{equation}
+\rho_{mix} = \sum_{j=0}^{m-1} \alpha_j \rhoin^{(i-j)}
++ \beta_j \rhout^{(i-j)}, \label{rhomix}
+\end{equation}
+where $\rhoin^{(i-j)}$ is the {\em input} charge density used
+to construct $H$ at the $i-j$th iteration, 
+$\rhout^{(i-j)}$ is the {\em output} charge density 
+obtained from 
+\begin{equation}
+\rhout^{(i-j)} = f(H(\rhoin^{(i-j)})) \label{frhout}
+\end{equation}
+and $f(H(\rhoin))$ is a function that we will discuss in the next section.
+Here, we can simply think of $f(H(\rhoin^{(i-j)}))$ as the diagonal
+part of the projection matrix $XX^{\ast}$, where columns of the $n \times n_e$
+matrix $X$ are approximations to the eigenvectors of $H(\rhoin^{(i-j)})$
+corresponding to the $n_e$ smallest eigenvalues.
+
+The coefficients $\alpha_0, \alpha_2, ..., \alpha_{i-m+1}$ and
+$\beta_0, \beta_2, ..., \beta_{i-m+1}$ in (\ref{rhomix}) are chosen 
+to reduce the lack of self consistency between the input charge
+density used to define the surrogate function and the output charge density
+defined by (\ref{frhout}).  Because $\rho_{mix}$ is a mixture of 
+previous input and output change densities, this type of 
+surrogate construction technique is often called {\em charge mixing}. 
+
+\subsubsection{Pulay mixing}
+A particular charge mixing scheme first proposed by Pulay
+for Hartree-Fock calculations \cite{pulay:80,pulay:82} 
+chooses the coefficients in (\ref{rhomix}) by solving 
+the following constrained minimization problem 
+\begin{equation}
+\min_{\rho} \| f(\rho) - \rho \|_2^2.
+\label{minrho}
+\end{equation}
+within a subspace that consists of input charge densities computed in previous
+SCF iterations.  We will derive Pulay's scheme in this section. 
+Note that in computational chemistry, Pulay mixing is referred to as 
+the method of {\em direct inversion of iterative subspace} or simply DIIS.  
+
+To derive the Pulay mixing scheme, let us assume that 
+$\rhostar$ is the exact solution to the equation
+\begin{equation}
+\rho = f(\rho). 
+\label{fixpt}
+\end{equation}
+Due to the way $f$ is defined, it is easy to show that
+$\rhostar \in  \mathbb{R}^+$ and $\|\rhostar\|_1 = n_e$.
+
+Suppose we already have a few approximations to $\rho$, say, 
+$\rho_1, \rho_2, ...,\rho_k$.  Pulay's mixing scheme seeks an optimal 
+approximation $\rho_{\mbox{opt}}$ to (\ref{minrho}) from 
+\begin{equation}
+{\mathcal S} \equiv \{ \rho | \rho = \sum_{i=1}^k\alpha_i\rho_i, \sum_{i=1}^k \alpha_i = 1\}.
+\label{subspace}
+\end{equation}
+
+It follows form the Taylor's expansion that
+\begin{eqnarray}
+f(\rhoopt) &=& f(\rhostar) + J_{\ast}(\rhoopt-\rhostar) +
+\mbox{higer order terms in } (\rhoopt - \rhostar) \\
+           &=& \rhostar + J_{\ast}(\rhoopt-\rhostar) +
+\mbox{higer order terms in } (\rhoopt - \rhostar),
+\label{taylor}
+\end{eqnarray}
+where $J_{\ast}$ is the Jacobian matrix of $f$ evaluated at $\rhostar$.
+
+If we ignore the higher order terms in (\ref{taylor}), we obtain
+\begin{equation}
+f(\rhoopt) - \rhoopt \approx \rhostar- \rhoopt+J_{\ast}(\rhoopt -\rhostar).
+\label{approx1st}
+\end{equation}
+
+Substituting $\rhoopt = \sum_i \alpha_i \rho_i$ into the right hand side of 
+(\ref{approx1st}), we obtain
+\begin{eqnarray}
+f(\rhoopt) - \rhoopt &\approx& \rhostar - \sum_{i=1}^k\alpha_i \rho_i
+-J_{\ast}\biggl[ \rhostar - \sum_{i=1}^k \alpha_i\rho_i \biggr] \nonumber\\
+&=& \sum_{i=1}^k\alpha_i (\rhostar - \rho_i) - J_{\ast} 
+\biggl[\sum_{i=1}^k \alpha_i (\rhostar-\rho_i) \biggr] \nonumber \\
+&=& \sum_{i=1}^k \alpha_i \biggl[
+(\rhostar - \rho_i) - J_{\ast} (\rhostar - \rho_i)
+\biggr].
+\label{newexpand}
+\end{eqnarray}
+
+It follow from the Taylor expansion of $f(\rho_i)$ at $\rhostar$ that
+\begin{equation}
+\Delta \rho_i \equiv f(\rho_i) - \rho_i 
+\approx \rhostar - \rho_i - J_{\ast}(\rhostar - \rho_i).
+\label{deltarho}
+\end{equation}
+
+It now follows from (\ref{newexpand}) and (\ref{deltarho}) that
+\begin{equation}
+f(\rhoopt) - \rhoopt \approx \sum_{i=1}^k \alpha_i \Delta \rho_i. \label{mixing}
+\end{equation}
+
+Therefore, with linear approximation, the best solution to (\ref{minrho})
+from the subspace ${\mathcal S}$
+can be obtained by solving the following equality constrained quadratic
+program
+\begin{equation}
+\begin{array}{cc}
+\min_{\alpha_i} & \| \sum_{i=1}^k \alpha_i \Delta \rho_i \|_2^2 \\
+\mbox{s.t.}     &  \sum_{i=1}^k \alpha_i = 1
+\end{array}
+\label{pulaymin}
+\end{equation}
+
+The solution to (\ref{pulaymin}), which can be obtained by eliminating the
+constraint and solving a standard linear least squares problem, gives the coefficients used in Pulay mixing.
+
+\subsubsection{Broyden mixing}
+Another class of charge mixing algorithms can be derived by 
+formulating the Kohn-Sham DFT problem as a system of nonlinear 
+equations that involves only the unknown electron charge density $\rho$ and 
+the chemical potential $\mu$. These equations can be 
+written as
+\begin{equation}
+F(\rho,\mu) = 
+\left(
+\begin{array}{c}
+r(\rho,\mu) \\
+\nu(\rho,\mu)
+\end{array}
+\right)
+=
+\left(
+\begin{array}{c}
+\rho - \mbox{diag}[f_{\beta,\mu}(H(\rho))] \\
+\mbox{trace}[f_{\beta,\mu}(H(\rho))] - n_e
+\end{array}
+\right) = 0,
+\label{fdeq}
+\end{equation}
+where $f_{\beta,\mu}(t)$ is the Fermi-Dirac distribution function
+\[
+  f_{\beta,\mu,}(t) = \frac{1}{1 + e^{\beta(t-\mu)}},
+\]
+$\beta$ is a fixed parameter proportional to the reciprocal of the temperature, $H$ is the Hamiltonian of the system, and $n_e$ is the number of electrons.
+
+In theory, we can solve (\ref{fdeq}) by using a standard Newton method, 
+which constructs approximations to $\rho$ and $\mu$ iteratively by
+\begin{equation}
+\left(
+\begin{array}{c}
+\rho^{(k+1)} \\
+\mu^{(k+1)}
+\end{array}
+\right)
+=
+\left(
+\begin{array}{c}
+\rho^{(k)} \\
+\mu^{(k)}
+\end{array}
+\right)
+-\hat{J}_k^{-1}
+\left(
+\begin{array}{c}
+r_k \\
+\nu_k
+\end{array}
+\right),
+\label{newtonupd}
+\end{equation}
+where $\hat{J}_k$ is the Jacobian matrix of $F(\rho,\mu)$ evaluated at
+$(\rho^{(k)},\mu^{(k)})$, $r_k\equiv r(\rho^{(k)},\mu^{(k)})$ and
+$\nu_k \equiv \nu(\rho^{(k)},\mu^{(k)})$.
+
+Because $J_k$ and its inverse are difficult to obtain in practice, 
+quasi-Newton methods that replace $J_k$ with an easy-to-evaluate 
+approximation are more appropriate.
+
+Note that once $\rhok$ is available, it is easy to find 
+$\muk$ such that the second equation in (\ref{fdeq}) is 
+satisfied, due to the monotonicity of $\nu(\rho,\mu)$ with respect to $\mu$.
+Therefore, we can effectively focus on the first equation in
+(\ref{newtonupd}), i.e.,
+\begin{equation}
+\rho^{(k+1)} = \rho^{(k)} - \tau J_k^{-1} r_k,
+\label{rhoupd}
+\end{equation}
+where $J_k^{-1}$ is the (1,1) block of $\hat{J}_k^{-1}$ and
+$\tau$ is an appropriate step length.
+
+Different approximations to $J_k$ or $J_k^{-1}$ yield
+different quasi-Newton algorithms. These approximations can be viewed as different
+{\em charge mixing} schemes for accelerating the self-consistent 
+field (SCF) iteration, and are frequently discussed in the physics 
+literature \cite{eyert,kress:cms}.  For example, 
+when $J_k^{-1} = I$, (\ref{rhoupd}) reduces to the simple mixing scheme,
+\[
+\rho^{(k+1)}=(1-\tau)\rho^{(k)} + \tau \mbox{diag}[f_{\beta,\mu}(H(\rho^{(k)}))],
+\]
+used in the SCF iteration.  
+
+More sophisticated quasi-Newton updating schemes can be devised by using 
+Broyden techniques \cite{broyden} to construct better approximations to 
+$J_k$ or $J_k^{-1}$. Such techniques yield 
+iterative procedures in which an approximation to $J_k$ or $J_k^{-1}$ is 
+obtained by performing a sequence of low-rank modifications to some initial 
+approximation using a recursive formula \cite{fangsaad,luke}. 
+
+\begin{enumerate}
+\item For example, we can construct an approximation to $J_k^{-1}$ by solving 
+the following constrained minimization problem
+\begin{align}
+\min_{C}  \hspace{.5in} &\frac{1}{2}||C - C_{k-1}||^2_F \nonumber \\
+\text{s.t } \hspace{.5in} & S_k = CY_k, \label{bmin2}
+\end{align}
+where $C_{k-1}$ is the approximation to $J^{-1}_{k-1}$, $S_k$ and 
+$Y_k$ are defined as 
+\begin{eqnarray}
+S^{(k)} &=& ( s^{(k)}\: s^{(k-1)} \: \cdots \: s^{(k-\ell)} ), \label{Sk}\\
+Y^{(k)} &=& ( y^{(k)}\: y^{(k-1)} \: \cdots \: y^{(k-\ell)} ), \label{Yk}
+\end{eqnarray}
+and
+\begin{equation}
+s^{(k)} = \rho^{(k)} - \rho^{(k-1)}, \ \ 
+y^{(k)} = r(\rho^{(k)},\mu^{(k)}) - r(\rho^{(k-1)},\mu^{(k)}). 
+\label{syk}
+\end{equation}
+The solution to (\ref{bmin2}) is
+\begin{equation}
+C_k = C_{k-1} + (S_k-C_{k-1}Y_k)Y_k^{\dagger},
+\label{bupd2}
+\end{equation}
+where $Y_k^{\dagger} = (Y_k^TY_k)^{-1}Y_k^T$ is the pseudoinverse of $Y_k$.
+
+Substituting (\ref{bupd2}) for $J_{k}^{-1}$ in (\ref{rhoupd}) 
+yields the following recursive formula for updating $\rhok$:
+\begin{equation}
+\rho^{(k+1)} = \rhok - \tau C_{k-1}r_k - \tau 
+(S_k - C_{k-1}Y_k)Y_k^{\dagger}r_k,
+\label{broy2}
+\end{equation}
+It is easy to show that when $\tau = 1$, (\ref{broy2}) is equivalent to
+\[
+\rho^{(k+1)} = \rhok
+- C_0 r_k - \sum_{j = 1}^k Y_jY_j^{\dagger} r_k + \sum_{j=1}^k S_j Y_j^{\dagger} r_k.
+\]
+
+When $\ell=0$, (\ref{broy2}) reduces to the standard Broyden's method of the 
+second type. 
+
+
+\item
+We can also construct an approximation to $J_{k-1}$ directly by solving 
+\begin{align}
+\min_{B}  \hspace{.5in} &\frac{1}{2}||B - B_{k-1}||^2_F \nonumber \\
+\text{s.t } \hspace{.5in} & BS_k = Y_k, \label{bmin1}
+\end{align}
+where $B_{k-1}$ is the approximation to $J_{k-1}$, $S_k$ and $Y_k$
+are the same as those defined in (\ref{Sk}) and (\ref{Yk}) respectively.  
+The solution to (\ref{bmin1}) yields the following updating formula for $B_k$, 
+i.e.,
+\begin{equation}
+B_k  = B_{k-1} - B_{k-1}S_k S_k^{\dagger} + Y_k S^{\dagger}.
+\end{equation}
+
+In order to obtain an approximation to $J_k^{-1}$, which is required in
+(\ref{rhoupd}), we invoke the Sherman-Morrison-Woodbury formula that yields
+\[
+C_k = C_{k-1} + (S_k - C_{k-1}Y_k)(S_k^TC_{k-1}Y_k)^{-1}S_k^TC_{k-1}.
+\]
+\end{enumerate}
+
+A number of practical issues must be addressed in the implementation
+of Broyden schemes.  These issues include
+\begin{itemize}
+\item The choice of the initial guess to $J$ or $J^{-1}$. A commonly
+used initial guess is $\sigma I$ for some $0 < \sigma < 1$. However,
+it is not clear how one should select an optimal $\sigma$.
+\item The determination of an optimal rank for the Jacobian update. 
+      The standard Broyden method performs a rank-1 update of 
+      $J_k$ or $J_k^{-1}$ at each iteration. Our preliminary experiments 
+      indicate that a multiple rank update \cite{fangsaad} is often more
+      effective. However, it is not yet clear what the optimal rank
+      should be.
+\item The choice of line search parameter $\tau$ in the Broyden
+update $\rho^{(k+1)} = \rhok - \gamma J_k^{-1} r_k$. 
+\item The choice of when to restart Broyden schemes to minimize storage requirements. 
+\end{itemize}
+
+\subsubsection{Anderson mixing}
+A special type of mixing scheme called {\em Anderson} mixing \cite{anderson} 
+can be derived from (\ref{broy2}) by simply replacing $C_{k-1}$ with
+$\sigma I$ and setting $\tau=1$. This yields the much simpler updating formula
+\begin{eqnarray*}
+\rho^{(k+1)} &=& \rhok - \sigma r_k - (S_k - \sigma Y_k)Y_k^{\dagger}r_k, \\
+&=& (\rhok - S_k g) - \sigma (r_k - Y_k g),
+\end{eqnarray*}
+where $g = Y_k^{\dagger}r_k$.
+
+%We would like to investigate these practical issues and analyze the convergence 
+%of Broyden-like iterative methods in terms of the spectral properties
+%of the Jacobian near the solution of \eqref{fdeq} and the choice of
+%various parameters discussed above.
+%
+%Another interesting question we would like to address is the accuracy 
+%required to evaluate the function
+%\begin{equation}
+%\mbox{diag}[f_{\beta,\mu}(H(\rho))], \label{fd}
+%\end{equation}
+%and its impact on the convergence rate of Broyden's method.  Our numerical experiments indicate 
+%that existing Broyden's methods often converge even 
+%when a large error is made in the function evaluation \eqref{fd} in 
+%the first few nonlinear iterations.  In many existing codes, (\ref{fd}) is often 
+%evaluated by computing the eigenvalues and eigenvectors of $H(\rho)$ using 
+%either a Lanczos algorithm \cite{lanczos} or some type of preconditioned 
+%conjugate gradient algorithm \cite{lobpcg}.  The number of iterations used 
+%in these algorithms is normally small (5 to 10 iterations) and as a result, 
+%the computed eigenvalue and eigenvectors have only a few digits 
+%of accuracy at the beginning of the nonlinear iterations. Nevertheless, 
+%the Broyden update manages to gradually improve the approximation ($\rhok$) 
+%to the solution of \eqref{fdeq}.  As $\rhok$ becomes more accurate,
+%the iterative evaluation of (\ref{fd}), which often uses the current
+%approximation $\rhok$ as the starting guess, produces more accurate results
+%in fewer iterations. A close examination of the connection between
+%the accuracy of function evaluation and the convergence rate of the 
+%Broyden scheme will allow us to develop effective strategies for
+%setting the stopping criterion used in the iterative procedures for
+%evaluating \eqref{fd}.  Furthermore, such a study will also allow us to
+%determine the accuracy required in other function evaluation methods
+%that do not compute the eigenvalue and eigenvectors of $H(\rho)$.
+%These methods include the polynomial filtering algorithm proposed in 
+%\cite{bekas05,zhou06}, the divide-and-conquer algorithm proposed in 
+%\cite{ls3df}, and the diagonal estimator \cite{bekas05} that we will 
+%discuss in the next section.  
+%
+\subsubsection{Other mixing schemes}
+Other mixing scheme include {\em Kerker mixing} \cite{kerker},
+{\em Thomas-Fermi mixing} \cite{tomfermi}. Charge mixing is often 
+quite effective in practice for improving the convergence SCF even though 
+its convergence property is still not well understood.  In some cases, 
+charge mixing may fail also.
+
+\subsubsection{Choosing a charge mixing scheme in KSSOLV}
+
+KSSOLV supports a number of charge mixing schemes. The default choice
+is the Anderson mixing scheme originally developed in \cite{anderson}
+and further analyzed in \cite{eyert,fangsaad}.  To change the default choice of 
+charge mixing, one must first construct an option structure by
+using
+\begin{verbatim}
+option = setksopt;
+\end{verbatim}
+This option structure can be modified by using, for example,
+\begin{verbatim}
+option = setksopt('mixtype','broyden');
+\end{verbatim}
+which replace the default charge mixing scheme by a Broyden mixing
+scheme \cite{luke}.
+
+
+\subsection{Trust Region}
+Another way to improve the convergence of the SCF iteration is to impose an additional constraint to
+the surrogate minimization problem (\ref{qsur}) so that the wavefunction
+update can be restricted within a small neighborhood of the gradient matching
+point $\exi$, thereby ensuring a reduction of the total energy function as we 
+minimize the surrogate function.
+In \cite{trdcm}, we showed that the following constraint
+\[
+\| XX^{\ast} - \exi {\exi}^{\ast} \|_F^2 \leq \Delta
+\]
+is preferred because it is rotationally invariant (i.e., post-multiplying $X$
+by an unitary matrix does not change the constraint), and because adding
+such a constraint does not increase the complexity of solving the surrogate 
+minimization problem.  It is not difficult to show \cite{trdcm} that that solving the
+following constrained minimization 
+\begin{equation}
+\begin{array}{c}
+\min q(X) \\
+XX^{\ast} = I \\
+\| XX^{\ast} - \exi {\exi}^{\ast} \|_F^2 \leq \Delta
+\end{array}
+\label{trsub}
+\end{equation}
+is equivalent to solving a low rank perturbed linear eigenvalue problem
+\begin{equation}
+\biggl[H(\exi) - \sigma \exi {\exi}^{\ast}\biggr] X = X \Lambda, 
+\label{shiftev}
+\end{equation}
+where $\sigma$ is essentially the Lagrange multiplier for the inequality constraint
+in (\ref{trsub}) and $\Lambda$ is a diagonal matrix that contains the $n_e$
+smallest eigenvalues of the low rank perturbed $\Hi$.
+When $\sigma$ is sufficiently large (which corresponds to a trust region
+radius $\Delta$ that is sufficiently small), the solution to (\ref{shiftev})
+is guaranteed to produce a reduction in $\hEtot(X)$.
+
+\subsection{LOBPCG for Solving Linear Eigenvalue Problems}
+As we mentioned earlier, Step 3 of the SCF iteration in which 
+one must compute approximations to desired eigenvectors of a fixed Hamiltonian 
+must is solved by the LOBPCG algorithm \cite{lobpcg}.  The algorithm
+is an iterative procedure that seeks the minimum of the quadratic
+surrogate function (\ref{qsur}) by projecting the function into 
+a sequence of low dimensional subspaces. The minimizer within each 
+subspace, which can be obtained by solving a small generalized eigenvalue
+problem produces the optimal search direction and ``step length''
+simultaneously.  We will refer users to \cite{lobpcg} for details of
+the algorithm.  We would like to point out that a user can easily 
+experiment with this algorithm in KSSOLV after a {\tt Ham} object {\tt H} has
+been properly constructed. To invoke LOBPCG, one can use
+\begin{verbatim} 
+[X,lambda,LVEC,RVEC] = lobpcg(H, X0, prec, tol, maxit),
+\end{verbatim}
+where {\tt H} is a predefined {\tt Ham} object, {\tt X0} is a
+{\tt Wavefun} object that contains the initial guess to the 
+minimizer of (\ref{qsur}), {\tt prec} is a preconditioner (which
+should be constructed as a {\tt Wavefun} object), {\tt tol} is
+the convergence tolerance a user must set, and {\tt maxit} is the
+maximum number of LOBPCG iterations allowed. Upon completion, 
+{\tt lobpcg} returns the approximation to the desired wavefunction 
+{\tt X}, the corresponding eigenvalue approximation stored in 
+the array {\tt lambda}, and residual norms ({\tt RVEC}) and 
+eigenvalues approximation ({\tt LVEC}) computed at each iteration. 
+
+\section{DCM}\label{sec:dcm}
+Instead of focusing on Kohn-Sham equations (\ref{kseq}) and minimizing
+the total energy indirectly in the SCF iteration, we can minimize the 
+total energy directly in an iterative procedure that involves
+finding a sequence of search directions along which $\hat{E}_{total}(X)$
+decreases and computing an appropriate step length. In most of the earlier 
+direct minimization methods developed in 
+\cite{arias:92,gillan:89,kress:cms,payne:92,teter:89,vh:2003,voorhis:2002}, 
+the search direction and step length computations are carried out separately.
+This separation sometimes results in slow convergence.  
+We recently developed a new direct constrained minimization (DCM) 
+algorithm \cite{dcm,trdcm} in which the search direction and
+step length are obtained simultaneously in each iteration by 
+minimizing the total energy within a subspace spanned by columns of 
+\[
+Y = \biggl( X^{(i)}, M^{-1}R^{(i)}, P^{(i-1)} \biggr),
+\]
+where $X^{(i)}$ is the approximation to $X$ obtained at the $i$th iteration,
+$\ri = \Hi \exi - \exi \Lambda^{(i)}$, $M$ is a hermitian positive definite
+preconditioner, and $\pim$ is the search direction
+obtained in the previous iteration.  It was shown in \cite{dcm} that solving
+the subspace minimization problem is equivalent to computing the 
+eigenvectors $G$ associated with the $n_e$ smallest eigenvalues of the following
+nonlinear eigenvalue problem
+\begin{equation}
+\hat{H}(G)G = BG\Omega, \ \ G^{\ast}BG = I,
+\label{projkseq}
+\end{equation}
+where 
+\begin{equation}
+\hat{H}(G) = Y^{\ast} \biggl[ \frac{1}{2}L + V_{ion}
++ \mbox{Diag}\biggl(L^{\dagger} \rho(YG)\biggr)
++ \mbox{Diag}\biggl(\mu_{xc}(\rho(YG))\biggr) \biggr] Y,
+\label{projham}
+\end{equation}
+and $B = Y^{\ast}Y$.
+
+Because the dimension of $\hat{H}(G)$ is at most $3n_e \times 3n_e$, 
+which is normally much smaller than that of $H(X)$, it is relatively
+easy to solve (\ref{projkseq}) by, for example, a trust region
+enabled SCF (TRSCF) iteration.
+We should note that it is not necessary to solve (\ref{projkseq})
+to full accuracy in the early stage of the DCM algorithm because 
+all we need is a $G$ that yields sufficient reduction in the objective
+function. 
+
+Once $G$ is obtained, we can update the wave function by
+\[
+X^{(i+1)} \leftarrow Y G.
+\]
+The search direction associated with this update is defined,
+using the MATLAB submatrix notation, to be
+\[
+P^{(i)} \equiv Y(:,n_e+1:3n_e)G(n_e+1:3n_e,:).
+\]
+A complete description of the constrained minimization algorithm
+is shown in Figure \ref{alg2}.  We should point out that solving the
+projected optimization problem in Step 7 of the algorithm
+requires us to evaluate the projected Hamiltonian $\hat{H}(G)$ 
+repeatedly as we search for the best $G$.  However, since the first
+two terms of $\hat{H}$ do not depend on $G$, they can be
+computed and stored in advance. Only the last two terms of
+(\ref{projham}) need to be updated.  These updates require
+the charge density, the Coulomb and the exchange-correlation
+potentials to be recomputed.
+%
+\begin{figure}[h!]
+\begin{center}
+\fbox{ \parbox{4.8in}{
+\vspace*{.1in}
+{{\bf Algorithm}: A Constrained Minimization Algorithm for Total Energy Minimization}\\
+\\
+\begin{tabular}{p{0.3in}p{4.0in}} 
+{\bf Input}:  & initial set of wave functions $\exz \in {\mathbb C}^{n \times n_e}$; 
+                ionic pseudopotential; a preconditioner $M$; \\
+{\bf Output}: & $X \in \mathbb{C}^{n \times k}$ such that the Kohn-Sham total
+                energy functional $E_{total}(X)$ is minimized and $X^{\ast} X = I_k$.
+\\
+{\bf \small 1.} & Orthonormalize $\exz$ such that ${\exz}^{\ast}\exz=I_k$;\\
+{\bf \small 2.} & for $i = 0, 1, 2$, ... until convergence\\
+{\bf \small 3.} & \hspace*{0.3cm} Compute $\Theta = {\exi}^{\ast} \Hi \exi$;\\
+{\bf \small 4.} & \hspace*{0.3cm} Compute $R = \Hi \exi - \exi \Theta$,\\
+{\bf \small 5.} & \hspace*{0.3cm} if ($i > 1$) then \\
+                & \hspace*{0.6cm} $Y \leftarrow (\exi, M^{-1}R, P^{(i-1)})$ \\
+                & \hspace*{0.3cm} else \\
+                & \hspace*{0.6cm} $Y \leftarrow (\exi, M^{-1}R)$; \\
+                & \hspace*{0.3cm} endif \\
+{\bf \small 6.} & \hspace*{0.3cm} $B \leftarrow Y^{\ast} Y$; \\
+{\bf \small 7.} & \hspace*{0.3cm} Find $G \in \mathbb{C}^{2n_e\times n_e} \ \
+                  \mbox{or} \ \ \mathbb{C}^{3n_e\times n_e}$ that
+                  minimizes $E_{total}(Y G)$ \\
+                & \hspace*{0.3cm} subject to the constraint $G^{\ast} B G = I_{n_e}$;\\
+{\bf \small 8.} & \hspace*{0.3cm} Set $X^{(i+1)} = Y G$; \\
+{\bf \small 9.} & \hspace*{0.3cm} if ($i>1$) then \\
+                & \hspace*{0.6cm} $P^{(i)} \leftarrow Y(:,n_e+1:3n_e)G(n_e+1:3n_e,:);$ \\
+                & \hspace*{0.3cm} else \\
+                & \hspace*{0.6cm} $P^{(i)} \leftarrow Y(:,n_e+1:2n_e)G(n_e+1:2n_e,:)$;\\
+                & \hspace*{0.3cm} endif \\
+{\bf \small 10.}& end for \\
+\end{tabular} \\
+}}
+\end{center}
+\caption{A Direct Constrained Minimization Algorithm for Total Energy Minimization}
+\label{alg2}
+\end{figure}
+
+\section{Options for SCF and DCM functions} \label{sec:option}
+KSSOLV allows one to change a number of parameters used in either
+SCF or DCM functions.  These parameters can be changed by defining
+and modifying an option structure that can be created by simply calling
+\begin{verbatim}
+options = setksopt;
+\end{verbatim}
+This call creates a structure named {\tt options} that contains
+a number of default parameters used in SCF and DCM functions. To
+see these parameters, one can simply type {\tt options} at the
+MATLAB prompt without a semicolon at the end. 
+\begin{verbatim}
+options = 
+
+       verbose: 'on'
+    maxscfiter: 10
+    maxdcmiter: 10
+    maxinerscf: 3
+     maxcgiter: 10
+        scftol: 1.0000e-08
+        dcmtol: 1.0000e-08
+         cgtol: 1.0000e-06
+       mixtype: 'anderson'
+        mixdim: 9
+       betamix: 0.8000
+         brank: 1
+            X0: []
+          rho0: []
+        degree: 10
+\end{verbatim}
+
+Each field can be modified by simply resetting the value of the field 
+through an assignment statement. For example, to change the maximum
+number of SCF iterations allowed, we can simply use
+\begin{verbatim}
+   opts.maxscfiter = 20.
+\end{verbatim}
+This parameter can also be modified by calling {\tt setksopt} again with
+appropriate argument pairs. For example,
+\begin{verbatim}
+   opts = setksopt(opts,'maxscfiter',20);
+\end{verbatim}
+achieves the same effect.  The advantage of calling {\tt setksopt} is
+that the function checks the validity of the structure field and its
+value.
+
+Table~\ref{tab:opts} lists all options that can be defined by {\tt setksopt}
+and explains what they are used for.
+
+\begin{table}[htbp]
+\center
+\begin{tabular}{|c|c|c|} \hline
+option name & allowed value & purpose \\ \hline
+
+{\tt verbose} &    'on' or 'off'  &    \begin{minipage}[t]{3in}  
+                                       display diagonostic info 
+                                       \end{minipage}\\ \hline
+{\tt maxscfiter} &  positive integer &    \begin{minipage}[t]{3in}
+                                      maximum SCF iterations allowed
+                                       \end{minipage}\\ \hline
+{\tt maxdcmiter} &  positive integer & \begin{minipage}[t]{3in}
+                                      maximum DCM iterations allowed 
+                                       \end{minipage}\\ \hline
+{\tt maxinerscf} &  positive integer &  \begin{minipage}[t]{3in}
+                                       maximum number of inner SCF 
+                                       iterations allowed in the DCM 
+                                       algorithm
+                                       \end{minipage}\\ \hline
+{\tt maxcgiter} & positive integer  &   \begin{minipage}[t]{3in}
+                                      maximum LOBPCG iterations allowed
+                                       \end{minipage}\\ \hline
+{\tt scftol} &  positive float &    \begin{minipage}[t]{3in}
+                                     convergence tolerance for SCF
+                                       \end{minipage}\\ \hline
+{\tt dcmtol} &  positive float &    \begin{minipage}[t]{3in}
+                                    convergence tolerance for DCM 
+                                       \end{minipage}\\ \hline
+{\tt cgtol}  &   positive float &    \begin{minipage}[t]{3in}
+                                    convergence tolerance for LOBPCG
+                                       \end{minipage}\\ \hline
+{\tt mixtype} &  \begin{minipage}[t]{1in}
+                   'anderson'    
+                  'broyden'
+                  'broyden1'
+                  'pulay'
+                  'kerker'
+                  'pulay+kerker'
+                \end{minipage}
+& \begin{minipage}[t]{3in} 
+  charge or potential mixing types
+  \end{minipage}\\ \hline
+{\tt mixdim} &  positive integer &  \begin{minipage}[t]{3in}
+                             maximum number of previous potentials to be mixed
+                                    \end{minipage}\\ \hline
+{\tt betamix} & positive float   &  \begin{minipage}[t]{3in}
+  The damping parameter used in Anderson and Broyden mixing
+                                    \end{minipage}\\ \hline
+{\tt brank} &  positive integer & \begin{minipage}[t]{3in}
+                              The rank of the Broyden update
+                                    \end{minipage}\\ \hline
+{\tt X0} & Wavefun object & \begin{minipage}[t]{3in}
+                         An initial guess of the wavefunctions
+                                \end{minipage}\\ \hline
+{\tt rho0} & 3-D array  & \begin{minipage}[t]{3in}
+                         An initial guess of the charge.
+                         To restart an SCF or DCM calculation
+                         using previously computed results
+                         One should pass in both the previously
+                         obtained wavefunction and charge.
+                                \end{minipage}\\ \hline
+{\tt degree} & positive integer  & \begin{minipage}[t]{3in}
+                         The degree of the Chebyshev polynomial
+                         used in chebyscf.
+                      \end{minipage}\\ \hline
+\end{tabular}
+\caption{Options that can be defined by calling {\tt setksopt}}
+\label{tab:opts}
+\end{table}
+%
+%\chapter{KSSOLV Performance} \label{chap:perf}
+%The KSSOLV toolbox includes a number of examples that users can 
+%experiment with. Each example represents a particular molecule or
+%bulk system. The system is created in a setup file.  Table~\ref{egtab}
+%shows the names of all setup files and a brief description for each
+%one of them. It also shows the number of occupied states ({\tt nocc})
+%which is simply the number of electron pairs for most systems
+%(with the exception of the quantum dot example in which electrons are 
+%not paired by their spin orientations).
+%To create a new system, a user can simply take one of the
+%existing setup files and modify the construction of the {\tt Molecule}
+%object. A user can also change of the size of the supercell or
+%the kinetic energy cutoff of the existing setup file to examine
+%changes in the convergence of the numerical method or
+%the quality of the computed solution.
+%%
+%
+%Table~\ref{egcompare} shows that running an example shown in Table~\ref{egtab}
+%typically takes less than a minute on a Linux workstation, with the exception 
+%of of the $Pt_2Ni_6O$ example which took more than 10 minutes to complete
+%10 SCF iterations.  The timing results reported in
+%the table are obtained on a single 2.2 Ghz AMD Opteron processor.
+%The total amount of memory available on the machine is 4 gigabytes (GB). 
+%A kinetic energy cutoff of $25$ Ryd is used for most systems.
+%For a $10\times 10 \times 10$ ($\mbox{\AA}^3$) cubic supercell, such 
+%a cutoff results in a $32\times 32 \times 32$ sampling grid for the 
+%wavefunctions.  For the $Pt_2Ni_6O$ bulk system, the use of a larger 
+%supercell requires the grid size to be increased to $63\times 34 \times 30$. 
+%Moreover, because the number of electrons in this heavy-atom system 
+%is relatively large ($nocc=43$), the problem takes more time to solve. 
+%
+%The same initial guesses to the wavefunctions were used for both the SCF and
+%DCM runs.  All runs reported in the table used the default parameters
+%in SCF and DCM.  For example, in the case of SCF, the maximum number of LOBPCG 
+%iterations for solving each linear eigenvalue was set to $10$. In the case of
+%DCM, three inner SCF iterations were performed to obtain an approximate
+%solution to (\ref{projkseq}).
+%
+%The SCF and DCM errors reported in the last two columns of the table are
+%the residual errors defined as
+%\[
+%error = \| H(X)X-X \Lambda \|_F,
+%\]
+%where $X$ contains the wavefunctions returned from SCF or DCM and 
+%$\Lambda = X^{\ast} H(X) X$.
+%
+%Table~\ref{egcompare} shows that DCM appears to run faster than SCF for
+%almost all systems. With the exception of two systems ($CO_2$ and quantum 
+%dot), it also produces more accurate results. We should caution
+%the reader not to interpret the timing provided in Table~\ref{egcompare} 
+%as a comparison between the relative efficiency of SCF and DCM 
+%because the implementations of these methods have not been optimized
+%in KSSOLV.  The optimal implementation of these methods will depend on a 
+%number of factors that we will not address in this paper.
+%%
+%\begin{table}[htbp]
+%\center
+%\begin{tabular}{|c|c|c||c|c|} \hline
+% system      &  SCF time &  DCM time & SCF error & DCM error \\ \hline
+%$C_2H_6$     &    44     &     34    &    4.6e-5 &  1.1e-5  \\
+%$CO_2$       &    35     &     30    &    1.9e-3 &  1.1e-4  \\
+%$H_2O$       &    17     &     17    &    7.9e-5 &  2.0e-5  \\
+%$HNCO$       &    48     &     38    &    7.4e-3 &  6.8e-5  \\
+%Quantum dot  &    25     &     18    &    5.0e-3 &  3.7e-1  \\
+%$Si_2H_4$    &    34     &     31    &    1.8e-3 &  2.7e-4  \\
+%silicon bulk &    15     &     17    &    3.0e-4 &  9.6e-6  \\
+%$SiH_4$      &    29     &     24    &    9.7e-6 &  4.9e-7  \\
+%$Pt_2Ni_6O$  &   1108    &    480    &    3.7    &  4.9e-2  \\
+%\hline
+%\end{tabular}
+%\caption{Comparing the timing and accuracy of running SCF and DCM in KSSOLV}
+%\label{egcompare}
+%\end{table}
+%
+\bibliographystyle{plain}
+\bibliography{kssolvug}
+\addtocounter{page}{1}
+\addcontentsline{toc}{chapter}{Bibliography}
+\addtocounter{page}{-1}
+\end{document}

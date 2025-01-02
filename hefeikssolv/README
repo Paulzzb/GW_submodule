@@ -1,0 +1,7 @@
+To use the code, cd into the crd-kssolv directory and type
+KSSOLV_Startup to set up all paths.
+
+You can then cd into the example directory, and type sih4_scf to run the simple SCF calculation for the SiH4 molecule
+
+At this point (June, 2017), KSSOLV appears to need MATLAB version R2013b or higher. Some earlier versions appear to suffer 
+conflicts with the calling syntax of repmat.
