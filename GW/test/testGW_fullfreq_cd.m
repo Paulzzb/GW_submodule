@@ -10,7 +10,7 @@ CPATH = fileparts(CPATH);
 % CPATH = fileparts(cfile);
 CPATH = [CPATH, '/'];
 KS_DIR = 'D:/kssolvGW/hefeikssolv/';
-GWsetfile = [CPATH, INFO_DIR, 'setGW_cohsex.m'];
+GWsetfile = [CPATH, INFO_DIR, 'setGW_fullfreq_cd.m'];
 INTER_DIR = [CPATH, INFO_DIR, 'IntermediateFiles/'];
 scoutput = [INTER_DIR, 'scinfo.mat'];
  

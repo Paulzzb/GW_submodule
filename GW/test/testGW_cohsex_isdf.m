@@ -10,7 +10,7 @@ CPATH = fileparts(CPATH);
 % CPATH = fileparts(cfile);
 CPATH = [CPATH, '/'];
 KS_DIR = 'D:/kssolvGW/hefeikssolv/';
-GWsetfile = [CPATH, INFO_DIR, 'setGW_cohsex.m'];
+GWsetfile = [CPATH, INFO_DIR, 'setGW_cohsex_isdf.m'];
 INTER_DIR = [CPATH, INFO_DIR, 'IntermediateFiles/'];
 scoutput = [INTER_DIR, 'scinfo.mat'];
  
@@ -30,6 +30,5 @@ run(GWsetfile);
 optionsGW.inputfile = scoutput;
 [GWinput, optionsGW] = kssolv2GW(mol, optionsGW);
 gwCalculation(GWinput, optionsGW);
-
 
 
