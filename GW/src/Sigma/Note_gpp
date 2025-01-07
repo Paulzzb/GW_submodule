@@ -1,0 +1,18 @@
+这个仅仅是为�?debug gpp代码使用，使用完应当另外放置.
+fact_wpeff = 16*pi*ry2ev^2/vol;
+coulfact_sigma_main = 8 * pi / GWinfo.vol;      
+plasma_omega = sqrt(4 * pi * rho(1)) * 2; % 先认为某种原因下，这里确实应该是16
+
+注意对于不同的igcol，相同的qg，precalc完全一�?..
+precalc(igrow, :) = fact_wpeff * coulG(igrow) * qg / coulfact_sigma_main; 
+% precalc = 16 * pi * ry2ev * ry2ev * (q+g) * (vcoul/vol)
+
+
+
+gg = G_index(igadd, :) - G_index(igpadd, :);
+kadd = findvector(gg, gvec);
+rho_g_minus_gp = rho(kadd); %% sum over kpoints if necessary.
+
+Omega2(igadd) =  (qgp * GWinfo.bdot * precalc(igrow, :)') * rho_g_minus_gp;
+% Omega = omega_p^2 * ((q+G) * (q+G') / ||q+G||^2 ) * rho(G-G') / rho(0);
+% omega_p^2 = 4 * pi * ne * * e^2 / m_e
