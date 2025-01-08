@@ -22,8 +22,20 @@ function gwCalculation(GWinfor, options)
         Ex = gw_x(GWinfor, options);
         Eres = gw_fullfreq_cd_res(GWinfor, options);
         Eint = gw_fullfreq_cd_int(GWinfor, options);
-        Vxc = GWinfor.Vxc * options.Constant.ry2ev;
-        ev  = GWinfor.ev  * options.Constant.ry2ev;
+
+        nameConstants = fieldnames(options.Constant);
+        for i = 1:numel(nameConstants)
+            fieldname = nameConstants{i};
+            value = options.Constant.(fieldname);    
+            if ~isempty(value)
+              strEval = sprintf('%s = %.16f;', fieldname, value);
+              eval(strEval);
+            end
+        end
+        Vxc = GWinfor.Vxc * ry2ev;
+        ev  = GWinfor.ev  * ry2ev;
+        ev = ev(nv-nv_ener+1:nv+nc_ener);
+        Vxc = Vxc(nv-nv_ener+1:nv+nc_ener);
         Sigma = ev - Vxc + Ex + Eres + Eint;
         Eqp = ev - Vxc + Sigma;
         save(options.GWCal.fileName, 'ev', 'Ex', 'Eres', 'Eint', 'Sigma',...

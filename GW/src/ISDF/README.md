@@ -9,6 +9,8 @@
 |   ├── isdf_indices: Generate corresponding indices for r_mu, phi_i(r_mu), psi_j(r_mu).
 |   ├── k_means: An implementation of k-means clustering.
 |   ├── k_means_hpc: An implementation of k-means clustering using parfor.
+|   ├── prod_states: Calculate the product states.
+|                    used in isdf_indices.
 |   ├── isdf_kernelg: Generate p_mu(r) and use FFT to get p_mu(g).
 |   ├── COmegaCstar: Calculate C * Omega^{-1} * C' with Cauchy integral method,
 |       where C_{ij, k} = conj(psi_i(r_k))psi_j(r_k) 
@@ -18,7 +20,7 @@
 |   └── landen & ellipk: two functions from siglib,
                          used in COmegaCstar.
 
-``````
+```
 
 
 [1] https://www.mathworks.com/matlabcentral/fileexchange/1316-schwarz-christoffel-toolbox

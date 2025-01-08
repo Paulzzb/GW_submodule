@@ -11,19 +11,13 @@ Note:
 # Structure of GW module
 ```
 ├── doc: documentations for GW module 
-├── doc: documentations for GW module 
-|   The following are classes in GW module.
-|   ├── options: options for GW module, @GWOptions
-|   The following are widely used functions.
-|   ├── do_FFT & get_from_fftbox & put_into_fftbox:
-|       a set of functions to do FFT.
-|   ├── gvec_to_fft_index: N x N x N --> N^3, in kssolv manner.
-├── doc: documentations for GW module 
-├── src: source code for GW module, see ./src/README.md for detail
+├── src: source code for GW module
+         see ./src/README.md for detail
 ├── test: test functions for GW module.
+          Currently INCORECT!!
 ├── example: simple examples for GW module
 └── util: utility functions for GW module, mainly for format conversion and I/O conversion.
-    see ./util/README.md for detail
+          see ./util/README.md for detail
 
 
 ```

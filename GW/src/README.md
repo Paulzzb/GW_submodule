@@ -25,7 +25,9 @@
 ├── ISDF: Suppose that we are calculating
     Phi_i(r)*Psi_j(r) \approx \sum_{mu} p_mu(r) phi_i(r_mu)*psi_j(r_mu)
     p_mu(g) = \int_{R^3} dr exp^(i g r) p_mu(r).
-|   ├── isdf_main: Main function to generate ISDF
+    This folder contains the implementation of ISDF,
+    see ISDF/README.md for details.
+<!-- |   ├── isdf_main: Main function to generate ISDF
 |   ├── isdf_indices: Generate corresponding indices for r_mu, phi_i(r_mu), psi_j(r_mu).
 |   ├── k_means: An implementation of k-means clustering.
 |   ├── k_means_hpc: An implementation of k-means clustering using parfor.
@@ -34,8 +36,7 @@
 |       where C_{ij, k} = conj(psi_i(r_k))psi_j(r_k) 
 |       and Omega_{ij, ij} = varepsilon_i - varepsilon_j (energies band).
 |       CURRENTLY ONLY OMEGA = 0 IS SUPPORTED.
-|   └── ellipjc & ellipkkp: a set of ellipses functions to support COmegaCstar, and is directly copied from [1].
-
+|   └── ellipjc & ellipkkp: a set of ellipses functions to support COmegaCstar, and is directly copied from [1]. -->
 ├── Utility:
 |   ├── testmemory: Test memory usage.
 

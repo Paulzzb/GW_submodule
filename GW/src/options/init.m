@@ -69,6 +69,21 @@ function options_in = init(mol, options_in)
   end
   options_in.n_ener = options_in.nv_ener + options_in.nc_ener;
   options_in.n_oper = options_in.nv_oper + options_in.nc_oper;
+
+  % nv_ener and nv_oper should be less than nv,
+  % nc_ener and nc_oper should be less than nc.
+  if options_in.nv_ener > options_in.nv
+    error("nv_ener should be less than nv");
+  end
+  if options_in.nc_ener > options_in.nc
+    error("nc_ener should be less than nc");
+  end
+  if options_in.nv_oper > options_in.nv
+    error("nv_oper should be less than nv");
+  end
+  if options_in.nc_oper > options_in.nc
+    error("nc_oper should be less than nc");
+  end
   
   % GPP initializing
   % if (options_in.frequency_dependence == 1)
