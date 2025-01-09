@@ -132,6 +132,7 @@ end;
 
 GWinfo.coulG = coulG;
 GWinfo.coulG0 = 8.0*pi*amin^2/2;
+GWinfo.supercell = mol.supercell;
 GWinfo.bdot = (2 * pi * inv(mol.supercell)').^2;    
 GWinfo.qk = [0.0, 0.0, 0.0];
 GWinfo.ntot =  get(mol,'n1') * get(mol,'n2') * get(mol,'n3');

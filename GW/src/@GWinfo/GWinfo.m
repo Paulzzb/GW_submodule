@@ -1,9 +1,10 @@
 classdef GWinfo 
   properties (SetAccess = public)
     coulG;
-    coulG0
-    bdot
-    qk 
+    coulG0;
+    supercell;
+    bdot;
+    qk;
     ntot 
     vol
     ne 
