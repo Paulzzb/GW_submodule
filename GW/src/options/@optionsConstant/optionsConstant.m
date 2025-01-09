@@ -12,7 +12,7 @@ classdef optionsConstant
   end
  
   methods
-    function Constants = optionsConstant(mol, options_in)
+    function Constants = optionsConstant(options_in, sys)
       Constants.nv = options_in.nv;
       Constants.nc = options_in.nc;
       Constants.nv_oper = options_in.nv_oper;
@@ -21,11 +21,12 @@ classdef optionsConstant
       Constants.nc_ener = options_in.nc_ener;
       Constants.n_oper = options_in.n_oper;
       Constants.n_ener = options_in.n_ener;
-      F = KSFFT(mol);
-      [Constants.ng, Constants.nr] = size(F);
-      clear F
-      Constants.ne = mol.nel;
-      Constants.vol = mol.vol;
+
+      Constants.ng = sys.ng;
+      Constants.nr = sys.nr;
+      Constants.ne = sys.ne;
+      Constants.vol = sys.vol;
+
       Constants.TOL_ZERO = 1e-12;
       Constants.TOL_SMALL = 1e-6;
       Constants.INF = 1e+12;

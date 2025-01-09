@@ -1,4 +1,4 @@
-function [GWinfor, optionsGW] = kssolv2GW(mol, options_in)
+function [GWinfor, optionsGW] = kssolv2GW(options_in, mol)
 %   [GWinfor, optionsGW] = kssolv2GW(mol, options_in)
 %   kssolv2GW: Converts the outputs of kssolv-scf to inputs required for
 %              GW calculations, and sets up the parameters for the GW.
@@ -16,7 +16,8 @@ function [GWinfor, optionsGW] = kssolv2GW(mol, options_in)
 %                  Refer to the documentation for detailed descriptions.
 %
 GWinfor = GWinfo();
-optionsGW = GWOptions(mol, options_in);
+[options_in, sys] = kssolv2GW_initopt(options_in, mol);
+optionsGW = GWOptions(options_in, sys);
 GWinfor = kssolv2GW_info(GWinfor, mol, optionsGW.Groundstate);
 
 end % end of function

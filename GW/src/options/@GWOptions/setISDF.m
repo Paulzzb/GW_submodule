@@ -1,16 +1,9 @@
-function opt = setISDF(opt, mol, options_in)
+function opt = setISDF(opt, options_in, sys_in)
 
   if ~isfield(options_in, 'optionsISDF')
     optionsISDF = [];
   else
-  %   opt.ISDFCauchy.isdfoptions.seed = 0;
-  %   opt.ISDFCauchy.exxmethod = 'kmeans'; 
-	%   opt.ISDFCauchy.isdfoptions.weight = 'add'; 
-	%   opt.ISDFCauchy.isdfoptions.sys = mol;
-	%   opt.ISDFCauchy.isdfoptions.init = 'wrs';
-  % %  opt.ISDFCauchy.froErr = 1e-8; optionsISDFCauchy.MaxIter = 10;
-  % else
-    optionsISDF = options_in.optionsISDF
+    optionsISDF = options_in.optionsISDF;
   end
 	
   optionsISDF.isISDF = true;
@@ -31,7 +24,13 @@ function opt = setISDF(opt, mol, options_in)
     optionsISDF.isdfoptions.weight = 'add';
   end
   if ~isfield(optionsISDF.isdfoptions, 'sys')
-    optionsISDF.isdfoptions.sys = mol;
+    sys = [];
+    sys.n1 = sys_in.n1;
+    sys.n2 = sys_in.n2;
+    sys.n3 = sys_in.n3;
+    sys.supercell = sys_in.supercell;
+    sys.xyzlist = sys_in.xyzlist;
+    optionsISDF.isdfoptions.sys = sys;
   end
   opt.ISDFCauchy = optionsISDF;
   % set informations of ISDF	
@@ -66,13 +65,14 @@ function opt = setISDF(opt, mol, options_in)
       optionsCauchy = options.optionsCauchy;
     else
       optionsCauchy = [];
-    if ~isfield(optionsCauchy, 'froErr')
-      optionsCauchy.froErr = 1e-6; 
-    end
-    if ~isfield(optionsCauchy, 'MaxIter')
-			optionsCauchy.MaxIter = 10;
+      if ~isfield(optionsCauchy, 'froErr')
+        optionsCauchy.froErr = 1e-6; 
+      end
+      if ~isfield(optionsCauchy, 'MaxIter')
+			  optionsCauchy.MaxIter = 10;
+      end
     end
     opt.ISDFCauchy.optionsCauchy = optionsCauchy;
   end  
 
-end
+end % EOF

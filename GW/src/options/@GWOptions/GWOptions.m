@@ -24,12 +24,12 @@ classdef GWOptions
 %   end
   
   methods
-    function options_out = GWOptions(mol, options_in)
-      options_in = init(mol, options_in);
-      options_out.Constant = optionsConstant(mol, options_in);
-      options_out = setGWCal(options_out, mol, options_in);
+    function options_out = GWOptions(options_in, sys)
+      % [options_in, sys] = init(mol, options_in);
+      options_out.Constant = optionsConstant(options_in, sys);
+      options_out = setGWCal(options_out, options_in);
       if (options_in.isISDF == true)
-        options_out = setISDF(options_out, mol, options_in);
+        options_out = setISDF(options_out, options_in, sys);
       else
         options_out.ISDFCauchy.isISDF = false;
       end

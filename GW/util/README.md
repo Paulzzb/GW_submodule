@@ -11,6 +11,9 @@ Currently, only inputs from kssolv are accepted.
 ```
 ├── util
 |   ├── kssolv2GW.m: Files are from kssolv ground-state calculation.
+|   |    ├── kssolv2GW_info.m: Transform kssolv info file into GWinfo.
+|   |    ├── kssolv2GW_initopt.m: Set GWOptions using information from kssolv.
+|   |    ├── kssolv2GW_opt*.m: Subfunctions for setting GWOptions.
 |   ├── qe2GW.m: Files are from Quantum Espresso ground-state calculation.
 |                Not write yet...
 |   └── ...

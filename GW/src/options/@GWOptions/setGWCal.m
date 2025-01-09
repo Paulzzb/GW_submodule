@@ -1,5 +1,4 @@
-% function [GWOptions, options] = setoptions(mol, options)
-function opt = setGWCal(opt, mol, options)
+function opt = setGWCal(opt, options)
 
 
 % Get some info from options, transform the readable varibles to unreadable one
@@ -15,7 +14,7 @@ TOL_ZERO = 1e-12;
 opt.GWCal = [];
 
 if ~isfield(options, 'fileName')
-  opt.GWCal.fileName = 'GW_output.mat';
+  opt.GWCal.fileName = 'GWoutput.mat';
 else
   opt.GWCal.fileName = options.fileName;
 end
@@ -101,9 +100,9 @@ if (options.frequency_dependence == 2)
 % variables for nonblocking scheme
 
 
-  if isfield(options, 'verbosity')
-    peinf.verbosity = options.verbosity;
-  end
+  % if isfield(options, 'verbosity')
+  %   peinf.verbosity = options.verbosity;
+  % end
 
   if isfield(options, 'frequency_dependence')
     opt.GWCal.freq_dep = options.frequency_dependence;
