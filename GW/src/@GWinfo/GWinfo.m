@@ -11,30 +11,30 @@ classdef GWinfo
     nv 
     gvec
     gvec2
-		gvecrho
-		Vxc
+    gvecrho
+    Vxc
     rho
-		idxnz
-		ev
-		Z
-		aqs
-	end
+    idxnz
+    ev
+    Z
+    aqs
+  end
 
-	properties (SetAccess = protected)
+  properties (SetAccess = protected)
 
-	end
-	
-	methods
-	  function GWinfo = GWinfo(mol, options)
+  end
+  
+  methods
+    function GWinfo = GWinfo(mol, options)
       % if nargin == 0
-			% 	return;
-			% end
-			GWinfo = GWinfo();
-			% if nargin < 2
-			% 	error('Number of inputs less than 2');
-			% end
+      %   return;
+      % end
+      GWinfo = GWinfo();
+      % if nargin < 2
+      %   error('Number of inputs less than 2');
+      % end
       % GWinfo = gwsetup(GWinfo, mol, options);
-	  end
+    end
   end % method
 
 end % classdef

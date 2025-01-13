@@ -10,17 +10,17 @@
  
 {函数或变量 'test_Silicon' 无法识别。
 } 
-a		 contributors.txt      iterinitProjected.m  NaCl.log	    Si2-1.log	    silicon-1.log   tddft_sih4.m    test_NaCl.m			     test_STO.m   ZnO-1.log
-abs_eh.dat	 data		       KSSOLV_startup.m     normal.pbs	    si2-kmeans.log  silicon.log     test	    test_nonlinearPET.m		     test_zzb1.m  ZnO-2.log
-abs_noeh.dat	 doc		       lambda1.mat	    pbe.m	    si2.log	    silicon.tar.gz  test_benzene.m  test_nonlinearPET_perturbed_1.m  test_zzb.m   ZnO.log
-benzene-10.log	 err		       log		    plotMD.py	    Si2.log	    si.log	    test_C10H6.m    test_nonlinearPET_perturbed_2.m  time.dat
-benzene-15.log	 example	       log-1		    ppdata	    si64-16.log     src		    test_c60.m	    test_nonlinearPET_perturbed.m    time.py
-benzene-20.log	 ex_fd.m	       log-2		    psirc.mat	    si64-6.log	    tddft2.m	    test_C6H6.m     test_PET.m			     TiO2.log
-benzene-30.log	 external	       log-3		    psirv.mat	    si8-1.log	    tddft3.m	    test_CnHm.m     test_scfProjected.m		     TODO
-benzene-bse.log  getchargeProjected.m  log-6		    -r		    si8.log	    tddft_dna.m     test_CO.m	    test_Si2.m			     util
-benzene.log	 gs_fd.m	       log-7		    README	    si96.log	    tddft_hse.m     test_h2.m	    test_si8.m			     VA.log
-CnHm		 h2_scf_opt.m	       log-8		    scfProjected.m  sih4.log	    tddft.m	    test_k.m	    test_SiH4.m			     vasp_std
-CnHm.tar.gz	 hse06.m	       log-9		    si2-1.log	    silicon	    tddft_si8.m     test.m	    test_Silicon.m		     WA.log
+a     contributors.txt      iterinitProjected.m  NaCl.log      Si2-1.log      silicon-1.log   tddft_sih4.m    test_NaCl.m           test_STO.m   ZnO-1.log
+abs_eh.dat   data           KSSOLV_startup.m     normal.pbs      si2-kmeans.log  silicon.log     test      test_nonlinearPET.m         test_zzb1.m  ZnO-2.log
+abs_noeh.dat   doc           lambda1.mat      pbe.m      si2.log      silicon.tar.gz  test_benzene.m  test_nonlinearPET_perturbed_1.m  test_zzb.m   ZnO.log
+benzene-10.log   err           log        plotMD.py      Si2.log      si.log      test_C10H6.m    test_nonlinearPET_perturbed_2.m  time.dat
+benzene-15.log   example         log-1        ppdata      si64-16.log     src        test_c60.m      test_nonlinearPET_perturbed.m    time.py
+benzene-20.log   ex_fd.m         log-2        psirc.mat      si64-6.log      tddft2.m      test_C6H6.m     test_PET.m           TiO2.log
+benzene-30.log   external         log-3        psirv.mat      si8-1.log      tddft3.m      test_CnHm.m     test_scfProjected.m         TODO
+benzene-bse.log  getchargeProjected.m  log-6        -r        si8.log      tddft_dna.m     test_CO.m      test_Si2.m           util
+benzene.log   gs_fd.m         log-7        README      si96.log      tddft_hse.m     test_h2.m      test_si8.m           VA.log
+CnHm     h2_scf_opt.m         log-8        scfProjected.m  sih4.log      tddft.m      test_k.m      test_SiH4.m           vasp_std
+CnHm.tar.gz   hse06.m         log-9        si2-1.log      silicon      tddft_si8.m     test.m      test_Silicon.m         WA.log
 
 system = Si96
 Cutoff of Wavefunctions and dielectric matrix = 20 (Ry)

@@ -6,7 +6,7 @@ Only use the files in "demo_test.m".
 ## Files:
 ```
 TEST:
-|   The following are test functions of GW module.
+|   The following are the main test functions of GW module.
 ├── testGW_cohsex:
 |     run the COHSEX approximation, without ISDF. 
 ├── testGW_cohsex_isdf:
@@ -17,6 +17,9 @@ TEST:
 |     run the full-frequency approximation, with ISDF.
 ├── data: contains data for test functions.
 |    ├── Si8: contains data for test functions.
+|   The following are some other test functions in GW module.
+├── testgvec:
+
 
 
 ```

@@ -31,7 +31,7 @@ function v = landen(k,tol)
 if nargin==1, tol=eps; end
 if tol>=1, M=tol; end 
 
-if k==0 || k==1, v=k; return; end  	% returns v=k, i.e., k=0 ==> v=0,  k=1 ==> v=1
+if k==0 || k==1, v=k; return; end    % returns v=k, i.e., k=0 ==> v=0,  k=1 ==> v=1
 
 v = [];
 

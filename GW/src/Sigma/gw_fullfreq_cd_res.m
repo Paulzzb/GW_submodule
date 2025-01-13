@@ -120,7 +120,7 @@ for ifreq = 1:nfreq_real
       Mgvc = mtxel_sigma(ind_nv, GWinfo, options.Groundstate, ...
             (nv+1:nv+nc_oper));
     end
-  	Mgvc = conj(Mgvc);
+    Mgvc = conj(Mgvc);
     
     Eden = ev(ind_nv) - ev(nv+1:nv+nc_oper);
     edenDRtmp = (-1.0 ./ (omega - Eden - mi*eta) ...

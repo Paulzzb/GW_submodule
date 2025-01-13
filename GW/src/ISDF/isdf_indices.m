@@ -10,13 +10,13 @@ function [ind_mu] = isdf_indices(Phi, Psi, options)
 %   Phi: A set of wavefunctions (size: M*N1).
 %   Psi: Another set of wavefunctions (size: M*N2).
 %   option: A structure.
-%	fields in option:
-%   	rk: rank of product states [ Phi_i*Psi_j ], 1 <= rk <= min(M, N1*N2).
-%		samp: sample method, 'qrcp' or 'kmeans'
-%		seed: random seed controls random number generator
-%		weight: weight type used in kmeans, 'multiply' or 'add'
-%		init: initialization method in kmeans
-%		points: cluster points in kmeans
+%  fields in option:
+%     rk: rank of product states [ Phi_i*Psi_j ], 1 <= rk <= min(M, N1*N2).
+%    samp: sample method, 'qrcp' or 'kmeans'
+%    seed: random seed controls random number generator
+%    weight: weight type used in kmeans, 'multiply' or 'add'
+%    init: initialization method in kmeans
+%    points: cluster points in kmeans
 % Outputs:
 %   ind_mu: indices of interpolation points
 

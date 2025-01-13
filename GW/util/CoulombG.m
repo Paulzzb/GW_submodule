@@ -9,7 +9,7 @@ kkxyz = mill * Creci;
 gkk = sum(kkxyz.^2, 2);
 
 switch truncation
-	case 2 % spherical_truncation
+  case 2 % spherical_truncation
     for j = 1:ng
       if ( abs(gkk(j)) ~= 0 )
         coulG(j) = 8.0*pi/(gkk(j));
@@ -33,8 +33,8 @@ switch truncation
       end;
     end;
   otherwise
-	  fprintf('options.coulomb_truncation = %d is not supported.\n', ...
-		         options.coulomb_truncation);
+    fprintf('options.coulomb_truncation = %d is not supported.\n', ...
+             options.coulomb_truncation);
     error();
 end;
 

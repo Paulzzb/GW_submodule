@@ -48,14 +48,14 @@ function GWinfo = gwsetup(GWinfo, mol, options)
 
 % Some initialization.
 if ~isfield(options, 'options_kssolv')
-	default_scf_options = true;
+  default_scf_options = true;
 else
-	default_scf_options = false;
+  default_scf_options = false;
 end
 
 
 if ~isfield(options, 'coulomb_truncation')
-	options.coulomb_truncation = 2;
+  options.coulomb_truncation = 2;
 end
 
 
@@ -102,7 +102,7 @@ end
 
 %spherical_truncation, ry
 switch options.coulomb_truncation
-	case 2 % spherical_truncation
+  case 2 % spherical_truncation
     for j = 1:ng
       if ( abs(gkk(j)) ~= 0 )
           coulG(j,4) = 8.0*pi/(gkk(j));
@@ -127,8 +127,8 @@ switch options.coulomb_truncation
       end;
     end;
   otherwise
-	  fprintf('options.coulomb_truncation = %d is not supported.\n', ...
-		         options.coulomb_truncation);
+    fprintf('options.coulomb_truncation = %d is not supported.\n', ...
+             options.coulomb_truncation);
     error();
 end;
 
@@ -146,11 +146,11 @@ GWinfo.nv = nv;
 
 
 switch lower(options.input)
-	case 'kssolv'
+  case 'kssolv'
   % run SCF to get ground state information
   kssolvpptype('pz-hgh', 'UPF');
   if default_scf_options
-	  options.options_kssolv = setksopt();
+    options.options_kssolv = setksopt();
     options.options_kssolv.nc = nc; % get an extra band.
     options.options_kssolv.useace = 1;
     %options._kssolv.what2mix = 'rho';
@@ -177,42 +177,42 @@ switch lower(options.input)
   end
   GWinfo.Vxc = Vxc * ha2ry;
   
-	if options.frequency_dependence == 1
+  if options.frequency_dependence == 1
     rhor = H.rho; 
     atomlist = mol.atoms(mol.alist);
     mol_rho = Molecule('supercell',mol.supercell, 'atomlist', atomlist,...
-		                   'xyzlist' ,mol.xyzlist, 'ecut', mol.ecut * 4, ...
-											 'n1', mol.n1, 'n2', mol.n2, 'n3', mol.n3, 'nbnd', mol.nbnd);
+                       'xyzlist' ,mol.xyzlist, 'ecut', mol.ecut * 4, ...
+                       'n1', mol.n1, 'n2', mol.n2, 'n3', mol.n3, 'nbnd', mol.nbnd);
     grid_rho = Ggrid(mol_rho);
     idxnz_rho = grid_rho.idxnz; 
-		Nfft = [mol.n1, mol.n2, mol.n3];
-		coulG_rho = [grid_rho.gkx, grid_rho.gky, grid_rho.gkz] * mol_rho.supercell / (2*pi);
-		coulG_rho = int64(coulG_rho);
-		gindex = 1:length(grid_rho.gkx);
-		fftbox2 = rhor;
-		fftbox2 = do_FFT(fftbox2, Nfft, -1);
-		scale = 1 ./ nr;
+    Nfft = [mol.n1, mol.n2, mol.n3];
+    coulG_rho = [grid_rho.gkx, grid_rho.gky, grid_rho.gkz] * mol_rho.supercell / (2*pi);
+    coulG_rho = int64(coulG_rho);
+    gindex = 1:length(grid_rho.gkx);
+    fftbox2 = rhor;
+    fftbox2 = do_FFT(fftbox2, Nfft, -1);
+    scale = 1 ./ nr;
     % rhog = GWinfo.vol * scale * get_from_fftbox(length(gindex), coulG_rho(:, 1:3), gindex, fftbox2, Nfft);
     rhog = GWinfo.vol * scale * get_from_fftbox(idxnz_rho, fftbox2, Nfft);
-		GWinfo.rho = rhog;
+    GWinfo.rho = rhog;
     GWinfo.gvecrho = gvec(mol_rho);
   end
-	
-%	gvec = struct();
+  
+%  gvec = struct();
 %  if (options.frequency_dependence == 1)
-%	  gvec.components = coulG_rho;
-%	  gvec.index_vec(grid_rho.idxnz) = (1:grid_rho.ng)';
-%	  gvec.ng = grid_rho.ng;
-%	else
-%		gvec.components = coulG(:, 1:3);
-%		gvec.index_vec(grid.idxnz) = (1:grid.ng)';
-%		gvec.ng = grid.ng;
-%	end
-%	gvec.nfftgridpts = nr;
-%	gvec.fftgrid = [mol.n1, mol.n2, mol.n3];
+%    gvec.components = coulG_rho;
+%    gvec.index_vec(grid_rho.idxnz) = (1:grid_rho.ng)';
+%    gvec.ng = grid_rho.ng;
+%  else
+%    gvec.components = coulG(:, 1:3);
+%    gvec.index_vec(grid.idxnz) = (1:grid.ng)';
+%    gvec.ng = grid.ng;
+%  end
+%  gvec.nfftgridpts = nr;
+%  gvec.fftgrid = [mol.n1, mol.n2, mol.n3];
 %  GWinfo.gvec = gvec;
-	GWinfo.gvec = gvec(mol, 'ecut', mol.ecut);
-	GWinfo.gvec2 = gvec(mol, 'ecut', mol.ecut2);
+  GWinfo.gvec = gvec(mol, 'ecut', mol.ecut);
+  GWinfo.gvec2 = gvec(mol, 'ecut', mol.ecut2);
   GWinfo.idxnz = idxnz; 
  
   % Other important information of DFT-KSSOLV
@@ -222,9 +222,9 @@ switch lower(options.input)
 % GWinfo.plasma_omega = plasma_omega;
 
    
-	  
-	otherwise
-	  error('The case is not supported yet!')
+    
+  otherwise
+    error('The case is not supported yet!')
 end
 
 % Gives outputs

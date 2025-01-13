@@ -8,16 +8,16 @@
 
 My problem 
   a. when mol.supercell is not diagonal, PROBLEMS 
-	  1. ksinfo.bdot needs to be checked
-		2. coulG(:, 1:3) needs to be checked
+    1. ksinfo.bdot needs to be checked
+    2. coulG(:, 1:3) needs to be checked
   b. when performs full frequency calculation, it seems that the current strategy is silly. We need a smarter FREQUENCIES SELECTING STRATEGY.
   c. Strategies of Coulomb potential and DIFFERENCE, NEED SOME PAPERS.
-	d. We notice some combination of (ibandouter, ibandinner) performs poor in fullfreq_cd.
-	   NEED DETAILED NUMERICAL ANALYSIS.
-	e. freq0 with freqevalmin --> check BGW code. 
-	f. ADD EVERY TEST TO FUNCTION. 
-	  gwsetup
-		gwCalculation
-		  ...
-		mtxel_sigma
-		  ...
+  d. We notice some combination of (ibandouter, ibandinner) performs poor in fullfreq_cd.
+     NEED DETAILED NUMERICAL ANALYSIS.
+  e. freq0 with freqevalmin --> check BGW code. 
+  f. ADD EVERY TEST TO FUNCTION. 
+    gwsetup
+    gwCalculation
+      ...
+    mtxel_sigma
+      ...

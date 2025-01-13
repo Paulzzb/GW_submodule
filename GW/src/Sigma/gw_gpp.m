@@ -53,10 +53,10 @@ nameConstants = fieldnames(options.Constant);
 for i = 1:numel(nameConstants)
   fieldname = nameConstants{i};
   value = options.Constant.(fieldname);    
-	if ~isempty(value)
+  if ~isempty(value)
     strEval = sprintf('%s = %.16f;', fieldname, value)
     eval(strEval);
-	end
+  end
 %    fprintf('Field: %s, Value: %s\n', fieldname, num2str(value));
 end
 

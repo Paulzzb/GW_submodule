@@ -1,3 +1,5 @@
+% test @gvec
+testgvec
 % test kssolv2GW
 prepare_cohsex
 prepare_cohsex_isdf

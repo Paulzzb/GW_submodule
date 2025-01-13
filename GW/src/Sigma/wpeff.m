@@ -127,7 +127,7 @@ for igrow = 1:ng
     end
     continue;
   end
-	rho_g_minus_gp = rho(kadd); %% sum over kpoints if necessary.
+  rho_g_minus_gp = rho(kadd); %% sum over kpoints if necessary.
   if testflag
     dlmwrite('rho_g_minus_gp.csv', rho_g_minus_gp, '-append', 'precision', 16);
   end
@@ -215,19 +215,19 @@ end % function Omega = wpeff()
 % end
 
 % function iout = findvector(kk, gvec)
-% 	iout = mill2nl(kk, gvec.fftgrid(1), gvec.fftgrid(2), gvec.fftgrid(3));
-% 	if (iout >= 1 && iout <= gvec.nfftgridpts)
+%   iout = mill2nl(kk, gvec.fftgrid(1), gvec.fftgrid(2), gvec.fftgrid(3));
+%   if (iout >= 1 && iout <= gvec.nfftgridpts)
 %     iout = gvec.index_vec(iout);
-% 		if iout >= 1 && iout <= gvec.ng
-% 			if (any(kk ~= gvec.components(iout, :)))
-% 				iout = 0;
-% 			end
-% 		else
-% 				iout = 0;
-% 		end
-% 	else
-% 		iout = 0;
-% 	end
+%     if iout >= 1 && iout <= gvec.ng
+%       if (any(kk ~= gvec.components(iout, :)))
+%         iout = 0;
+%       end
+%     else
+%         iout = 0;
+%     end
+%   else
+%     iout = 0;
+%   end
 %   
-% 	return
+%   return
 % end

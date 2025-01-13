@@ -10,7 +10,7 @@ function fftbox = put_into_fftbox(data, idxnz, Nfft)
 % fftbox: with proper number inside.
 
 % if nargin < 6
-% 	error('method is not given in put_into_fftbox.')
+%   error('method is not given in put_into_fftbox.')
 % end
 
 im                 = sqrt(-1);

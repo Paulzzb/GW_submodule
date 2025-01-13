@@ -100,18 +100,18 @@ if 1
       Mgvc = mtxel_sigma(ind_nv, GWinfo, options.Groundstate, ...
             (nv+1:nv+nc_oper));
     end
-  	Mgvc = conj(Mgvc);
+    Mgvc = conj(Mgvc);
     Eden = ev(ind_nv) - ev(nv+1:nv+nc_oper);
     for ifreq = 1 : nFreq
-  		edenDRtmp = 0.5 .* (1.0 ./ (Eden - (dFreqGrid(ifreq)+dFreqBrd(ifreq))) ...
-  		+ 1.0 ./ (Eden + (dFreqGrid(ifreq)+dFreqBrd(ifreq))) );
-  		epsilon(:, :, ifreq) = epsilon(:, :, ifreq) + 4 * Mgvc * (edenDRtmp .* Mgvc');
-  	end % for ifreq
+      edenDRtmp = 0.5 .* (1.0 ./ (Eden - (dFreqGrid(ifreq)+dFreqBrd(ifreq))) ...
+      + 1.0 ./ (Eden + (dFreqGrid(ifreq)+dFreqBrd(ifreq))) );
+      epsilon(:, :, ifreq) = epsilon(:, :, ifreq) + 4 * Mgvc * (edenDRtmp .* Mgvc');
+    end % for ifreq
   end % for ind_nv
   
   for ifreq = 1:nFreq
-  	epsilon(:, :, ifreq) = eye(ng) - ...
-  	GWinfo.coulG(:, 4) .* epsilon(:, :, ifreq) / vol;
+    epsilon(:, :, ifreq) = eye(ng) - ...
+    GWinfo.coulG(:, 4) .* epsilon(:, :, ifreq) / vol;
   end
   
   if testflag1
@@ -120,7 +120,7 @@ if 1
   end
   
   for ifreq = 1:nFreq
-  	epsilon(:, :, ifreq) = inv(epsilon(:, :, ifreq));
+    epsilon(:, :, ifreq) = inv(epsilon(:, :, ifreq));
   end
   
   if testflag1
@@ -128,7 +128,7 @@ if 1
   end
   
   for ifreq = 1:nFreq
-  	epsilon(:, :, ifreq) = eye(ng) - epsilon(:, :, ifreq);
+    epsilon(:, :, ifreq) = eye(ng) - epsilon(:, :, ifreq);
   end
   
 end      
