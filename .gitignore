@@ -1,0 +1,5 @@
+./GW/test/**/*.mat
+./GW/test/*.mat
+# Add mol and kssolv-scf result of Si8 into path
+!./GW/test/data/Si8/IntermediateFiles/molinfo.mat
+!./GW/test/data/Si8/IntermediateFiles/scinfo.mat
