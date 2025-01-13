@@ -33,8 +33,6 @@ end
 
 GWinfor.Z = GWinfor.Z * sqrt(GWinfor.vol); % Turn to \int_V \abs{psi(r)}^2 dr = 1.
 Z     = GWinfor.Z;
-ev    = GWinfor.ev * ry2ev;
-Vxc   = GWinfor.Vxc;
 Dcoul = spdiags(GWinfor.coulG(:,4), 0, ng, ng) * ry2ev;
 gvec = GWinfor.gvec;
 Dcoul(1,1) = GWinfor.coulG0 * ry2ev;

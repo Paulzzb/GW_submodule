@@ -20,8 +20,13 @@ function gwCalculation(GWinfor, options)
       elseif options.GWCal.freq_dep_method == 2
         % gw_fullfreq_cd(GWinfor, GWOptions);
         Ex = gw_x(GWinfor, options);
-        Eres = gw_fullfreq_cd_res(GWinfor, options);
-        Eint = gw_fullfreq_cd_int(GWinfor, options);
+        if (options.ISDFCauchy.isISDF == true)
+          Eres = gw_fullfreq_cd_res_ISDF(GWinfor, options);
+          Eint = gw_fullfreq_cd_int_ISDF(GWinfor, options);
+        else
+          Eres = gw_fullfreq_cd_res(GWinfor, options);
+          Eint = gw_fullfreq_cd_int(GWinfor, options);
+        end
 
         nameConstants = fieldnames(options.Constant);
         for i = 1:numel(nameConstants)
