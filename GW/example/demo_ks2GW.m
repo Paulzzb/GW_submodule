@@ -25,7 +25,7 @@ load(GWinput);
 % 3. run
 run(GWsetfile);
 options_GW.inputfile = GWinput;
-[GWinput, optionsGW] = kssolv2GW(mol, options_GW);
+[GWinput, optionsGW] = kssolv2GW(options_GW, mol);
 
 % 4. Save
 save([INTER_DIR, 'GWinput.mat'], 'GWinput', 'optionsGW');

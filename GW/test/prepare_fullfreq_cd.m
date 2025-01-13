@@ -25,7 +25,7 @@ cd(GWPATH); gw_startup; cd(CPATH);
 load(scoutput)
 run(GWsetfile)
 optionsGW.inputfile = scoutput;
-[GWinput, optionsGW] = kssolv2GW(mol, optionsGW);
+[GWinput, optionsGW] = kssolv2GW(optionsGW, mol);
 save(GWinputfile, 'GWinput', 'optionsGW');
 
 
