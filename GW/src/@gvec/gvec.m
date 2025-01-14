@@ -82,7 +82,8 @@ classdef gvec
         gvec_out.components = gvecinput.Ggrid;
         ng = size(gvecinput.Ggrid, 1);
         gvec_out.ng = ng;
-        gvec_out.idxnz = findidxnz(gvec_out.components, [n1, n2, n3]); 
+        idxnz = findidxnz(gvec_out.components, [n1, n2, n3]); 
+        gvec_out.idxnz = idxnz;
       else
         % Generate it based on ecut and Ggrid_forming_method
         gvec_out = mill(gvec_out, gvecinput);
@@ -115,5 +116,20 @@ classdef gvec
   %     end
     end % function gvec
   end % method
+
+  % methods (Static, Access = private)
+  %   function idxnz = findidxnz(grid, n1n2n3)
+  %   % Find the mapping from 3-D grid indices to 1-D indices,
+  %   % Use 'our mapping rules'
+  %   n1 = n1n2n3(1);
+  %   n2 = n1n2n3(2);
+  %   n3 = n1n2n3(3);
+    
+  %   idxnz = 1 + (grid(:, 1) + (grid(:, 1) < 0) * n1) ...
+  %           + (grid(2) + (grid(2) < 0) * n2) * n1 ... 
+  %           + (grid(3) + (grid(3) < 0) * n3) * n1 * n2;
+    
+  %   end % EOF
+  % end
 
 end % classdef
