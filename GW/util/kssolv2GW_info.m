@@ -177,16 +177,18 @@ switch lower(options.input)
     grid_rho = Ggrid(mol_rho);
     idxnz_rho = grid_rho.idxnz; 
     Nfft = [mol.n1, mol.n2, mol.n3];
-    coulG_rho = [grid_rho.gkx, grid_rho.gky, grid_rho.gkz] * mol_rho.supercell / (2*pi);
-    coulG_rho = int64(coulG_rho);
-    gindex = 1:length(grid_rho.gkx);
     fftbox2 = rhor;
     fftbox2 = do_FFT(fftbox2, Nfft, -1);
     scale = 1 ./ nr;
-    % rhog = GWinfo.vol * scale * get_from_fftbox(length(gindex), coulG_rho(:, 1:3), gindex, fftbox2, Nfft);
     rhog = GWinfo.vol * scale * get_from_fftbox(idxnz_rho, fftbox2, Nfft);
     GWinfo.rho = rhog;
-    GWinfo.gvecrho = gvec(mol_rho);
+    gvecinput = [];
+    gvecinput.n1 = mol.n1;
+    gvecinput.n2 = mol.n2;
+    gvecinput.n3 = mol.n3;
+    gvecinput.ecut = 4*mol.ecut;
+    gvecinput.supercell = mol.supercell;
+    GWinfo.gvecrho = gvec(gvecinput);
   end
   
 %  gvec = struct();
@@ -202,8 +204,17 @@ switch lower(options.input)
 %  gvec.nfftgridpts = nr;
 %  gvec.fftgrid = [mol.n1, mol.n2, mol.n3];
 %  GWinfo.gvec = gvec;
-  GWinfo.gvec = gvec(mol, 'ecut', mol.ecut);
-  GWinfo.gvec2 = gvec(mol, 'ecut', mol.ecut2);
+  
+  gvecinput = [];
+  gvecinput.n1 = mol.n1;
+  gvecinput.n2 = mol.n2;
+  gvecinput.n3 = mol.n3;
+  gvecinput.ecut = mol.ecut;
+  gvecinput.supercell = mol.supercell;
+
+  GWinfo.gvec = gvec(gvecinput);
+  gvecinput.ecut = 4.0*mol.ecut;
+  GWinfo.gvec2 = gvec(gvecinput);
   GWinfo.idxnz = idxnz; 
  
   % Other important information of DFT-KSSOLV
