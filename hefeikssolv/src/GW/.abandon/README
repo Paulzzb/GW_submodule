@@ -1,3 +1,0 @@
-GaussLegendre_: script to generate Gauss--Legendre quadrature rule
-
-test_kmeans: test parfor, spmd in kmeans.

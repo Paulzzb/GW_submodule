@@ -1,7 +1,0 @@
-isdf_indices: Calculate the interpolative indices (rather than calculate all together).
-
-isdf_kernelg: Use the isdf_indices to calculate helper functions.
-
-k_means: Calculate the clustering indices using k-means.
-
-other files are redundant.
