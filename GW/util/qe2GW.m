@@ -53,18 +53,26 @@ function [GWinput, options] = qe2GW(options_in)
   % Deal with the grid
   nkpts = length(options__.mill);
   if nkpts == 1
-    gvectmp = gvec(); % Construct a empty gvec.
-    idxnz_qe = options__.X0.wavefuncell{1}.idxnz;
-    mill = options__.mill{1};
-    gvectmp.components = mill;
-    gvectmp.idxnz = idxnz_qe{1};
-    gvectmp.fftgrid = [sys.n1, sys.n2, sys.n3]; 
-    gvectmp.nfftgridpts = prod(gvectmp.fftgrid);
-    ng = length(idxnz_qe{1});
-    gvectmp.ng = ng; 
+    gvecinput = [];
+    gvecinput.n1 = sys.n1;
+    gvecinput.n2 = sys.n2;
+    gvecinput.n3 = sys.n3;
+    gvecinput.supercell = sys.supercell;
+    gvecinput.Ggrid = options__.mill{1};
+    gvectmp = gvec(gvecinput); 
+    % gvectmp = gvec(); % Construct a empty gvec.
+    % idxnz_qe = options__.X0.wavefuncell{1}.idxnz;
+    % mill = options__.mill{1};
+    % gvectmp.components = mill;
+    % gvectmp.idxnz = idxnz_qe{1};
+    % gvectmp.fftgrid = [sys.n1, sys.n2, sys.n3]; 
+    % gvectmp.nfftgridpts = prod(gvectmp.fftgrid);
+    % ng = length(idxnz_qe{1});
+    % gvectmp.ng = ng; 
     GWinput.coulG0 = 8.0 * pi * sys.ecut^2 / 2;
     GWinput.idxnz = gvectmp.idxnz;
     GWinput.gvec = gvectmp;
+    % need to be finished
     GWinput.gvec2;
     GWinput.gvecrho; 
     % Calculate the coulomb potential
