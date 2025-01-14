@@ -1,4 +1,4 @@
-function [options_in, sys] = kssolv2GW_initopt(options_in, mol)
+function [options_in, sys] = kssolv2GW_initopt(options_in, optinput)
 
 % Initialize options_in with KSSOLV inputs
 % Input:
@@ -11,16 +11,6 @@ function [options_in, sys] = kssolv2GW_initopt(options_in, mol)
 %   sys: system information, contains
 %        ng, nr, ne, vol, xyzlist, n1, n2, n3, supercell.
   
-  F = KSFFT(mol);
-  [sys.ng, sys.nr] = size(F);
-  clear F
-  sys.vol = mol.vol;
-  sys.xyzlist = mol.xyzlist;
-  sys.n1 = mol.n1;
-  sys.n2 = mol.n2;
-  sys.n3 = mol.n3;
-  sys.ne = mol.nel;
-  sys.supercell = mol.supercell;
 
   if ~isfield(options_in, 'isGW')
     options_in.isGW = true;
@@ -52,7 +42,7 @@ function [options_in, sys] = kssolv2GW_initopt(options_in, mol)
 
   if ~isfield(options_in, 'nv')
     if options_in.Spin_dependence == 0
-      options_in.nv = mol.nel / 2;
+      options_in.nv = optinput.nel / 2;
     else
       options_in.nv = 0;
       error('Only support spin degeneration calculation now!');

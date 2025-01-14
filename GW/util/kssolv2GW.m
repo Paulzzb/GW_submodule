@@ -16,7 +16,12 @@ function [GWinfor, optionsGW] = kssolv2GW(options_in, mol)
 %                  Refer to the documentation for detailed descriptions.
 %
 GWinfor = GWinfo();
-[options_in, sys] = kssolv2GW_initopt(options_in, mol);
+% set some infos to call initopt.m
+initopt_input = [];
+initopt_input.nel = mol.nel;
+
+options_in = initopt(options_in, initopt_input);
+sys = kssolv2GW_initsys(mol);
 optionsGW = GWOptions(options_in, sys);
 GWinfor = kssolv2GW_info(GWinfor, mol, optionsGW.Groundstate);
 
