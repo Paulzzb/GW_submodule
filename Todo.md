@@ -2,7 +2,10 @@
 - Finish the code that transform the QE result to result we can use.
 
 ## 清单
+- [ ] 修改Gauss-Lendgre积分公式对应代码.
+
 - [ ] 测试在使用qe的输出结果情形下，计算全频率时候与BGW的差距
+  - [ ] 看上去差的不少，一个个修改
 - [ ] 现在看上去gpp代码有些问题，需要重新修正一下.
 - [ ] 需要 test/ 中添加正确结果，用于进行运行后的对比.
 - [ ] 全频率下，用三对角格式生成的 Gauss-Legendre 积分公式, 并测试效果
