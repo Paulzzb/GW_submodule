@@ -37,8 +37,9 @@ function gwCalculation(GWinfor, options)
               eval(strEval);
             end
         end
-        Vxc = GWinfor.Vxc * ry2ev;
-        ev  = GWinfor.ev  * ry2ev;
+        % Vxc = GWinfor.Vxc * ry2ev;
+        Vxc = GWinfor.Vxc;
+        ev  = GWinfor.ev * ry2ev;
         ev = ev(nv-nv_ener+1:nv+nc_ener);
         Vxc = Vxc(nv-nv_ener+1:nv+nc_ener);
         Sigma = ev - Vxc + Ex + Eres + Eint;

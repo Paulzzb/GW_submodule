@@ -173,7 +173,7 @@ if (options.frequency_dependence == 2)
   end
   
   if isfield(options, 'skip_epsilon')
-    opt.GWCal.skip_epsilon =true
+    opt.GWCal.skip_epsilon = true;
   end
   
 %  if isfield(options, 'skip_chi')
