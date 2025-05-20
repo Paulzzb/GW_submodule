@@ -283,8 +283,10 @@ if (abs(opt.GWCal.dDeltaFreq) > TOL_ZERO && opt.GWCal.freq_dep == 2)
     freqStep = opt.GWCal.dDeltaFreq;
     while (tmpFreq <= opt.GWCal.dFreqCutoff2)
         iFreqCounter = iFreqCounter + 1;
-        opt.GWCal.dFreqGrid(iFreqCounter) = tmpFreq / ry2ev;
-        opt.GWCal.dFreqBrd(iFreqCounter) = opt.GWCal.dBrdning * (0.0 + 1.0i) / ry2ev;
+        % opt.GWCal.dFreqGrid(iFreqCounter) = tmpFreq / ry2ev;
+        % opt.GWCal.dFreqBrd(iFreqCounter) = opt.GWCal.dBrdning * (0.0 + 1.0i) / ry2ev;
+        opt.GWCal.dFreqGrid(iFreqCounter) = tmpFreq;
+        opt.GWCal.dFreqBrd(iFreqCounter) = opt.GWCal.dBrdning * (0.0 + 1.0i);
 
         if (tmpFreq < opt.GWCal.dFreqCutoff1)
             tmpFreq = tmpFreq + opt.GWCal.dDeltaFreq;

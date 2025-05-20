@@ -20,7 +20,7 @@ if nargin <= 2
 end
 
 if nargin <= 3
-  method_imag = 0;
+  method_imag = 1;
 end
 
 switch method_real
@@ -54,7 +54,7 @@ switch method_real
     grid_real = dFreqGrid(1:nfreq_real) + dFreqBrd(1:nfreq_real);
 
     coeff_real_func = cell(nfreq_real, 1);
-    for ifreq = 1:nfreq_real
+    for ifreq = 1:nfreq_real;
       coeff_real_func{ifreq} = @(x) 0;
     end
     % left = real(grid_real(1));
@@ -104,7 +104,7 @@ switch method_imag
 
     
     grid_imag = dFreqGrid(nfreq_real+1:nFreq) + dFreqBrd(nfreq_real+1:nFreq);
-    % grid_imag = grid_imag * ry2ev;
+    grid_imag = grid_imag * ry2ev;
     for ifreq = 1:nfreq_imag
       if (ifreq == 1)
         freqStart = imag(grid_imag(ifreq));
@@ -112,13 +112,13 @@ switch method_imag
         freqStart = imag((grid_imag(ifreq - 1) + grid_imag(ifreq)) * 0.5);
       end
       if (ifreq == options.GWCal.nfreq_imag)
-        freqEnd = (3*imag(grid_imag(end)) - imag(grid_imag(end)))*0.5;
+        freqEnd = imag(grid_imag(end));
       else
         freqEnd = imag((grid_imag(ifreq) + grid_imag(ifreq + 1)) * 0.5);
       end
       coeff_imag_func{ifreq} = @(x) atan(freqEnd ./ x) - atan(freqStart ./ x);
     end
-    % grid_imag = grid_imag / ry2ev;
+    grid_imag = grid_imag / ry2ev;
   case 1
     if isfield(options.GWCal, 'nfreq_imag')
       nfreq_imag = options.GWCal.nfreq_imag;

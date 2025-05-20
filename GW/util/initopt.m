@@ -117,7 +117,7 @@ function [options_in, sys] = kssolv2GW_initopt(options_in, optinput)
       options_in.number_imaginary_freqs = 15;
     end
     if ~isfield(options_in, 'broadening')
-      options_in.broadening = 0.2;
+      options_in.broadening = 0.1;
     end
     if ~isfield(options_in, 'delta_frequency')
       options_in.delta_frequency = 1;

@@ -29,8 +29,8 @@ function sres = gw_fullfreq_cd_res(GWinfo, options)
 %        end 
 
 
-% testflag1 = true;
-% testflag1 = false;
+testflag1 = true;
+testflag1 = false;
 
 startintgral = tic;
 
@@ -57,13 +57,23 @@ nv_ener = length(bandtocal_occ);
 nc_ener = length(bandtocal_unocc);
 
 % Initialize other values
+if flagry2ev
+  GWinfo.ev = GWinfo.ev * ry2ev;
+  GWinfo.Vxc = GWinfo.Vxc * ry2ev;
+  options.GWCal.dFreqBrd = options.GWCal.dFreqBrd * ry2ev;
+  options.GWCal.dFreqGrid = options.GWCal.dFreqGrid * ry2ev;
+end
 
 GWinfo.Z     = GWinfo.Z * sqrt(vol);
 Z     = GWinfo.Z;
-ev    = GWinfo.ev * ry2ev;
+ev    = GWinfo.ev;
+Vxc   = GWinfo.Vxc;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
 aqsFlag = ~isempty(GWinfo.aqs);
-Dcoul = Dcoul * ry2ev;
+Dcoul(1, 1) = GWinfo.coulG0;
+if flagry2ev
+  Dcoul = Dcoul * ry2ev;
+end
 
 
 % 1. Generate frequency sequences in real axis and imaginary axis.
@@ -85,14 +95,15 @@ fprintf('Time for Generating Frequencies = %.3s.\n', timeFrequencyGen);
 % ev = ev * ry2ev;
 % grid_real = grid_real * ry2ev;
 % grid_imag = grid_imag * ry2ev;
+Dcoul = Dcoul * ry2ev;
 
 
 sres = zeros(n_ener, 1);
-% if testflag1
-%   load I_eps_array.mat
-%   load coeff_real.mat
-%   load sres_elements.mat  
-% end
+if testflag1
+  load I_eps_array.mat
+  load coeff_real.mat
+  load sres_elements.mat  
+end
 
 % Place to save the <nn'|W(omega)|nn'>, MWM_occ for two occupied,
 % and MWM_unocc for two unoccupied.
@@ -102,7 +113,6 @@ MWM_unocc = zeros(nc_ener, nc_oper, nfreq_real);
 for ifreq = 1:nfreq_real
   omega = grid_real(ifreq);
   epsilon = zeros(ng, ng); 
-  Dcoul(1, 1) = 0;
   for ind_nv = nv-nv_oper+1:nv
     if aqsFlag
       Mgvc = GWinfo.aqs{ind_nv}(:, nv+1:nv+nc_oper);
@@ -124,13 +134,12 @@ for ifreq = 1:nfreq_real
     epsilon = eye(ng) - Dcoul * epsilon;
     epsilon = inv(epsilon);
     fprintf('ifreq = %3d, norm(epsilon) = %12.6f\n', ifreq, norm(epsilon, 'fro'));
-    Dcoul(1, 1) = GWinfo.coulG0*ry2ev;
     W = (eye(ng) - epsilon)*Dcoul / vol;
-    % if testflag1
-    %   W_old = (I_eps_array(:, :, ifreq))*Dcoul/vol;
-    %   out = norm(W - W_old);
-    %   fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
-    % end
+    if testflag1
+      W_old = (I_eps_array(:, :, ifreq))*Dcoul/vol;
+      out = norm(W - W_old);
+      fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
+    end
     clear epsilon;
   end
 
@@ -185,12 +194,17 @@ occ_sign = -1;
 for ibandener_count = 1:nv_ener 
   ibandener = bandtocal_occ(ibandener_count);
   for ibandoper = nv-nv_oper+1:nv
-    % if testflag1 
-    %   coeffcount = 0;
-    % end
+    if testflag1 
+      coeffcount = 0;
+    end
     ibandoper_Mg = ibandoper - nv+nv_oper;
-    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
-    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if flagry2ev
+      %x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+      x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    else
+      x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+      % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL/ry2ev;
+    end
     
     if x >= 0
       continue;
@@ -198,36 +212,36 @@ for ibandener_count = 1:nv_ener
     x = abs(x);
     for ifreq = 1:nfreq_real
       coeff = coeff_real_func{ifreq}(x);
-      % if testflag1
-      %   coeff_old = coeff_real(ibandener_count, ibandoper_Mg, ifreq);
-      %   if abs(coeff - coeff_old) >= TOL_ZERO
-      %     fprintf("n = %d, i = %d, ifreq = %d, coeff not equal to coeff_real!\n", ...
-      %              ibandener, ibandoper, ifreq);
-      %     fprintf("coeff = %.3e, coeff_old = %.3e.\n", coeff, coeff_old);
-      %   end
-      %   elements_new = MWM_occ(ibandener_count, ibandoper_Mg, ifreq);
-      %   elements_old = sres_elements(ibandener_count, ibandoper_Mg, ifreq);
-      %   if abs(elements_new - elements_old) >= TOL_ZERO
-      %     fprintf("n = %d, i = %d, elements not equal to sres_elements!", ...
-      %              ibandener, ibandoper);
-      %   end
-      % end 
+      if testflag1
+        coeff_old = coeff_real(ibandener_count, ibandoper_Mg, ifreq);
+        if abs(coeff - coeff_old) >= TOL_ZERO
+          fprintf("n = %d, i = %d, ifreq = %d, coeff not equal to coeff_real!\n", ...
+                   ibandener, ibandoper, ifreq);
+          fprintf("coeff = %.3e, coeff_old = %.3e.\n", coeff, coeff_old);
+        end
+        elements_new = MWM_occ(ibandener_count, ibandoper_Mg, ifreq);
+        elements_old = sres_elements(ibandener_count, ibandoper_Mg, ifreq);
+        if abs(elements_new - elements_old) >= TOL_ZERO
+          fprintf("n = %d, i = %d, elements not equal to sres_elements!", ...
+                   ibandener, ibandoper);
+        end
+      end 
 
       if abs(coeff) <= TOL_ZERO
         continue;
       end
       sres(ibandener_count) = sres(ibandener_count) ...
       - coeff * occ_sign * MWM_occ(ibandener_count, ibandoper_Mg, ifreq); 
-      % if testflag1
-      %   coeffcount = coeffcount+coeff;
-      % end
+      if testflag1
+        coeffcount = coeffcount+coeff;
+      end
 
-      % if testflag1
-      %   if (abs(coeffcount - 1) >= TOL_ZERO)
-      %     fprintf("n = %d, i = %d, coeff added up = %d, not 1!\n", ...
-      %             ibandener, ibandoper, coeffcount);
-      %   end
-      % end
+      if testflag1
+        if (abs(coeffcount - 1) >= TOL_ZERO)
+          fprintf("n = %d, i = %d, coeff added up = %d, not 1!\n", ...
+                  ibandener, ibandoper, coeffcount);
+        end
+      end
     end
   end
 end
@@ -238,8 +252,13 @@ for ibandener_count = 1:nc_ener
   ibandener = bandtocal_unocc(ibandener_count);
   for ibandoper = nv+1:nv+nc_oper
     ibandoper_Mg = ibandoper - nv;
-    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
-    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if flagry2ev
+      x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+%      x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    else
+%       x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL/ry2ev;
+      x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    end
     if x < 0
       continue;
     end

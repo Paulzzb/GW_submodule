@@ -30,7 +30,6 @@ function sint = gw_fullfreq_cd_int(GWinfo, options)
 % flag2 is for method (numerically equal, suggest to use flag2 = true.)
 testflag1 = true;
 testflag1 = false;
-testflag2 = true;
 % flag2 = true;
 flag2 = false;
 
@@ -91,9 +90,6 @@ if testflag1
   load aqslist.mat
   aqscount = 0;
 end
-% if testflag2
-  % debugin
-% end
 for ifreq = 1:nfreq_imag
   omega = grid_imag(ifreq);
   coeff_func = coeff_imag_func{ifreq};
@@ -213,7 +209,7 @@ for ifreq = 1:nfreq_imag
         else
           coeff = coeff_func(x);
         end
-%         fprintf("iener = %6d, ioper = %6d, coeff = %12.6f\n", ibandoper, ibandener, coeff); 
+%        fprintf("iener = %6d, ioper = %6d, coeff = %12.6f\n", ibandoper, ibandener, coeff); 
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
         if testflag1
           if abs(coeff_old - coeff) >= 1e-6
