@@ -30,24 +30,25 @@ options_GW.inputfile = GWinput;
 
 
 
-  % 3.3 Read qe and ks
-  qepath = 'Si8/Si8.save'
-  [sys, extra_info] = read_qe_gw_bgw(qepath);
-  
-  
-  % use ggrid to find corresponding
-  qeinfo.ggrid = double(extra_info.mill{1});
-  ksinfo.ggrid = GWinput.coulG(:, 1:3);
-  ind_bgw2ks = zeros(size(GWinput.coulG, 1), 1);
-  for i = 1:size(GWinput.coulG, 1)
-      ind_bgw2ks(i) = findind(ksinfo.ggrid(i, :), qeinfo.ggrid);
-  end
-  
-  % change data
-  nb = optionsGW.Constant.nv + optionsGW.Constant.nc;
-  GWinput.ev = extra_info.ev(1:nb);
-  % GWinput.coulG = extra_info.coulG;
-  GWinput.Z = extra_info.X0.wavefuncell{1}.psi(ind_bgw2ks, 1:nb);
+ % 3.3 Read qe and ks
+ qepath = 'Si8/Si8.save'
+ [sys, extra_info] = read_qe_gw_bgw(qepath);
+ 
+ 
+ % use ggrid to find corresponding
+ qeinfo.ggrid = double(extra_info.mill{1});
+ ksinfo.ggrid = GWinput.coulG(:, 1:3);
+ ind_bgw2ks = zeros(size(GWinput.coulG, 1), 1);
+ for i = 1:size(GWinput.coulG, 1)
+     ind_bgw2ks(i) = findind(ksinfo.ggrid(i, :), qeinfo.ggrid);
+ end
+ 
+ % change data
+ nb = optionsGW.Constant.nv + optionsGW.Constant.nc;
+ GWinput.ev = extra_info.ev(1:nb);
+ % GWinput.coulG = extra_info.coulG;
+ GWinput.Z = extra_info.X0.wavefuncell{1}.psi(ind_bgw2ks, 1:nb);
+ optionsGW.Groundstate.ind_bgw2ks = ind_bgw2ks;
 
 
 

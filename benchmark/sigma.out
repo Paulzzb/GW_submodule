@@ -1,0 +1,505 @@
+
+ BerkeleyGW version 3.0
+ Sigma code, Complex version, run on 24-Apr-2025 at 17:46:08 +0800
+
+                                                                 ..o.          
+                                                                .oxxo.         
+                                                               .oxxxxo...      
+                                                               oxxxxxxo.       
+                                                              .oxxxxxxx.       
+                                                              .ooooooxxo..     
+                                                              .oooooooxo..     
+                                                              .oooooxxo...     
+                                                       .........oxooo......    
+                                                 ............................  
+                                             ................................. 
+                                          .................................... 
+           .          ..oo. ....  .................................oooxxxxxxxo.
+     .............oxxxx@ox@@@x@x.....................o...........ooooooooooxx. 
+    .o.........oox@x.oo........xxx@@............ooxxxxo..........ooooxxxxxoxo  
+    .x........x@xxo...............o@xxo........oxxx@@@xoooooooooooooooxxxo...  
+    .o......ox@@o..................oox@o.....ooxxx@xoooxxxxxxxoooooooooooo.... 
+    o..ooooo@@xoooo....ooo...........x@o.....ooxxxxo   .oxxxxxxxxxxooooooo.... 
+    . .oooo@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@....ooooox.     .oxx@@@@@xxoo........ 
+      .ooooxxxxxxxooooooxooooooooooooooxo...oooooxx.        ..ox@xxxoo.........
+      .ooooooxxxx@xoooooooooooooxxoooooooooooxxxxx.            .oxxooooooooxxo.
+     .oooooxxxxx@@@xxxxxxxxxxxxxxxxxxxxxxxxoxxxxo.                .oxxxxxxxxo. 
+   ....oooxxxxx@@@xo..oxxx@@@@@@xxxxoxxoooooooxx.                  .oxxxoo..   
+  .....ooxxxx@@xo.       ........    .ooooooooxxo                              
+  ..oooxxxx@@@o                       .oooooooxoo.                             
+  ....oxooxxxxx.                       .ooo..oooo.                             
+  .....o.ooxxxxxo.                     .oooooooxo.                             
+ ......ooooxxxxxxo.                     .ooooooxoo..                           
+........ooxxxxxxxo..                     .o....oxoo...                         
+.......ooooxxxxxxxo.                     ........oooo.                         
+.ooooooo..ooxxxxoooo.                    .........ooo...                       
+..oxo...ooooxxxoooo..                    .ooo......oooo...                     
+  .ooooo....o.                            .oxxxoo....ooo....                   
+    .oooooo...                              ...ooooo...ooo..                   
+       ...                                     .oo.......                      
+                                               ....ooo...                      
+                      __              __                                       
+ ______              [  |            [  |                 ._____  _          _ 
+|_   _ \              | |  _          | |                /  ___ \| |        | |
+  | |_) | .---.  _. _.| | / |  .---.  | | .---.  _    _ / /    \_|\ \  /\  / / 
+  |  __'./ /__\\[ /`\_| '' <  / /__\\ | |/ /__\\| \  | | |   _____ \ \/  \/ /  
+ _| |__| | \__. | |   | |`\ \ | \___. | || \___. \ \/ / \ \.___| |  \  /\  /   
+|_______/ \.__./[_]  [__|  \_] \.__./[___]\.__./  \  /   \.____./    \/  \/    
+                                                  / /                          
+                                                 /_/                           
+ --------------------------------------------------------------------------------
+ Please cite the main BerkeleyGW paper when using results from this calculation:
+
+ Jack Deslippe, Georgy Samsonidze, David A. Strubbe, Manish Jain, Marvin L.
+ Cohen, and Steven G. Louie, "BerkeleyGW: A Massively Parallel Computer Package
+ for the Calculation of the Quasiparticle and Optical Properties of Materials
+ and Nanostructures," Comput. Phys. Commun. 183, 1269 (2012)
+
+ Aditionally, PLEASE CITE ALL PAPERS REPORTED AT THE END OF THIS CALCULATION.
+ --------------------------------------------------------------------------------
+
+ Running MPI version (parallel)
+ Running with 16 MPI task(s)
+
+ Compilation flags:
+ - Compiler: INTEL
+ - Para. flags: MPI
+ - Math  flags: USESCALAPACK, UNPACKED, USEFFTW3, HDF5
+ - Debug flags: 
+
+ Running with verbosity level 1 (default).
+
+ Using the full frequency-dependent inverse dielectric matrix
+
+ We are communicating via MPI
+
+ Computing CH as a partial sum over empty bands
+
+ Running with semiconductor screening
+
+ We are using a truncated Coulomb interaction: spherical
+ r_cut =   5.000000 Bohr
+ Cutoff for Monte-Carlo average of Coulomb potential: 1.000E-012 Ry
+
+ Reading exchange-correlation matrix elements from vxc.dat file
+
+ Treating W within the full frequency Contour Deformation method
+ We`ll use an integration scheme of order 0 in the Contour Deformation method
+
+ Frequency sampling: using a QP-centered grid with 5 points.
+
+ Memory available: 4289.9 MB per PE
+ 
+ Read from eps0mat.h5:
+ - Number of G-vectors in the charge-density grid: 13301
+ - Max. number of G-vectors for dielectric matrices: 1743
+ - Cutoff of the dielectric matrix (Ry): 20.000
+ - Number of imaginary frequencies: 15
+ - Total number of frequencies: 26
+ - Frequency dependence: 2
+ - Number of q-points: 1
+ - Q grid: 1 1 1
+ 
+ Reading header of WFN_inner
+ Highest occupied band (unshifted grid) = 16
+ Valence max    (unshifted grid) = 6.152831 eV
+ Conduction min (unshifted grid) = 6.623083 eV
+ Middle energy  (unshifted grid) = 6.387957 eV
+ Fermi  energy  (unshifted grid) = 6.387957 eV
+
+ 
+ Calculation parameters:
+ - Cutoff of the bare Coulomb interaction (Ry): 20.00
+ - Cutoff of the screened Coulomb interaction (Ry): 20.00
+ - Number of G-vectors up to the bare int. cutoff: 1743
+ - Number of G-vectors up to the screened int. cutoff: 1743
+ - Total number of bands in the calculation: 35
+ - Number of fully occupied valence bands: 16
+ - Number of partially occ. conduction bands: 0
+ 
+ Memory required for execution: 1208.3 MB per PE
+ Memory required for vcoul: 114.4 MB per PE
+ 
+ Number of electrons per unit cell (from ifmax) = 32.000000
+ Number of electrons per unit cell (from occupations) = 32.000000
+ Plasma Frequency = 1.207208 Ry
+
+ Q-grid symmetries are not being used.
+ 
+ Parallelization report:
+ - Using 16 processor(s), 4 pool(s), 4 processor(s) per pool.
+ - Each pool is computing 8 to 9 diagonal sigma matrix element(s).
+ - Note: distribution is not ideal because the number of diagonal sigma
+   matrix elements (35) is not divisible by the number of pools (4).
+ - Each pool is computing 0 off-diagonal sigma matrix element(s).
+ - Each pool is holding 8 to 9 band(s).
+ - Note: distribution is not ideal because the total number of bands
+   (35) is not divisible by the number of processors per pool (4).
+ 
+ 
+ Started reading wavefunctions (WFN_inner) with 35 state(s) at 17:46:09.
+ [ 17:46:09 |   0% ] state  1 / 35.
+ [ 17:46:09 |   6% ] state  3 / 35, remaining: 0 s.
+ [ 17:46:09 |   9% ] state  4 / 35, remaining: 0 s.
+ [ 17:46:09 |  17% ] state  7 / 35, remaining: 0 s.
+ [ 17:46:09 |  29% ] state 11 / 35, remaining: 0 s.
+ [ 17:46:09 |  37% ] state 14 / 35, remaining: 0 s.
+ [ 17:46:09 |  49% ] state 18 / 35, remaining: 0 s.
+ [ 17:46:09 |  57% ] state 21 / 35, remaining: 0 s.
+ [ 17:46:09 |  69% ] state 25 / 35, remaining: 0 s.
+ [ 17:46:09 |  77% ] state 28 / 35, remaining: 0 s.
+ [ 17:46:09 |  89% ] state 32 / 35, remaining: 0 s.
+ [ 17:46:09 |  97% ] state 35 / 35, remaining: 0 s.
+ Finished reading wavefunctions (WFN_inner) at 17:46:09.
+ Elapsed time: 0 s.
+ 
+
+ Scissors parameters:
+ - Valence:    es =   0.0000 eV, e0 =   0.0000 eV, edel =   0.0000
+ - Conduction: es =   0.0000 eV, e0 =   0.0000 eV, edel =   0.0000
+
+ Scissors parameters (outer):
+ - Valence:    es =   0.0000 eV, e0 =   0.0000 eV, edel =   0.0000
+ - Conduction: es =   0.0000 eV, e0 =   0.0000 eV, edel =   0.0000
+
+ Number of bands to compute diagonal self-energy matrix elements: 35
+ Bands:
+ - 1
+ - 2
+ - 3
+ - 4
+ - 5
+ - 6
+ - 7
+ - 8
+ - 9
+ - 10
+ - 11
+ - 12
+ - 13
+ - 14
+ - 15
+ - 16
+ - 17
+ - 18
+ - 19
+ - 20
+ - 21
+ - 22
+ - 23
+ - 24
+ - 25
+ - 26
+ - 27
+ - 28
+ - 29
+ - 30
+ - 31
+ - 32
+ - 33
+ - 34
+ - 35
+ Number of off-diagonal bands to compute self-energy matrix elements: 0
+ 
+ GPU acceleration is : DISABLED
+ 
+ Algorithms used:
+ - mtxel     : CPU_ALGO
+ - sigma_gpp : CPU_ALGO
+
+ Total number of frequencies in the dielectric matrix: 26
+ Number of imag. frequencies in the dielectric matrix: 15
+
+ 
+ Started reading eps0mat.h5 with 1 q-point(s) at 17:46:09.
+ [ 17:46:09 |   0% ] q-point 1 / 1.
+ Finished reading eps0mat.h5 at 17:47:23.
+ Elapsed time: 74 s.
+ 
+ Number of k-points in WFN_inner: 1
+ Number of k-points in the full BZ of WFN_inner: 1
+ 
+================================================================================
+ 17:47:23   Dealing with k =  0.000000  0.000000  0.000000                 1 / 1
+================================================================================
+
+ Reading vxc.dat
+ Number of q-points in the irreducible BZ(k) (nrq): 1
+ 
+ Started calculating Sigma with 9 block(s) at 17:47:23.
+ [ 17:47:36 |   0% ] block 1 / 9.
+ [ 17:47:56 |  11% ] block 2 / 9.
+ [ 17:48:10 |  22% ] block 3 / 9, remaining: 97 s.
+ [ 17:48:28 |  33% ] block 4 / 9, remaining: 95 s.
+ [ 17:48:46 |  44% ] block 5 / 9, remaining: 82 s.
+ [ 17:49:03 |  56% ] block 6 / 9, remaining: 67 s.
+ [ 17:49:15 |  67% ] block 7 / 9, remaining: 47 s.
+ [ 17:49:33 |  78% ] block 8 / 9, remaining: 32 s.
+ [ 17:49:52 |  89% ] block 9 / 9, remaining: 16 s.
+ Finished calculating Sigma at 17:50:12.
+ Elapsed time: 169 s.
+ 
+ Unsymmetrized values for ik =   1 spin = 1
+ 
+     n      Emf       Eo        X      Vxc   Re Res   Re Int   Re Sig
+                                             Im Res   Im Int   Im Sig
+     1   -5.755   -5.755  -18.640  -10.395   10.208   -3.927  -12.359  -10.395
+                                             -0.000   -0.000   -0.000   -0.000
+     2   -1.662   -1.662  -15.842  -10.788    7.221   -2.126  -10.746  -10.788
+                                             -0.000    0.000   -0.000   -0.000
+     3   -1.662   -1.662  -15.842  -10.788    6.335   -1.239  -10.746  -10.788
+                                              0.000   -0.000    0.000    0.000
+     4   -1.662   -1.662  -15.842  -10.788    6.770   -1.675  -10.746  -10.788
+                                              0.000   -0.000    0.000    0.000
+     5   -1.662   -1.662  -15.842  -10.788    6.107   -1.012  -10.746  -10.788
+                                             -0.000    0.000   -0.000   -0.000
+     6   -1.662   -1.662  -15.842  -10.788    5.718   -0.623  -10.746  -10.788
+                                              0.000   -0.000    0.000    0.000
+     7   -1.662   -1.662  -15.842  -10.788    5.349   -0.254  -10.746  -10.788
+                                              0.000   -0.000    0.000    0.000
+     8    3.258    3.258  -12.873  -10.514    1.803   -0.740  -11.810  -10.514
+                                             -0.000   -0.000   -0.000   -0.000
+     9    3.258    3.258  -12.873  -10.514    1.736   -0.674  -11.810  -10.514
+                                             -0.000    0.000    0.000   -0.000
+    10    3.258    3.258  -12.873  -10.514    1.694   -0.631  -11.810  -10.514
+                                              0.000   -0.000    0.000    0.000
+    11    3.258    3.258  -12.873  -10.514    1.703   -0.641  -11.810  -10.514
+                                              0.000    0.000    0.000    0.000
+    12    3.258    3.258  -12.873  -10.514    1.512   -0.449  -11.810  -10.514
+                                              0.000   -0.000    0.000    0.000
+    13    3.258    3.258  -12.873  -10.514    1.411   -0.348  -11.810  -10.514
+                                             -0.000    0.000   -0.000   -0.000
+    14    6.153    6.153  -13.151  -11.280    0.015    0.987  -12.150  -11.280
+                                             -0.000   -0.000   -0.000   -0.000
+    15    6.153    6.153  -13.151  -11.280    0.000    1.001  -12.150  -11.280
+                                              0.000    0.000    0.000    0.000
+    16    6.153    6.153  -13.151  -11.280    0.000    1.001  -12.150  -11.280
+                                              0.000   -0.000   -0.000    0.000
+    17    6.623    6.623   -4.729   -8.880   -0.730    0.088   -5.371   -8.880
+                                              0.000   -0.000    0.000    0.000
+    18    6.623    6.623   -4.729   -8.880   -0.821    0.179   -5.371   -8.880
+                                             -0.000    0.000   -0.000   -0.000
+    19    6.623    6.623   -4.729   -8.880   -1.037    0.395   -5.371   -8.880
+                                              0.000   -0.000    0.000    0.000
+    20    6.623    6.623   -4.729   -8.880   -0.903    0.260   -5.371   -8.880
+                                             -0.000    0.000   -0.000   -0.000
+    21    6.623    6.623   -4.729   -8.880   -0.754    0.112   -5.371   -8.880
+                                              0.000   -0.000    0.000    0.000
+    22    6.623    6.623   -4.729   -8.880   -1.142    0.499   -5.371   -8.880
+                                             -0.000    0.000   -0.000   -0.000
+    23    8.553    8.553   -5.947   -9.926   -1.788    1.580   -6.155   -9.926
+                                              0.000    0.000    0.000    0.000
+    24    8.553    8.553   -5.947   -9.926   -1.788    1.580   -6.155   -9.926
+                                              0.000    0.000    0.000    0.000
+    25    8.553    8.553   -5.947   -9.926   -1.793    1.585   -6.155   -9.926
+                                              0.000    0.000    0.000    0.000
+    26    9.041    9.041   -5.391  -10.841   -2.605    1.384   -6.612  -10.841
+                                              0.000    0.000    0.000    0.000
+    27   13.495   13.495   -1.917   -7.755   -4.050    0.883   -5.084   -7.755
+                                              0.000    0.000    0.000    0.000
+    28   13.839   13.839   -4.316   -9.960   -1.261    0.744   -4.832   -9.960
+                                              0.000    0.000    0.000    0.000
+    29   13.839   13.839   -4.316   -9.960   -1.261    0.744   -4.832   -9.960
+                                              0.000    0.000    0.000    0.000
+    30   15.867   15.867   -4.135  -10.459   -2.679    1.001   -5.813  -10.459
+                                             -0.000    0.000   -0.000   -0.000
+    31   15.867   15.867   -4.135  -10.459   -2.717    1.039   -5.813  -10.459
+                                              0.000   -0.000   -0.000    0.000
+    32   15.867   15.867   -4.135  -10.459   -2.904    1.226   -5.813  -10.459
+                                              0.000    0.000    0.000    0.000
+    33   15.867   15.867   -4.135  -10.459   -2.970    1.292   -5.813  -10.459
+                                              0.000    0.000    0.000    0.000
+    34   15.867   15.867   -4.135  -10.459   -3.071    1.393   -5.813  -10.459
+                                              0.000    0.000    0.000    0.000
+    35   15.867   15.867   -4.135  -10.459   -3.212    1.533   -5.813  -10.459
+                                              0.000   -0.000    0.000    0.000
+
+ Symmetrized values from band-averaging:
+
+       k =  0.000000  0.000000  0.000000 ik =   1 spin = 1
+ 
+     n      Emf       Eo      Vxc        X   Re Cor  Re Eqp0  Re Eqp1     Soln
+                                             Im Cor  Im Eqp0  Im Eqp1
+     1   -5.755   -5.755  -10.395  -18.640    6.281   -7.719   -6.037   unique
+                                             -0.000   -0.000   -0.000
+     2   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                             -0.000   -0.000   -0.000
+     3   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                              0.000    0.000    0.000
+     4   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                              0.000    0.000    0.000
+     5   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                              0.000    0.000    0.000
+     6   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                              0.000    0.000    0.000
+     7   -1.662   -1.662  -10.788  -15.842    5.095   -1.621   -1.644   unique
+                                              0.000    0.000    0.000
+     8    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+     9    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+    10    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+    11    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+    12    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+    13    3.258    3.258  -10.514  -12.873    1.063    1.961    2.167   unique
+                                              0.000    0.000    0.000
+    14    6.153    6.153  -11.280  -13.151    1.001    5.283    5.427   unique
+                                             -0.000   -0.000   -0.000
+    15    6.153    6.153  -11.280  -13.151    1.001    5.283    5.427   unique
+                                             -0.000   -0.000   -0.000
+    16    6.153    6.153  -11.280  -13.151    1.001    5.283    5.427   unique
+                                             -0.000   -0.000   -0.000
+    17    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                             -0.000   -0.000    0.000
+    18    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                             -0.000   -0.000    0.000
+    19    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                             -0.000   -0.000    0.000
+    20    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                             -0.000   -0.000    0.000
+    21    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                              0.000    0.000    0.000
+    22    6.623    6.623   -8.880   -4.729   -0.642   10.132    9.929  extrap+
+                                              0.000    0.000    0.000
+    23    8.553    8.553   -9.926   -5.947   -0.208   12.325   11.894  extrap+
+                                              0.000    0.000    0.000
+    24    8.553    8.553   -9.926   -5.947   -0.208   12.325   11.894  extrap+
+                                              0.000    0.000    0.000
+    25    8.553    8.553   -9.926   -5.947   -0.208   12.325   11.894  extrap+
+                                              0.000    0.000    0.000
+    26    9.041    9.041  -10.841   -5.391   -1.220   13.271   11.769  extrap+
+                                              0.000    0.000   -0.000
+    27   13.495   13.495   -7.755   -1.917   -3.167   16.166   17.262  extrap+
+                                              0.000    0.000   -0.000
+    28   13.839   13.839   -9.960   -4.316   -0.517   18.967   18.639  extrap+
+                                              0.000    0.000    0.000
+    29   13.839   13.839   -9.960   -4.316   -0.517   18.967   18.639  extrap+
+                                              0.000    0.000    0.000
+    30   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+    31   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+    32   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+    33   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+    34   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+    35   15.867   15.867  -10.459   -4.135   -1.678   20.513   21.820  extrap+
+                                              0.000    0.000   -0.000
+
+================================================================================
+
+    n = band index.
+  Emf = "inner" mean-field energy eigenvalue used to construct Sigma(E),
+        read from WFN_inner.
+   Eo = "outer" mean-field energy eigenvalue where we center the evaluation
+        frequency grid {E} of Sigma(E). Defaults to Emf, unless
+        you use WFN_outer and eqp_outer.dat / scissors_outer.
+  Vxc = exchange-correlation pot., calculated from VXC or read from vxc.dat.
+  KIH = Kinetic energy + Ionic potential + Hartree, read from kih.dat.
+    X = bare exchange.
+  Res = residue contrib. to Sigma(E) at energy E=Eo.
+  Int = contrib. to Sigma(E) at energy E=Eo due to integral over imag. freqs.
+  Cor = Res + Int = correlation portion of Sigma(E) at energy E=Eo.
+  Sig = X + Cor = self energy Sigma(E) at energy E=Eo.
+ Eqp0 = on-shell QP energy = Emf - Vxc + Sig(Eo)
+        Eqp0 is *not* the recommended quantity to use for QP properties.
+ Eqp1 = off-shell solution to the linearized  Dyson`s equation
+      = Eqp0 + (dSig/dE) / (1 - dSig/dE) * (Eqp0 - Eo),
+        or a full linear interpolation if more freq. points where computed.
+        Eqp1 is the recommended quantity to use for QP properties.
+ Soln = Whether we found a solution to Dyson`s equation for Eqp1 (see notes).
+  Znk = quasiparticle renormalization factor
+
+ Notes on the solutions to Dyson`s equation (Soln):
+ - When we solve Dyson`s eqn. for Eqp1, we might find several or no roots.
+ - If Soln=unique, there is only one solution and the answer is unambiguous
+ - If Soln=extrap{-/+}, we found a solution by extrapolating Sigma(E) to values of
+   E smaller/greater than our frequency grid. PROCEED WITH CAUTION
+ - If Soln=MULT:, there are multiple solutions to Dyson`s equation. We
+   report the solution closer to Eqp0. PROCEED WITH CAUTION
+ - If Soln=NO_SOLN!, there is no solution and extrap. is not possible. This
+   can happen if your frequency grid for Sigma is too small, and Sigma(E) is
+   ill-behaved. We simply copy Eqp0 to Eqp1, so DON`T TRUST THE ANSWER.
+ - The number of sols. in full-freq. calcs. is affected by self-consistently
+   updating the eigenvalues in WFN_inner. Consider reruning your calculation
+   with eqp or scissors corrections if you have many unstable solutions.
+
+ General notes:
+ - All energies are reported here in eV.
+ - Both Emf and Vxc contain the average pot. Vxc0, so Vxc0 doesn`t affect Sigma.
+ - Eqp1 and Eqp0 are Eqs. (36-37) from Hybertsen & Louie PRB 34 5390.
+ - We recommend you use Eqp1 for QP properties of materials.
+
+================================================================================
+
+
+********************************************************************************
+*                                                                              *
+* Your calculation employed methods and algorithms published in peer-reviewed  *
+* papers. Please, cite the following references to give proper credit to their *
+*          authors and help support future development of BerkeleyGW.          *
+*                                                                              *
+********************************************************************************
+
+ J. Deslippe, G. Samsonidze, D. A. Strubbe, M. Jain, M. L. Cohen, and S. G.
+ Louie, BerkeleyGW: A Massively Parallel Computer Package for the Calculation
+ of the Quasiparticle and Optical Properties of Materials and Nanostructures,
+ Computer Physics Communications 183, 1269 (2012).
+
+ M. S. Hybertsen and S. G. Louie, Electron Correlation in Semiconductors and
+ Insulators: Band Gaps and Quasiparticle Energies, Phys. Rev. B 34, 5390
+ (1986).
+
+********************************************************************************
+
+ 
+ Timing information
+ 
+                                CPU time (s)          WALL time (s)       Number
+ Routine                       min        max        min        max     of calls
+ -------------------------  ---------  ---------  ---------  ---------  --------
+ - Input I/O                     0.00       0.35       0.00       0.38        38
+ - Input Comm                    0.00       0.35       0.00       0.39        38
+ - FFT Zero                      0.02       0.03       0.02       0.05        90
+ - FFT Put                       0.01       0.01       0.00       0.02        90
+ - FFT Plan                      0.01       0.06       0.02       0.10       171
+ - FFT Exec                      0.05       0.06       0.04       0.09       171
+ - FFT Mltply                    0.06       0.07       0.06       0.08        81
+ - FFT Conjg                     0.00       0.01       0.00       0.01         9
+ - FFT Get                       0.01       0.01       0.00       0.03        81
+ - INPUT                         0.61       0.67       0.97       0.97         1
+ - EPSCOPY                      77.90      78.10      73.97      73.97         1
+ - FULLBZ                        0.02       0.04       0.04       0.07         2
+ - VXC                           0.00       0.00       0.00       0.00         2
+ - SUBGRP                        0.00       0.00       0.00       0.00         1
+ - IRRBZ                         0.00       0.00       0.00       0.00         1
+ - GMAP                          0.00       0.00       0.00       0.00         1
+ - GENWF                         0.00       0.00       0.00       0.01         1
+ - MTXEL                         0.17       0.24       0.21       0.30         9
+ - MTXEL_COR TOT               151.99     153.28     155.08     156.49         9
+ - VCOUL                         0.00       0.04       0.00       0.04         1
+ - EPSREAD                       2.15       2.22      13.72      13.82         1
+ - INPUT_OUTER                   0.00       0.00       0.00       0.00         1
+ - MTXEL COMM                    0.00       0.00       0.00       0.00         1
+ - BARE X                        0.00       0.00       0.00       0.01        10
+ - WF COMM                       0.00       0.00       0.00       0.00         1
+ - INPUT (READ)                  0.01       0.01       0.01       0.01        37
+ - INPUT (WRITE)                 0.00       0.00       0.00       0.00        35
+ - SUB-TRANSF TOT                0.00       0.00       0.00       0.00         9
+ - M.COR INIT                    0.00       0.00       0.00       0.00         9
+ - M.COR EPSINIT                 9.54       9.67      10.46      10.60         9
+ - M.COR COMM                    0.04       1.70      -4.96       1.87        36
+ - M.COR CD RES                 17.32      18.79      12.89      19.29       315
+ - M.COR CD INT                123.22     124.96     125.01     131.61       315
+ - M.COR CD SUM                  0.00       0.00       0.00       0.01       315
+ - READ NEPS                     0.01       0.01       0.01       0.01         1
+ - EPSCOPY IO                   77.89      78.06      73.92      73.92         1
+ - TOTAL                       234.37     234.69     245.75     245.75         1
+ 
+ Job Done
+ 
