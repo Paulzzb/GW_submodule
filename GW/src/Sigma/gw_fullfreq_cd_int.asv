@@ -26,13 +26,12 @@ function sint = gw_fullfreq_cd_int(GWinfo, options)
 %          end 
 %        end 
 
-% testflag1 is for debugging
 % flag2 is for method (numerically equal, suggest to use flag2 = true.)
-testflag1 = true;
-testflag1 = false;
-% flag2 = true;
 flag2 = false;
-
+testflag1 = false;
+testflag2 = true;
+ii = sqrt(-1);
+ind_bgw2ks = options.Groundstate.ind_bgw2ks;
 
 startintgral = tic;
 
@@ -53,20 +52,16 @@ n_ener = length(bandtocal);
 
 % Initialize other values
 GWinfo.Z     = GWinfo.Z * sqrt(vol);
-Z     = GWinfo.Z;
 ev    = GWinfo.ev;
-Vxc   = GWinfo.Vxc;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
 aqsFlag = ~isempty(GWinfo.aqs);
 Dcoul(1, 1) = GWinfo.coulG0;
-sqrtDcoul = sqrt(Dcoul); 
 
 % 1. Generate frequency sequences in imaginary axis.
 startFrequencyGen = tic;
 [grid_real, ~, grid_imag, coeff_imag_func] = freqgen(GWinfo, options);
 nfreq_real = length(grid_real);
 nfreq_imag = length(grid_imag);
-% eta = options.GWCal.dBrdning;
 eta = 0;
 % eta = 1e-4;
 timeFrequencyGen = toc(startFrequencyGen);
@@ -76,20 +71,21 @@ fprintf('Time for Generating Frequencies = %.3s.\n', timeFrequencyGen);
 % Since both KSSOLV_dft and frequency generating part use Ry as unit
 % Change unit first.
 ev = ev * ry2ev;
-grid_real = grid_real * ry2ev;
-% grid_imag = grid_imag * ry2ev;
 Dcoul = Dcoul * ry2ev;
 
 % ! testperpose
 
 sint = zeros(n_ener, 1);
+
 if testflag1
-  load intcoeff.mat
-  load I_eps_array.mat
-  load sint_n_i_omega.mat
-  load aqslist.mat
-  aqscount = 0;
+  W_V = readmatrix('W_V');
+  W_V = W_V(:, 1) + ii*W_V(:, 2);
+  W_V = reshape(W_V, ng, ng, []);
+  for i = 1:nfreq_real + nfreq_imag
+    W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
+  end
 end
+
 for ifreq = 1:nfreq_imag
   omega = grid_imag(ifreq);
   coeff_func = coeff_imag_func{ifreq};
@@ -121,30 +117,13 @@ for ifreq = 1:nfreq_imag
     epsilon = inv(epsilon);
     Dcoul(1, 1) = GWinfo.coulG0 * ry2ev;
     W = (eye(ng) - epsilon) * Dcoul / vol;
-    if testflag1
-      W_old = (I_eps_array(:, :, ifreq+nfreq_real))*Dcoul/vol;
-      out = norm(W - W_old);
-      fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
-      clear epsilon;
-    end
   end
   if flag2
     epsilon = (Dcoul/vol)^(-1) - epsilon*vol;
     % Here epsilon is supposed to be an Hermite matrix.
-    if testflag1
-      epsilon_old = epsilon;
-    end
     epsilon = tril(epsilon, -1) + tril(epsilon, -1)' + diag(real(diag(epsilon)));
-    if testflag1
-      norm(epsilon_old - epsilon)
-    end
     [L, D] = ldl(epsilon); rsqrtD = diag(sqrt(diag(D)).^(-1));
     W = Dcoul/vol - (L')^(-1) * rsqrtD * rsqrtD * (L)^(-1);
-    if testflag1
-      W_old = (I_eps_array(:, :, ifreq+nfreq_real))*Dcoul/vol;
-      out = norm(W - W_old);
-      fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
-    end
   end
   % 3. For each band i to construct GW operators
   for ibandener_count = 1:length(bandtocal) % Iteration over n
@@ -170,27 +149,11 @@ for ifreq = 1:nfreq_imag
         end
 
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
-        if testflag1
-          coeff_old = coeff_matrix(ibandener, ibandoper, ifreq);
-          if abs(coeff_old - coeff) >= 1e-6
-            fprintf("n = %d, i = %d, ifreq = %d,\n",...
-            ibandener, ibandoper, ifreq);
-            fprintf("coeff_old = %.6e, coeff = %.6e, diff = %.3e.\n", ...
-            coeff_old, coeff, coeff_old - coeff);
-          end
-        end
         if (ibandener == 2 & ibandoper == 2)
           1;
         end
         % out = Mgvc(:, ibandoper_Mg)'*Mgvc(:, ibandoper_Mg); 
         out = out_list(ibandoper_Mg);
-        if testflag1
-          out_old = sint_out(ibandener, ibandoper, ifreq);
-          fprintf("n = %d, i = %d, ifreq = %d,\n",...
-          ibandener, ibandoper, ifreq);
-          fprintf("func_int = %.6e, func = %.6e, diff = %.3e.\n", ...
-          out_old, out, out_old - out);
-        end
         sint(ibandener_count) = sint(ibandener_count) + coeff*out;
       end
     end % if 0
@@ -198,46 +161,29 @@ for ifreq = 1:nfreq_imag
       Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
                         (nv-nv_oper+1):nv+nc_oper);
       Mgvc = conj(Mgvc);
+      if testflag2
+        aqs_file = ['aqs_', num2str(ibandener_count)];
+        aqs = readmatrix(aqs_file);
+        aqs = aqs(:, 1) + ii*aqs(:, 2);
+        aqs = reshape(aqs, ng, []);
+        aqs(:, :) = aqs(ind_bgw2ks, :);
+        fprintf("Fnorm(aqs(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
+        fprintf("Fnorm(Mg(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
+      end
       for ibandoper = nv-nv_oper+1:nv+nc_oper  
         % x = (ev(ibandener) - ev(ibandoper))*ry2ev + TOL_SMALL;
         x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
-        if testflag1
-          coeff_old = coeff_matrix(ibandener, ibandoper, ifreq);
-        end
         if abs(x) < TOL_SMALL
           coeff = coeff_func(TOL_SMALL);
         else
           coeff = coeff_func(x);
         end
-%        fprintf("iener = %6d, ioper = %6d, coeff = %12.6f\n", ibandoper, ibandener, coeff); 
+%         fprintf("iener = %6d, ioper = %6d, coeff = %12.6f\n", ibandoper, ibandener, coeff); 
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
-        if testflag1
-          if abs(coeff_old - coeff) >= 1e-6
-            fprintf("n = %d, i = %d, ifreq = %d,\n",...
-            ibandener, ibandoper, ifreq);
-            fprintf("coeff_old = %.6e, coeff = %.6e, diff = %.3e.\n", ...
-            coeff_old, coeff, coeff_old - coeff);
-          end
-          if ifreq == 1
-            aqscount = aqscount+1;
-            if (norm(aqslist(:, aqscount) - Mgvc(:, ibandoper_Mg)) >= 1e-8)
-              fprintf("n = %d, i = %d, ifreq = %d,\n",...
-              ibandener, ibandoper, ifreq);
-              fprintf("aqstemp is different!");
-            end
-          end
-        end
         if (ibandener == 2 & ibandoper == 2)
           1;
         end
         out = Mgvc(:, ibandoper_Mg)'*W*Mgvc(:, ibandoper_Mg); 
-        if testflag1
-          out_old = sint_out(ibandener, ibandoper, ifreq);
-          fprintf("n = %d, i = %d, ifreq = %d,\n",...
-          ibandener, ibandoper, ifreq);
-          fprintf("func_int = %.6e, func = %.6e, diff = %.3e.\n", ...
-          out_old, out, out_old - out);
-        end
         sint(ibandener) = sint(ibandener) + coeff*out;
       end
     end % if 0

@@ -29,8 +29,8 @@ function sres = gw_fullfreq_cd_res(GWinfo, options)
 %        end 
 
 
-% testflag1 = true;
-% testflag1 = false;
+testflag1 = false;
+testflag2 = false;
 
 startintgral = tic;
 
@@ -88,11 +88,14 @@ fprintf('Time for Generating Frequencies = %.3s.\n', timeFrequencyGen);
 
 
 sres = zeros(n_ener, 1);
-% if testflag1
-%   load I_eps_array.mat
-%   load coeff_real.mat
-%   load sres_elements.mat  
-% end
+if testflag1
+  W_V = readmatrix('W_V');
+  W_V = W_V(:, 1) + ii*W_V(:, 2);
+  W_V = reshape(W_V, ng, ng, []);
+  for i = 1:nfreq_real + nfreq_imag
+    W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
+  end
+end
 
 % Place to save the <nn'|W(omega)|nn'>, MWM_occ for two occupied,
 % and MWM_unocc for two unoccupied.
@@ -111,10 +114,13 @@ for ifreq = 1:nfreq_real
             (nv+1:nv+nc_oper));
     end
     Mgvc = conj(Mgvc);
+
     
     Eden = ev(ind_nv) - ev(nv+1:nv+nc_oper);
-    edenDRtmp = (-1.0 ./ (omega - Eden - mi*eta) ...
-    + 1.0 ./ (omega + Eden + mi*eta));
+    % edenDRtmp = (-1.0 ./ (omega - Eden - mi*eta) ...
+    % + 1.0 ./ (omega + Eden + mi*eta));
+    edenDRtmp = (1.0 ./ (Eden - omega) ...
+    + 1.0 ./ (Eden + omega));
 
     epsilon = epsilon + 2*Mgvc*(edenDRtmp.*Mgvc') / vol;
   end % for ind_nv
@@ -126,11 +132,10 @@ for ifreq = 1:nfreq_real
     fprintf('ifreq = %3d, norm(epsilon) = %12.6f\n', ifreq, norm(epsilon, 'fro'));
     Dcoul(1, 1) = GWinfo.coulG0*ry2ev;
     W = (eye(ng) - epsilon)*Dcoul / vol;
-    % if testflag1
-    %   W_old = (I_eps_array(:, :, ifreq))*Dcoul/vol;
-    %   out = norm(W - W_old);
-    %   fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
-    % end
+    if testflag1
+      fprintf("Fnorm(W_V(%d)) = %12.6f\n", ibandener_count, norm(W_V(:, :, ifreq), 'fro'));
+      fprintf("Fnorm(W_me(%d)) = %12.6f\n", ibandener_count, norm(W(:, :, ifreq), 'fro'));
+    end
     clear epsilon;
   end
 
@@ -143,6 +148,7 @@ for ifreq = 1:nfreq_real
       Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
                         (nv-nv_oper+1):nv);
       Mgvc = conj(Mgvc);
+
       temp = W * Mgvc;
       for ibandoper_Mg = 1:nv_oper
         MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
@@ -151,7 +157,7 @@ for ifreq = 1:nfreq_real
     end
   end
   % Calculate for both i and n are unoccupied states.
-  % Sae it into MWM_unocc
+  % Save it into MWM_unocc
   for ibandener_count = 1:nc_ener 
     ibandener = bandtocal_unocc(ibandener_count);
     if 1
@@ -167,17 +173,6 @@ for ifreq = 1:nfreq_real
   end
 end% for ifreq
 
-% if testflag1
-%   for ifreq = 1:nfreq_real
-%     norm(sres_elements(1:4, 1:4, ifreq) - MWM_occ(:, :, ifreq))
-%     norm(sres_elements(5:8, 5:8, ifreq) - MWM_unocc(:, :, ifreq))
-%   end
-%   % sres_ele_old = sres_elements(ibandener_count, ibandoper_Mg, ifreq);
-%   % sres_ele = MWM_occ(ibandener_count, ibandoper_Mg, ifreq)
-%   % if (abs(sres_ele_old - sres(ibandener_count)) >= TOL_ZERO)
-%   %   fprintf("n = %d, i = %d, sres not equal to sres_elements!", ibandener, ibandoper);
-%   % end
-% end
 
 % Use the elements in MWM to calculate sres
 % First, both occupied states.
@@ -185,12 +180,9 @@ occ_sign = -1;
 for ibandener_count = 1:nv_ener 
   ibandener = bandtocal_occ(ibandener_count);
   for ibandoper = nv-nv_oper+1:nv
-    % if testflag1 
-    %   coeffcount = 0;
-    % end
     ibandoper_Mg = ibandoper - nv+nv_oper;
     % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
-    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
     
     if x >= 0
       continue;
@@ -198,36 +190,11 @@ for ibandener_count = 1:nv_ener
     x = abs(x);
     for ifreq = 1:nfreq_real
       coeff = coeff_real_func{ifreq}(x);
-      % if testflag1
-      %   coeff_old = coeff_real(ibandener_count, ibandoper_Mg, ifreq);
-      %   if abs(coeff - coeff_old) >= TOL_ZERO
-      %     fprintf("n = %d, i = %d, ifreq = %d, coeff not equal to coeff_real!\n", ...
-      %              ibandener, ibandoper, ifreq);
-      %     fprintf("coeff = %.3e, coeff_old = %.3e.\n", coeff, coeff_old);
-      %   end
-      %   elements_new = MWM_occ(ibandener_count, ibandoper_Mg, ifreq);
-      %   elements_old = sres_elements(ibandener_count, ibandoper_Mg, ifreq);
-      %   if abs(elements_new - elements_old) >= TOL_ZERO
-      %     fprintf("n = %d, i = %d, elements not equal to sres_elements!", ...
-      %              ibandener, ibandoper);
-      %   end
-      % end 
-
       if abs(coeff) <= TOL_ZERO
         continue;
       end
       sres(ibandener_count) = sres(ibandener_count) ...
       - coeff * occ_sign * MWM_occ(ibandener_count, ibandoper_Mg, ifreq); 
-      % if testflag1
-      %   coeffcount = coeffcount+coeff;
-      % end
-
-      % if testflag1
-      %   if (abs(coeffcount - 1) >= TOL_ZERO)
-      %     fprintf("n = %d, i = %d, coeff added up = %d, not 1!\n", ...
-      %             ibandener, ibandoper, coeffcount);
-      %   end
-      % end
     end
   end
 end
