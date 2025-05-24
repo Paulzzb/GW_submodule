@@ -144,31 +144,27 @@ for ifreq = 1:nfreq_real
   % Save it into MWM_occ
   for ibandener_count = 1:nv_ener
     ibandener = bandtocal_occ(ibandener_count);
-    if 1
-      Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
-                        (nv-nv_oper+1):nv);
-      Mgvc = conj(Mgvc);
+    Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
+                      (nv-nv_oper+1):nv);
+    Mgvc = conj(Mgvc);
 
-      temp = W * Mgvc;
-      for ibandoper_Mg = 1:nv_oper
-        MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
-        = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
-      end
+    temp = W * Mgvc;
+    for ibandoper_Mg = 1:nv_oper
+      MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
+      = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
     end
   end
   % Calculate for both i and n are unoccupied states.
   % Save it into MWM_unocc
   for ibandener_count = 1:nc_ener 
     ibandener = bandtocal_unocc(ibandener_count);
-    if 1
-      Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
-                        (nv+1):nv+nc_oper);
-      Mgvc = conj(Mgvc);
-      temp = W * Mgvc;
-      for ibandoper_Mg = 1:nc_oper
-        MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
-        = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
-      end
+    Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
+                      (nv+1):nv+nc_oper);
+    Mgvc = conj(Mgvc);
+    temp = W * Mgvc;
+    for ibandoper_Mg = 1:nc_oper
+      MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
+      = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
     end
   end
 end% for ifreq
@@ -182,7 +178,7 @@ for ibandener_count = 1:nv_ener
   for ibandoper = nv-nv_oper+1:nv
     ibandoper_Mg = ibandoper - nv+nv_oper;
     % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
-    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
     
     if x >= 0
       continue;
