@@ -148,7 +148,6 @@ for ifreq = 1:nfreq_imag
         else
           coeff = coeff_func(x);
         end
-
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
         if (ibandener == 2 & ibandoper == 2)
           1;

@@ -29,7 +29,14 @@ function [Esx_x, Ecoh] = gw_cohsex(GWinfo, options)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+% Initialization
+% global nv nv_ener nv_oper nc nc_ener nc_oper n_oper n_ener
+% global ng nr ne vol bdot
+% global ry2ev
+% global im
+% global TOL_SMALL
+% ZERO = 0.0;
+% CZERO = 0.0 + sqrt(-1) * 0.0;
 startGW = tic;
 nameConstants = fieldnames(options.Constant);
 for i = 1:numel(nameConstants)
@@ -43,12 +50,11 @@ end
 
 GWinfo.Z = GWinfo.Z * sqrt(GWinfo.vol); % Turn to \int_V \abs{psi(r)}^2 dr = 1.
 Z     = GWinfo.Z;
-ev    = GWinfo.ev * ry2ev;
-Vxc   = GWinfo.Vxc * ry2ev;
+ev    = GWinfo.ev;
+Vxc   = GWinfo.Vxc;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
-Dcoul(1,1) = GWinfo.coulG0;
 gvec = GWinfo.gvec;
-Dcoul = Dcoul * ry2ev;
+Dcoul(1,1) = GWinfo.coulG0;
 fprintf('nr = %d, ng = %d, n_oper = %d\n', nr, ng, n_oper);
 
 
@@ -116,13 +122,23 @@ if (options.ISDFCauchy.isISDF)
   timeforSS = toc(startSS);
   timeforISDF = etime(clock, startISDF);
 
+  % startaqsch = tic;
+  % aqsch = zeros(ng, n_ener);
+  % tmpC = psir(ssind_mu, nv-nv_ener+1:nv+nc_ener);
+  % tmpC = abs(tmpC).^2;
+  % aqsch = ssgzeta_mu * tmpC;
+  % clear ssrzeta_mu;
+  % timeforaqsch = toc(startaqsch);
+  % clear aqsch
+
   psirvc = psir(vcind_mu, :);
   psirvs = psir(vsind_mu, :);
   psirss = psir(ssind_mu, :);
   clear psir;
 
   fprintf('ISDF time = %.4f.\n', timeforVC+timeforVS+timeforSS);
-
+  % fprintf('Aqsch time = %.4f.\n', timeforaqsch);
+  % ISDF DONE
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Manipulate operators
@@ -177,6 +193,7 @@ if (options.ISDFCauchy.isISDF)
   Sigma_coh   = W1_mu_1 .* (Phiss * Phiss');
   clear W1_mu vcDcoulvs vcDcoulss epsvcDcoulvs epsvcDcoulss;
   vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
+  Sigma_x     = vsDcoulvs .* conj(Phivs * Phivs'); 
   clear vsDcoulvs;
   timeForSigma = toc(startSigma);
   fprintf('Sigma operator time = %f.\n', timeForSigma);
@@ -189,8 +206,9 @@ if (options.ISDFCauchy.isISDF)
   Psivs = conj(psirvs(:, nv-nv_ener+1:nv+nc_ener)); 
   Psiss = conj(psirss(:, nv-nv_ener+1:nv+nc_ener)); 
   
-  Esx_x = - Psivs' * Sigma_sex_x * Psivs / GWinfo.vol;
-  Ecoh   = 0.5 * Psiss' * Sigma_coh   * Psiss / GWinfo.vol;
+  Esx_x = Psivs' * Sigma_sex_x * Psivs / GWinfo.vol;
+  Ecoh   = Psiss' * Sigma_coh   * Psiss / GWinfo.vol;
+  Ex    = Psivs' * Sigma_x     * Psivs / GWinfo.vol;
 
   clear Psivs Psiss;
   timeforSelfE = toc(timeForSelfE);
@@ -258,7 +276,15 @@ if (options.ISDFCauchy.isISDF)
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  % Calculate energies
+  GWenergy.ev = ev(nv-nv_ener+1:nv+nc_ener) * ry2ev;
+  GWenergy.Ex = real(diag(0.0 - Ex) * ry2ev);
+  GWenergy.Esx_x = real(diag(0.0 - Esx_x) * ry2ev);
+  GWenergy.Ecoh = real(diag(0.5 * Ecoh * ry2ev));
+  % GWenergy.Ech_exact = real(achx * ry2ev);
+  GWenergy.Sig = real(GWenergy.Ex + GWenergy.Esx_x + GWenergy.Ech);
+  GWenergy.Vxc = Vxc(nv-nv_ener+1:nv+nc_ener) * ry2ev;
+  GWenergy.eqp = GWenergy.ev - GWenergy.Vxc + GWenergy.Sig;
 
 else % No ISDF version
 %   gvec_bgw = readmatrix('gvec_components.csv');
@@ -286,22 +312,29 @@ else % No ISDF version
 
 
   % Sigma part
+  Dcoul(1) = GWinfo.coulG0;
+  % vcoul  = diag(Dcoul);
+  % W1     = inveps * Dcoul;
+  % W1     = W1 - Dcoul;
+  % W1_     = (inveps + eye(ng) * Dcoul;
   timeforW = toc(startforW);
   fprintf('timeforW = %.4f sec.\n', timeforW); 
 
   startEsx_xExEch = tic;
   Esx_x  = zeros(n_ener);
-  Ecoh    = zeros(n_ener);
+  Ex     = zeros(n_ener);
+  Ech    = zeros(n_ener);
 
   for ioper = nv-nv_oper+1:nv
     Mgvn = mtxel_sigma(ioper, GWinfo, options.Groundstate, (nv-nv_ener+1:nv+nc_ener));
     Mgvn = conj(Mgvn);
     W1Mgvn = Dcoul * Mgvn;
+    Ex = Ex + Mgvn' * W1Mgvn / GWinfo.vol;
 
     W1Mgvn = inveps \ W1Mgvn;
     W1Mgvn = W1Mgvn - Dcoul * Mgvn;
-    Esx_x = Esx_x - Mgvn' * W1Mgvn / GWinfo.vol;
-    Ecoh = Ecoh + 0.5 * Mgvn' * W1Mgvn / GWinfo.vol;
+    Esx_x = Esx_x + Mgvn' * W1Mgvn / GWinfo.vol;
+    Ech = Ech + Mgvn' * W1Mgvn / GWinfo.vol;
   end
   clear Mgvn W1Mgvn;
 
@@ -312,12 +345,12 @@ else % No ISDF version
     W1Mgcn = inveps \ W1Mgcn;
     W1Mgcn = W1Mgcn - Dcoul * Mgcn;
     
-    Ecoh = Ecoh + 0.5 * Mgcn' * W1Mgcn / GWinfo.vol;
+    Ech = Ech + Mgcn' * W1Mgcn / GWinfo.vol;
   end
   clear W1Mgcn Mgcn;
 
   timeforEsx_xExEch = toc(startEsx_xExEch);
-  fprintf('Time for Ex, Esx_x and finite cutoff Ecoh = %.4f.\n', ...
+  fprintf('Time for Ex, Esx_x and finite cutoff Ech = %.4f.\n', ...
           timeforEsx_xExEch);  
 
   % timeforEchExact = tic;
@@ -502,15 +535,29 @@ else % No ISDF version
   % timeexactch2 = toc(startexactch2);
   % fprintf('Time for exactch 2 = %f.\n', timeexactch2);
   % achx * ry2ev;
+  % Calculate energies
+  GWenergy.ev = ev(nv-nv_ener+1:nv+nc_ener) * ry2ev;
+  GWenergy.Ex = real(diag(0.0 - Ex) * ry2ev);
+  GWenergy.Esx_x = real(diag(0.0 - Esx_x) * ry2ev);
+  GWenergy.Ech = real((diag(0.5 * Ech))* ry2ev);
+  % GWenergy.Ech = real(achx) * ry2ev;
+  % GWenergy.Ech = real(achx)* ry2ev;
+% GWenergy.Ech1 = real((diag(0.5 * Ech) + achx)* ry2ev);
+%  GWenergy.Ech
+  GWenergy.Sig = real(GWenergy.Ex + GWenergy.Esx_x + GWenergy.Ech);
+  GWenergy.Vxc = Vxc(nv-nv_ener+1:nv+nc_ener) * ry2ev;
+  GWenergy.eqp = GWenergy.ev - GWenergy.Vxc + GWenergy.Sig;
 end
 
 
-Esx_x = real(diag(Esx_x));
-Ecoh = real(diag(Ecoh));
 
 
 
 % save(['GWenergy_',num2str(vcrank_mu),'_',num2str(vsrzeta_mu),'_',num2str(ssrank_mu),'.mat'], GWenergy);
 % save(['GWenergy', name_of_mol, '_',num2str(vcrank_mu), '_', num2str(vsrank_mu), '_', num2str(ssrank_mu), '.mat'], 'GWenergy');
 % save(['timeinfo', name_of_mol], 'time*');
+timeforGW = toc(startGW);
+save(options.GWCal.fileName, 'GWenergy', 'time*') 
+fprintf('Time for GW Calculation under COHSEX approximation = %f.\n', timeforGW);
+fprintf('Result is saved in %s.\n', options.GWCal.fileName)
 end

@@ -20,11 +20,13 @@ function sres = gw_fullfreq_cd_res(GWinfo, options)
 %     0. Initialize inputs.
 %     1. Generate the qudrature weights and the quadrature node on the real axis.
 %        For each frequencies omega
-%     2    Calculate W(omega)
-%     3.   Calculate <nn'|W(omega)|nn'> for all n and n' both occupied
+%     2. Calculate pattern, i.e., for which set of (n, n') we need to 
+%        calculate <nn'|W(omega)|nn'>.
+%     3    Calculate W(omega)
+%     4.   Calculate <nn'|W(omega)|nn'> for all n and n' both occupied
 %          and both unoccupied, then save it. 
 %          For each n and n' both occupied and unoccupied
-%     4.     Check if it is residual, add to sres.
+%     5.     Check if it is residual, add to sres.
 %          end 
 %        end 
 
@@ -32,10 +34,6 @@ function sres = gw_fullfreq_cd_res(GWinfo, options)
 testflag1 = false;
 testflag2 = false;
 
-startintgral = tic;
-
-flagry2ev = true;
-% flagry2ev = false;
 
 % 0. Initialize
 % Initialize constant from options.Constant
@@ -57,13 +55,14 @@ nv_ener = length(bandtocal_occ);
 nc_ener = length(bandtocal_unocc);
 
 % Initialize other values
-
-GWinfo.Z     = GWinfo.Z * sqrt(vol);
-Z     = GWinfo.Z;
-ev    = GWinfo.ev * ry2ev;
-Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
-aqsFlag = ~isempty(GWinfo.aqs);
-Dcoul = Dcoul * ry2ev;
+% We use unit as ev, while usual input is Ry.
+GWinfo.Z = GWinfo.Z * sqrt(vol);
+Z        = GWinfo.Z * sqrt(vol);
+ev       = GWinfo.ev * ry2ev;
+Dcoul    = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
+aqsFlag  = ~isempty(GWinfo.aqs);
+Dcoul(1, 1) = GWinfo.coulG0;
+Dcoul    = Dcoul * ry2ev;
 
 
 % 1. Generate frequency sequences in real axis and imaginary axis.
@@ -79,33 +78,74 @@ eta = 0.0;
 timeFrequencyGen = toc(startFrequencyGen);
 fprintf('Time for Generating Frequencies = %.3s.\n', timeFrequencyGen);
 
-% Energies use unit 'ev' in this code.
-% Since both KSSOLV_dft and frequency generating part use Ry as unit
-% Change unit first.
-% ev = ev * ry2ev;
-% grid_real = grid_real * ry2ev;
-% grid_imag = grid_imag * ry2ev;
-
 
 sres = zeros(n_ener, 1);
-if testflag1
-  W_V = readmatrix('W_V');
-  W_V = W_V(:, 1) + ii*W_V(:, 2);
-  W_V = reshape(W_V, ng, ng, []);
-  for i = 1:nfreq_real + nfreq_imag
-    W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
-  end
-end
+% if testflag1
+%   W_V = readmatrix('W_V');
+%   W_V = W_V(:, 1) + ii*W_V(:, 2);
+%   W_V = reshape(W_V, ng, ng, []);
+%   for i = 1:nfreq_real + nfreq_imag
+%     W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
+%   end
+% end
+
+
+
 
 % Place to save the <nn'|W(omega)|nn'>, MWM_occ for two occupied,
 % and MWM_unocc for two unoccupied.
 MWM_occ = zeros(nv_ener, nv_oper, nfreq_real);
 MWM_unocc = zeros(nc_ener, nc_oper, nfreq_real);
 
+% Calculate pattern first, deciding which part to calculate
+% After that, MWM_occ/MWM_unocc contains 1 or 0.
+% We only need values for place 1.
+for ibandener_count = 1:nv_ener 
+  ibandener = bandtocal_occ(ibandener_count);
+  for ibandoper = nv-nv_oper+1:nv
+    ibandoper_Mg = ibandoper - nv+nv_oper;
+    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if x >= 0
+      continue;
+    end
+    x = abs(x);
+    for ifreq = 1:nfreq_real
+      coeff = coeff_real_func{ifreq}(x);
+      if abs(coeff) <= TOL_ZERO
+        continue;
+      end
+      MWM_occ(ibandener_count, ibandoper_Mg, ifreq) = 1;
+    end
+  end
+end
+
+% Then both unoccupied states
+for ibandener_count = 1:nc_ener 
+  ibandener = bandtocal_unocc(ibandener_count);
+  for ibandoper = nv+1:nv+nc_oper
+    ibandoper_Mg = ibandoper - nv;
+    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if x < 0
+      continue;
+    end
+    x = abs(x);
+    for ifreq = 1:nfreq_real
+      coeff = coeff_real_func{ifreq}(x);
+      if abs(coeff) > TOL_ZERO
+        MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) = 1;
+      end
+    end 
+  end
+end
+
+
+
 for ifreq = 1:nfreq_real
   omega = grid_real(ifreq);
   epsilon = zeros(ng, ng); 
-  Dcoul(1, 1) = 0;
+  % Dcoul(1, 1) = 0;
   for ind_nv = nv-nv_oper+1:nv
     if aqsFlag
       Mgvc = GWinfo.aqs{ind_nv}(:, nv+1:nv+nc_oper);
@@ -150,8 +190,10 @@ for ifreq = 1:nfreq_real
 
     temp = W * Mgvc;
     for ibandoper_Mg = 1:nv_oper
-      MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
-      = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      if (MWM_occ(ibandener_count, ibandoper_Mg, ifreq) > 0)
+        MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
+        = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      end
     end
   end
   % Calculate for both i and n are unoccupied states.
@@ -163,8 +205,10 @@ for ifreq = 1:nfreq_real
     Mgvc = conj(Mgvc);
     temp = W * Mgvc;
     for ibandoper_Mg = 1:nc_oper
-      MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
-      = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      if (MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) > 0)
+        MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
+        = Mgvc(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      end
     end
   end
 end% for ifreq
@@ -186,11 +230,10 @@ for ibandener_count = 1:nv_ener
     x = abs(x);
     for ifreq = 1:nfreq_real
       coeff = coeff_real_func{ifreq}(x);
-      if abs(coeff) <= TOL_ZERO
-        continue;
+      if abs(coeff) > TOL_ZERO
+        sres(ibandener_count) = sres(ibandener_count) ...
+        - coeff * occ_sign * MWM_occ(ibandener_count, ibandoper_Mg, ifreq); 
       end
-      sres(ibandener_count) = sres(ibandener_count) ...
-      - coeff * occ_sign * MWM_occ(ibandener_count, ibandoper_Mg, ifreq); 
     end
   end
 end
@@ -209,8 +252,10 @@ for ibandener_count = 1:nc_ener
     x = abs(x);
     for ifreq = 1:nfreq_real
       coeff = coeff_real_func{ifreq}(x);
-      sres(ibandener_count+nv_ener) = sres(ibandener_count+nv_ener) ...
-      - coeff * occ_sign * MWM_unocc(ibandener_count, ibandoper_Mg, ifreq); 
+      if abs(coeff) > TOL_ZERO
+        sres(ibandener_count+nv_ener) = sres(ibandener_count+nv_ener) ...
+        - coeff * occ_sign * MWM_unocc(ibandener_count, ibandoper_Mg, ifreq); 
+      end
     end 
   end
 end
