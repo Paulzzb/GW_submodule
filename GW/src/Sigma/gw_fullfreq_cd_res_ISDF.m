@@ -53,21 +53,20 @@ nv_ener = length(bandtocal_occ);
 nc_ener = length(bandtocal_unocc);
 
 % Initialize other values
-% We use unit as ev, while usual input is Ry.
-Z     = GWinfo.Z*sqrt(vol);
-ev    = GWinfo.ev;
-Vxc   = GWinfo.Vxc;
+Z        = GWinfo.Z * sqrt(vol);
 gvec = GWinfo.gvec;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
 Dcoul(1, 1) = GWinfo.coulG0;
+
+% We use unit as ev, while usual input is Ry.
+ev    = GWinfo.ev;
 Dcoul = Dcoul * ry2ev;
 
 
 % 1. Generate frequency sequences in real axis and imaginary axis.
 startFrequencyGen = tic;
-[grid_real, coeff_real_func, grid_imag, coeff_imag_func] = freqgen(GWinfo, options);
+[grid_real, coeff_real_func, ~, ~] = freqgen(GWinfo, options);
 nfreq_real = length(grid_real);
-nfreq_imag = length(grid_imag);
 % eta = options.GWCal.dBrdning / ry2ev;
 eta = 0;
 timeFrequencyGen = toc(startFrequencyGen);
@@ -98,8 +97,8 @@ optionsISDF = options.ISDFCauchy;
 
 startVC = tic;
 optionsISDF.isdfoptions.rank = vcrank_mu;
-[vcind_mu, vcgzeta_mu] = isdf_main('vc', conj(psir(:,nv-nv_oper+1:nv)), ...
-        (psir(:,nv+1:nv+nc_oper)), gvec, vol, optionsISDF);
+[vcind_mu, vcgzeta_mu] = isdf_main('vc', psir, nv-nv_oper+1:nv, ...
+        nv+1:nv+nc_oper, gvec, vol, optionsISDF);
 vcgzeta_mu = conj(vcgzeta_mu);
 timeforVC = toc(startVC);
 
@@ -108,8 +107,8 @@ startVS = tic;
 vsrzeta_mu = zeros(nr, vsrank_mu);
 vsgzeta_mu = zeros(ng, vsrank_mu);
 optionsISDF.isdfoptions.rank = vsrank_mu;
-[vsind_mu, vsgzeta_mu] = isdf_main('vs', conj(psir(:,nv-nv_oper+1:nv)), ...
-        (psir(:,nv-nv_ener+1:nv+nc_ener)), gvec, vol, optionsISDF);
+[vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, nv-nv_oper+1:nv, ...
+        nv-nv_ener+1:nv+nc_ener, gvec, vol, optionsISDF);
 vsgzeta_mu = conj(vsgzeta_mu);
 timeforVS = toc(startVS);
 
@@ -118,8 +117,8 @@ startSS = tic;
 ssrzeta_mu = zeros(nr, vsrank_mu);
 ssgzeta_mu = zeros(ng, ssrank_mu);
 optionsISDF.isdfoptions.rank = ssrank_mu;
-[ssind_mu, ssgzeta_mu] = isdf_main('ss', conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-        (psir(:,nv-nv_ener+1:nv+nc_ener)), gvec, vol, optionsISDF);
+[ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, nv-nv_oper+1:nv+nc_oper, ...
+        nv-nv_ener+1:nv+nc_ener, gvec, vol, optionsISDF);
 
 ssgzeta_mu = conj(ssgzeta_mu);
 
@@ -136,6 +135,54 @@ MWM_occ = zeros(nv_ener, nv_oper, nfreq_real);
 MWM_unocc = zeros(nc_ener, nc_oper, nfreq_real);
 vcVvc = vcgzeta_mu' * Dcoul * vcgzeta_mu / vol;
 vcVnn = vcgzeta_mu' * Dcoul * ssgzeta_mu / vol;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Calculate pattern first, deciding which part to calculate
+% After that, MWM_occ/MWM_unocc contains 1 or 0.
+% We only need values for place 1.
+for ibandener_count = 1:nv_ener 
+  ibandener = bandtocal_occ(ibandener_count);
+  for ibandoper = nv-nv_oper+1:nv
+    ibandoper_Mg = ibandoper - nv+nv_oper;
+    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if x >= 0
+      continue;
+    end
+    x = abs(x);
+    for ifreq = 1:nfreq_real
+      coeff = coeff_real_func{ifreq}(x);
+      if abs(coeff) <= TOL_ZERO
+        continue;
+      end
+      MWM_occ(ibandener_count, ibandoper_Mg, ifreq) = 1;
+    end
+  end
+end
+
+% Then both unoccupied states
+for ibandener_count = 1:nc_ener 
+  ibandener = bandtocal_unocc(ibandener_count);
+  for ibandoper = nv+1:nv+nc_oper
+    ibandoper_Mg = ibandoper - nv;
+    % x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL*ry2ev;
+    x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
+    if x < 0
+      continue;
+    end
+    x = abs(x);
+    for ifreq = 1:nfreq_real
+      coeff = coeff_real_func{ifreq}(x);
+      if abs(coeff) > TOL_ZERO
+        MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) = 1;
+      end
+    end 
+  end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Main Calculation
+
 
 for ifreq = 1:nfreq_real
   omega = grid_real(ifreq);
@@ -162,20 +209,24 @@ for ifreq = 1:nfreq_real
     Mg = vcVnn * Mg;
     temp = WKernel*Mg;
     for ibandoper_Mg = 1:nv_oper
-      MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
-      = Mg(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      if (MWM_occ(ibandener_count, ibandoper_Mg, ifreq) > 0)
+        MWM_occ(ibandener_count, ibandoper_Mg, ifreq) ...
+        = Mg(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      end
     end
   end
   % Calculate for both i and n are unoccupied states.
-  % Sae it into MWM_unocc
+  % Save it into MWM_unocc
   for ibandener_count = 1:nc_ener 
     ibandener = bandtocal_unocc(ibandener_count);
     Mg = psir(ssind_mu, ibandener) .* conj(psir(ssind_mu, nv+1:nv+nc_oper));
     Mg = vcVnn * Mg;
     temp = WKernel * Mg;
     for ibandoper_Mg = 1:nc_oper
-      MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
-      = Mg(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      if (MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) > 0)
+        MWM_unocc(ibandener_count, ibandoper_Mg, ifreq) ...
+        = Mg(:, ibandoper_Mg)' * temp(:, ibandoper_Mg);
+      end
     end
   end
 end% for ifreq

@@ -55,13 +55,13 @@ nv_ener = length(bandtocal_occ);
 nc_ener = length(bandtocal_unocc);
 
 % Initialize other values
-% We use unit as ev, while usual input is Ry.
 GWinfo.Z = GWinfo.Z * sqrt(vol);
 Z        = GWinfo.Z * sqrt(vol);
-ev       = GWinfo.ev * ry2ev;
 Dcoul    = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
 aqsFlag  = ~isempty(GWinfo.aqs);
 Dcoul(1, 1) = GWinfo.coulG0;
+% We use unit as ev, while usual input is Ry.
+ev       = GWinfo.ev * ry2ev;
 Dcoul    = Dcoul * ry2ev;
 
 

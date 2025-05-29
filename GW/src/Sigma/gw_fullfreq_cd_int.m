@@ -27,10 +27,8 @@ function sint = gw_fullfreq_cd_int(GWinfo, options)
 %        end 
 
 % flag2 is for method (numerically equal, suggest to use flag2 = true.)
-flag2 = false;
-testflag1 = false;
-testflag2 = false;
-% testflag2 = true;
+% flag2 = 0;
+flag2 = 1;
 ii = sqrt(-1);
 ind_bgw2ks = options.Groundstate.ind_bgw2ks;
 
@@ -78,14 +76,15 @@ Dcoul = Dcoul * ry2ev;
 
 sint = zeros(n_ener, 1);
 
-if testflag1
-  W_V = readmatrix('W_V');
-  W_V = W_V(:, 1) + ii*W_V(:, 2);
-  W_V = reshape(W_V, ng, ng, []);
-  for i = 1:nfreq_real + nfreq_imag
-    W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
-  end
-end
+% if testflag1
+%   W_V = readmatrix('W_V');
+%   W_V = W_V(:, 1) + ii*W_V(:, 2);
+%   W_V = reshape(W_V, ng, ng, []);
+%   for i = 1:nfreq_real + nfreq_imag
+%     W_V(:, :, i) = W_V(ind_bgw2ks, ind_bgw2ks, i);
+%   end
+% end
+nm_Womega_nm = zeros(n_ener, n_oper, nfreq_imag);
 
 for ifreq = 1:nfreq_imag
   omega = grid_imag(ifreq);
@@ -118,13 +117,15 @@ for ifreq = 1:nfreq_imag
     epsilon = inv(epsilon);
     Dcoul(1, 1) = GWinfo.coulG0 * ry2ev;
     W = (eye(ng) - epsilon) * Dcoul / vol;
+    Wnorm = norm(W, 'fro') ;
+    fprintf('ifreq = %6d, Wnorm = %12.6f\n', ifreq+nfreq_real, Wnorm);
   end
   if flag2
     epsilon = (Dcoul/vol)^(-1) - epsilon*vol;
     % Here epsilon is supposed to be an Hermite matrix.
     epsilon = tril(epsilon, -1) + tril(epsilon, -1)' + diag(real(diag(epsilon)));
     [L, D] = ldl(epsilon); rsqrtD = diag(sqrt(diag(D)).^(-1));
-    W = Dcoul/vol - (L')^(-1) * rsqrtD * rsqrtD * (L)^(-1);
+    % W = Dcoul/vol - (L')^(-1) * rsqrtD * rsqrtD * (L)^(-1);
   end
   % 3. For each band i to construct GW operators
   for ibandener_count = 1:length(bandtocal) % Iteration over n
@@ -137,17 +138,17 @@ for ifreq = 1:nfreq_imag
       Mgvc = conj(Mgvc);
       out_list = zeros(n_oper, 1);
       out_list = sum(Dcoul/vol*abs(Mgvc).^2)';
-      Mgvc = rsqrtD * (L^(-1)*Mgvc); 
+      Mgvc = rsqrtD * (L\Mgvc); 
       out_list = out_list - sum(abs(Mgvc).^2)';
       clear Mgvc;
       for ibandoper = nv-nv_oper+1:nv+nc_oper  
         % x = (ev(ibandener) - ev(ibandoper))*ry2ev + TOL_SMALL;
         x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
-        if abs(x) < TOL_SMALL
-          coeff = coeff_func(TOL_SMALL);
-        else
-          coeff = coeff_func(x);
-        end
+        % if abs(x) < TOL_SMALL
+        %   coeff = coeff_func(TOL_SMALL);
+        % else
+        coeff = coeff_func(x);
+        % end
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
         if (ibandener == 2 & ibandoper == 2)
           1;
@@ -161,35 +162,38 @@ for ifreq = 1:nfreq_imag
       Mgvc = mtxel_sigma(ibandener, GWinfo, options.Groundstate, ...
                         (nv-nv_oper+1):nv+nc_oper);
       Mgvc = conj(Mgvc);
-      if testflag2
-        aqs_file = ['aqs_', num2str(ibandener_count)];
-        aqs = readmatrix(aqs_file);
-        aqs = aqs(:, 1) + ii*aqs(:, 2);
-        aqs = reshape(aqs, ng, []);
-        aqs(:, :) = aqs(ind_bgw2ks, :);
-        fprintf("Fnorm(aqs(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
-        fprintf("Fnorm(Mg(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
-      end
+      % if testflag2
+      %   aqs_file = ['aqs_', num2str(ibandener_count)];
+      %   aqs = readmatrix(aqs_file);
+      %   aqs = aqs(:, 1) + ii*aqs(:, 2);
+      %   aqs = reshape(aqs, ng, []);
+      %   aqs(:, :) = aqs(ind_bgw2ks, :);
+      %   fprintf("Fnorm(aqs(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
+      %   fprintf("Fnorm(Mg(%d)) = %12.6f\n", ibandener_count, norm(aqs, 'fro'));
+      % end
       for ibandoper = nv-nv_oper+1:nv+nc_oper  
         % x = (ev(ibandener) - ev(ibandoper))*ry2ev + TOL_SMALL;
         x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
-        if abs(x) < TOL_SMALL
-          coeff = coeff_func(TOL_SMALL);
-        else
-          coeff = coeff_func(x);
-        end
+        % if abs(x) < TOL_SMALL
+        %   coeff = coeff_func(TOL_SMALL);
+        % else
+        coeff = coeff_func(x);
+        % end
 %         fprintf("iener = %6d, ioper = %6d, coeff = %12.6f\n", ibandoper, ibandener, coeff); 
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
         if (ibandener == 2 & ibandoper == 2)
           1;
         end
         out = Mgvc(:, ibandoper_Mg)'*W*Mgvc(:, ibandoper_Mg); 
+        nm_Womega_nm(ibandener_count, ibandoper_Mg, ifreq) = out;
+
         sint(ibandener) = sint(ibandener) + coeff*out;
       end
     end % if 0
   end
 end 
 
+save('nm_W_nm.mat', 'nm_Womega_nm');
 % sint = sint / pi * ry2ev;
 sint = sint / pi;
 [real(sint), imag(sint)];

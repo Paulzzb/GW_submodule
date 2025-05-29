@@ -1,4 +1,4 @@
-function sint = gw_fullfreq_cd_int(GWinfo, options)
+function sint = gw_fullfreq_cd_int_ISDF(GWinfo, options)
 % This file will be final version for the full-frequency GW calculation.
 % Generally speaking, user should not directly call this function, instead
 % call this indirectly by calling through gwCalculation->gw_fullfreq_cd.
@@ -31,12 +31,7 @@ function sint = gw_fullfreq_cd_int(GWinfo, options)
 
 % testflag1 is for debugging
 % flag2 is for method (numerically equal, suggest to use flag2 = true.)
-testflag1 = true;
-testflag1 = false;
-flag2 = true;
-% flag2 = false;
-flag3 = 1;
-% flag3 = 0;
+flag2 = 1;
 
 
 startintgral = tic;
@@ -60,45 +55,42 @@ n_ener = length(bandtocal);
 GWinfo.Z     = GWinfo.Z * sqrt(vol);
 Z     = GWinfo.Z;
 ev    = GWinfo.ev;
-Vxc   = GWinfo.Vxc;
 gvec = GWinfo.gvec;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
-aqsFlag = ~isempty(GWinfo.aqs);
 Dcoul(1, 1) = GWinfo.coulG0;
+
+% Energies use unit 'ev' in this code.
+% Since both KSSOLV_dft and frequency generating part use Ry as unit
+% Change unit first.
+ev = ev * ry2ev;
+Dcoul = Dcoul * ry2ev;
 sqrtDcoul = sqrt(Dcoul); 
+
 
 % 1. Generate the qudrature weights and the quadrature node
 %    on the imaginary axis.
 startFrequencyGen = tic;
-[grid_real, ~, grid_imag, coeff_imag_func] = freqgen(GWinfo, options);
-nfreq_real = length(grid_real);
+[~, ~, grid_imag, coeff_imag_func] = freqgen(GWinfo, options);
 nfreq_imag = length(grid_imag);
-% DOUBT!!!
 % eta = options.GWCal.dBrdning;
 eta = 0;
 % eta = 1e-4;
 timeFrequencyGen = toc(startFrequencyGen);
 fprintf('Time for Generating Frequencies = %.3s.\n', timeFrequencyGen);
 
-% Energies use unit 'ev' in this code.
-% Since both KSSOLV_dft and frequency generating part use Ry as unit
-% Change unit first.
 
-ev = ev * ry2ev;
-grid_real = grid_real * ry2ev;
-grid_imag = grid_imag * ry2ev;
-Dcoul = Dcoul * ry2ev;
-
-% ISDF here
-vcrank_mu = ceil(sqrt(nv_oper*nc_oper) * options.ISDFCauchy.vcrank_ratio);
-vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * options.ISDFCauchy.vsrank_ratio);
-ssrank_mu = ceil(sqrt(n_ener *n_ener)  * options.ISDFCauchy.ssrank_ratio);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Start ISDF
 % Generally, we have relations 
 %     Mr{xx} = xxrzeta_mu * Mrxx_mu;
 startISDF = tic;
+
+vcrank_mu = ceil(sqrt(nv_oper*nc_oper) * options.ISDFCauchy.vcrank_ratio);
+vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * options.ISDFCauchy.vsrank_ratio);
+ssrank_mu = ceil(sqrt(n_ener *n_ener)  * options.ISDFCauchy.ssrank_ratio);
+
+
 
 psir = zeros(nr, nv+nc);
 for iband = 1:nv+nc
@@ -128,8 +120,8 @@ optionsISDF.isdfoptions.rank = vcrank_mu;
 %   vcgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv)), ...
 %               (psir(:,nv+1:nv+nc_oper)), vcind_mu, gvec, vol);
 % end
-[vcind_mu, vcgzeta_mu] = isdf_main('vc', conj(psir(:,nv-nv_oper+1:nv)), ...
-        (psir(:,nv+1:nv+nc_oper)), gvec, vol, optionsISDF);
+[vcind_mu, vcgzeta_mu] = isdf_main('vc', psir, nv-nv_oper+1:nv, ...
+        nv+1:nv+nc_oper, gvec, vol, optionsISDF);
 vcgzeta_mu = conj(vcgzeta_mu);
 timeforVC = toc(startVC);
 
@@ -138,23 +130,8 @@ startVS = tic;
 vsrzeta_mu = zeros(nr, vsrank_mu);
 vsgzeta_mu = zeros(ng, vsrank_mu);
 optionsISDF.isdfoptions.rank = vsrank_mu;
-% if ~flag3
-%   [vsrzeta_mu, vsind_mu] = isdf(conj(psir(:,nv-nv_oper+1:nv)), ...
-%                                 (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-%   for i = 1:vsrank_mu
-%     fftbox1 = reshape(vsrzeta_mu(:, i), gvec.fftgrid);
-%     fftbox1 = do_FFT(fftbox1, gvec.fftgrid, 1) * GWinfo.vol;
-%     vsgzeta_mu(:, i) = get_from_fftbox(gvec.idxnz, fftbox1, gvec.fftgrid);
-%   end
-%   clear vsrzeta_mu;
-% else
-%   vsind_mu = isdf_indices(conj(psir(:,nv-nv_oper+1:nv)), ...
-%                                 (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-%   vsgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv)), ...
-%               (psir(:,nv-nv_ener+1:nv+nc_ener)), vsind_mu, gvec, vol);
-% end
-[vsind_mu, vsgzeta_mu] = isdf_main('vs', conj(psir(:,nv-nv_oper+1:nv)), ...
-        (psir(:,nv-nv_ener+1:nv+nc_ener)), gvec, vol, optionsISDF);
+[vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, nv-nv_oper+1:nv, ...
+        nv-nv_ener+1:nv+nc_ener, gvec, vol, optionsISDF);
 vsgzeta_mu = conj(vsgzeta_mu);
 timeforVS = toc(startVS);
 
@@ -163,22 +140,8 @@ startSS = tic;
 ssrzeta_mu = zeros(nr, vsrank_mu);
 ssgzeta_mu = zeros(ng, ssrank_mu);
 optionsISDF.isdfoptions.rank = ssrank_mu;
-% if ~flag3
-%   [ssrzeta_mu, ssind_mu] = isdf(conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-%                                 (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-%   for i = 1:ssrank_mu
-%     fftbox1 = reshape(ssrzeta_mu(:, i), gvec.fftgrid);
-%     fftbox1 = do_FFT(fftbox1, gvec.fftgrid, 1) * GWinfo.vol;
-%     ssgzeta_mu(:, i) = get_from_fftbox(gvec.idxnz, fftbox1, gvec.fftgrid);
-%   end
-% else
-%   ssind_mu = isdf_indices(conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-%                                 (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-%   ssgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-%               (psir(:,nv-nv_ener+1:nv+nc_ener)), ssind_mu, gvec, vol);
-% end
-[ssind_mu, ssgzeta_mu] = isdf_main('ss', conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-        (psir(:,nv-nv_ener+1:nv+nc_ener)), gvec, vol, optionsISDF);
+[ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, nv-nv_oper+1:nv+nc_oper, ...
+        nv-nv_ener+1:nv+nc_ener, gvec, vol, optionsISDF);
 ssgzeta_mu = conj(ssgzeta_mu);
 timeforSS = toc(startSS);
 timeforISDF = toc(startISDF);
@@ -202,16 +165,9 @@ for ifreq = 1:nfreq_imag
       + 1.0 ./ (omega + Eden + mi*eta));
       epsilon = epsilon + 2*vcgzeta_mu * Mgvc*diag(edenDRtmp)*Mgvc'*vcgzeta_mu' / vol;
     end % for ind_nv
-
     epsilon = eye(ng) - Dcoul * epsilon;
     epsilon = inv(epsilon);
     W = (eye(ng) - epsilon)*Dcoul / vol;
-    if testflag1
-      W_old = (I_eps_array(:, :, ifreq+nfreq_real))*Dcoul/vol;
-      out = norm(W - W_old);
-      fprintf('ifreq = %d, epsilon difference = %.3e.\n', ifreq, out)
-      clear epsilon;
-    end
     ssWss = ssgzeta_mu' * W * ssgzeta_mu;
   end
   if flag2
@@ -266,13 +222,6 @@ for ifreq = 1:nfreq_imag
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
         % out = Mgvc(:, ibandoper_Mg)'*Mgvc(:, ibandoper_Mg); 
         out = out_list(ibandoper_Mg);
-        if testflag1
-          out_old = sint_out(ibandener, ibandoper, ifreq);
-          fprintf("n = %d, i = %d, ifreq = %d,\n",...
-          ibandener, ibandoper, ifreq);
-          fprintf("func_int = %.6e, func = %.6e, diff = %.3e.\n", ...
-          out_old, out, out_old - out);
-        end
         sint(ibandener_count) = sint(ibandener_count) + coeff*out;
       end
     end % if 0
@@ -282,39 +231,13 @@ for ifreq = 1:nfreq_imag
       C_in_n = conj(C_in_n);
       for ibandoper = nv-nv_oper+1:nv+nc_oper  
         x = (ev(ibandener) - ev(ibandoper)) + TOL_SMALL;
-        if testflag1
-          coeff_old = coeff_matrix(ibandener, ibandoper, ifreq);
-        end
         if abs(x) < TOL_SMALL
           coeff = coeff_func(TOL_SMALL);
         else
           coeff = coeff_func(x);
         end
         ibandoper_Mg = ibandoper - (nv-nv_oper);   
-        if testflag1
-          if abs(coeff_old - coeff) >= 1e-6
-            fprintf("n = %d, i = %d, ifreq = %d,\n",...
-            ibandener, ibandoper, ifreq);
-            fprintf("coeff_old = %.6e, coeff = %.6e, diff = %.3e.\n", ...
-            coeff_old, coeff, coeff_old - coeff);
-          end
-          if ifreq == 1
-            aqscount = aqscount+1;
-            if (norm(aqslist(:, aqscount) - Mgvc(:, ibandoper_Mg)) >= 1e-8)
-              fprintf("n = %d, i = %d, ifreq = %d,\n",...
-              ibandener, ibandoper, ifreq);
-              fprintf("aqstemp is different!");
-            end
-          end
-        end
         out = C_in_n(:, ibandoper_Mg)'*ssWss*C_in_n(:, ibandoper_Mg); 
-        if testflag1
-          out_old = sint_out(ibandener, ibandoper, ifreq);
-          fprintf("n = %d, i = %d, ifreq = %d,\n",...
-          ibandener, ibandoper, ifreq);
-          fprintf("func_int = %.6e, func = %.6e, diff = %.3e.\n", ...
-          out_old, out, out_old - out);
-        end
         sint(ibandener) = sint(ibandener) + coeff*out;
       end
     end % if 0
