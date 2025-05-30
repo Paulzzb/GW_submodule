@@ -26,11 +26,6 @@ function sint = gw_fullfreq_cd_int2(GWinfo, options)
 %          end 
 %        end 
 
-% flag2 is for method (numerically equal, suggest to use flag2 = true.)
-flag2 = 1;
-% flag2 = 1;
-ii = sqrt(-1);
-ind_bgw2ks = options.Groundstate.ind_bgw2ks;
 
 startintgral = tic;
 
@@ -47,13 +42,6 @@ for i = 1:numel(nameConstants)
 end
 bandtocal = nv-nv_ener+1:nv+nc_ener;
 n_ener = length(bandtocal);
-
-% Initialize other values
-Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
-Dcoul(1, 1) = GWinfo.coulG0;
-% Energies use unit 'ev' in this code.
-% Since both KSSOLV_dft and frequency generating part use Ry as unit
-% Change unit first.
 ev = GWinfo.ev * ry2ev;
 
 % 1. Generate frequency sequences in imaginary axis.
@@ -71,9 +59,13 @@ nm_Womega_nm_list = zeros(n_ener, n_oper, nfreq_imag);
 
 % for ifreq = 1:nfreq_imag
 nm_Womega_nm_list(:, :, :) = fourcenterintegral(GWinfo, options, 1, ...
-            [nv-nv_ener+1, nv+nc_ener], [nv-nv_ener+1, nv+nc_ener], ...
+            [nv-nv_ener+1, nv+nc_ener], [nv-nv_oper+1, nv+nc_oper], ...
             grid_imag);
 % end
+
+save('nmWnm.mat', 'nm_Womega_nm_list');
+nmWnm = load('nmWnm.mat');
+
 
 
 for ibandener = nv-nv_ener+1:nv+nc_ener

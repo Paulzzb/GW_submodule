@@ -23,13 +23,15 @@ function gwCalculation(GWinfor, options)
         gw_fullfreq_ra(GWinfor, options);
       elseif options.GWCal.freq_dep_method == 2
         % gw_fullfreq_cd(GWinfor, GWOptions);
-        if (options.ISDFCauchy.isISDF == true)
-          GWenergy.Eres = gw_fullfreq_cd_res_ISDF(GWinfor, options);
-          GWenergy.Eint = gw_fullfreq_cd_int_ISDF(GWinfor, options);
-        else
-          GWenergy.Eres = gw_fullfreq_cd_res(GWinfor, options);
-          GWenergy.Eint = gw_fullfreq_cd_int(GWinfor, options);
-        end
+        % if (options.ISDFCauchy.isISDF == true)
+        %   GWenergy.Eres = gw_fullfreq_cd_res_ISDF(GWinfor, options);
+        %   GWenergy.Eint = gw_fullfreq_cd_int_ISDF(GWinfor, options);
+        % else
+        %   GWenergy.Eres = gw_fullfreq_cd_res(GWinfor, options);
+        %   GWenergy.Eint = gw_fullfreq_cd_int(GWinfor, options);
+        % end
+        GWenergy.Eres = gw_fullfreq_cd_res2(GWinfor, options);
+        GWenergy.Eint = gw_fullfreq_cd_int2(GWinfor, options);
       else
         error('Error Not support now!');
       end

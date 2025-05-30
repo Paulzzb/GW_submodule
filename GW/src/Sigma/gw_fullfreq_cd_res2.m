@@ -30,11 +30,6 @@ function sres = gw_fullfreq_cd_res2(GWinfo, options)
 %          end 
 %        end 
 
-
-testflag1 = false;
-testflag2 = false;
-
-
 % 0. Initialize
 % Initialize constant from options.Constant
 nameConstants = fieldnames(options.Constant);
@@ -46,13 +41,9 @@ for i = 1:numel(nameConstants)
     eval(strEval);
   end
 end
-mi = sqrt(-1);
 bandtocal = nv-nv_ener+1:nv+nc_ener;
-bandtocal_occ = find(bandtocal <= nv);
-bandtocal_unocc = find(bandtocal > nv);
-n_ener = length(bandtocal);
-nv_ener = length(bandtocal_occ);
-nc_ener = length(bandtocal_unocc);
+bandtocal_occ = bandtocal(find(bandtocal <= nv));
+bandtocal_unocc = bandtocal(find(bandtocal > nv));
 
 % Initialize other values
 % We use unit as ev, while usual input is Ry.
@@ -119,11 +110,17 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calculate four-center integral
 nm_Womega_nm_list(:, :, :) = fourcenterintegral(GWinfo, options, 1, ...
-            [nv-nv_ener+1, nv+nc_ener], [nv-nv_ener+1, nv+nc_ener], grid_real, ...
+            [nv-nv_ener+1, nv+nc_ener], [nv-nv_oper+1, nv+nc_oper], grid_real, ...
             'pattern', nm_Womega_nm_pattern);
 % Four-center integral calculated 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% save('nmWnm.mat', 'nm_Womega_nm_list');
+nmWnm = load('nmWnm.mat');
+nmWnm = nmWnm.nm_Womega_nm_list;
+for ifreq = 1:nfreq_real
+  norm(nmWnm(nv-nv_ener+1:nv+nc_ener, :, ifreq) - nm_Womega_nm_list(:, :, ifreq))
+end
 
 % Calculate residual energies 
 sres = zeros(n_ener, 1);

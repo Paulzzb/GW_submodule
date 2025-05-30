@@ -43,85 +43,54 @@ end
 
 GWinfo.Z = GWinfo.Z * sqrt(GWinfo.vol); % Turn to \int_V \abs{psi(r)}^2 dr = 1.
 Z     = GWinfo.Z;
-ev    = GWinfo.ev * ry2ev;
-Vxc   = GWinfo.Vxc * ry2ev;
 Dcoul = spdiags(GWinfo.coulG(:,4), 0, ng, ng);
 Dcoul(1,1) = GWinfo.coulG0;
 gvec = GWinfo.gvec;
+ev    = GWinfo.ev * ry2ev;
 Dcoul = Dcoul * ry2ev;
-fprintf('nr = %d, ng = %d, n_oper = %d\n', nr, ng, n_oper);
 
 
 
-% Normalize the wavefunc in Fourier space.
-startZ = tic;
-timeforZ = toc(startZ);
-startC2R = tic;
-psir = zeros(nr, nv+nc);
-for iband = 1:nv+nc
-  fftbox1 = put_into_fftbox(Z(:, iband), gvec.idxnz, gvec.fftgrid);
-  fftbox1 = gvec.nfftgridpts / GWinfo.vol * do_FFT(fftbox1, gvec.fftgrid, 1);
-  psir(:, iband) = reshape(fftbox1, gvec.nfftgridpts, []);
-end
-timeforC2R = toc(startC2R);
-fprintf('Time for psir = %.4f.\n', timeforC2R)
-clear Z;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Start calculation
 if (options.ISDFCauchy.isISDF)
-  vcrank_mu = ceil(sqrt(nv_oper*nc_oper) * options.ISDFCauchy.vcrank_ratio);
-  vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * options.ISDFCauchy.vsrank_ratio);
-  ssrank_mu = ceil(sqrt(n_ener *n_ener)  * options.ISDFCauchy.ssrank_ratio);
+  startISDF = tic;
+  optISDF = options.ISDFCauchy;
+  Phig = GWinfo.Z;
+  nr = gvec.nfftgridpts; nb = size(Phig, 2); 
+  psir = zeros(nr, nb);
+  for iband = 1:nb
+    fftbox1 = put_into_fftbox(Phig(:, iband), gvec.idxnz, gvec.fftgrid);
+    fftbox1 = nr / vol * do_FFT(fftbox1, gvec.fftgrid, 1);
+    psir(:, iband) = reshape(fftbox1, nr, []);
+  end
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Start ISDF
-  % Generally, we have relations 
-  %     Mr{xx} = xxrzeta_mu * Mrxx_mu;
-  startISDF = clock;
-  vcrzeta_mu = zeros(nr, vcrank_mu);
-  vcgzeta_mu = zeros(ng, vcrank_mu);
-  optionsISDF = options.ISDFCauchy;
-
-
-  startVC = tic;
-  optionsISDF.isdfoptions.rank = vcrank_mu;
-  vcind_mu = isdf_indices(conj(psir(:,nv-nv_oper+1:nv)), ...
-                               (psir(:,nv+1:nv+nc_oper)), optionsISDF);
-  vcgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv)), ...
-              (psir(:,nv+1:nv+nc_oper)), vcind_mu, gvec, vol);
-  vcgzeta_mu = conj(vcgzeta_mu);
-  timeforVC = toc(startVC);
-  
-
-  startVS = tic;
-  vsgzeta_mu = zeros(ng, vsrank_mu);
-  optionsISDF.isdfoptions.rank = vsrank_mu;
-  vsind_mu = isdf_indices(conj(psir(:,nv-nv_oper+1:nv)), ...
-                                (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-  vsgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv)), ...
-              (psir(:,nv-nv_ener+1:nv+nc_ener)), vsind_mu, gvec, vol);
+  vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * optISDF.vsrank_ratio);
+  optISDF.isdfoptions.rank = vsrank_mu;
+  [vsind_mu, vsgzeta_mu] = isdf_main('vs', Phig, nv-nv_oper+1:nv, ...
+          nv-nv_ener+1:nv+nc_ener, gvec, vol, optISDF);
   vsgzeta_mu = conj(vsgzeta_mu);
-  timeforVS = toc(startVS);
-
-
-  startSS = tic;
-  ssgzeta_mu = zeros(ng, ssrank_mu);
-  optionsISDF.isdfoptions.rank = ssrank_mu;
-  ssind_mu = isdf_indices(conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-                                (psir(:,nv-nv_ener+1:nv+nc_ener)), optionsISDF);
-  ssgzeta_mu = isdf_kernelg(conj(psir(:,nv-nv_oper+1:nv+nc_oper)), ...
-              (psir(:,nv-nv_ener+1:nv+nc_ener)), ssind_mu, gvec, vol);
+  
+  % In this case, ISDF for vc, vs, ss are all needed.
+  vcrank_mu = ceil(sqrt(nv_oper*nc_oper) * optISDF.vcrank_ratio);
+  ssrank_mu = ceil(sqrt(n_ener *n_ener)  * options.ISDFCauchy.ssrank_ratio);
+  optISDF.isdfoptions.rank = vcrank_mu;
+  [vcind_mu, vcgzeta_mu] = isdf_main('vc', Phig, nv-nv_oper+1:nv, ...
+          nv+1:nv+nc_oper, gvec, vol, optISDF);
+  vcgzeta_mu = conj(vcgzeta_mu);
+  
+  optISDF.isdfoptions.rank = ssrank_mu;
+  [ssind_mu, ssgzeta_mu] = isdf_main('ss', Phig, nv-nv_oper+1:nv+nc_oper, ...
+          nv-nv_ener+1:nv+nc_ener, gvec, vol, optISDF);
   ssgzeta_mu = conj(ssgzeta_mu);
-  timeforSS = toc(startSS);
-  timeforISDF = etime(clock, startISDF);
-
+  
   psirvc = psir(vcind_mu, :);
   psirvs = psir(vsind_mu, :);
   psirss = psir(ssind_mu, :);
-  clear psir;
 
-  fprintf('ISDF time = %.4f.\n', timeforVC+timeforVS+timeforSS);
+  timeforISDF = toc(startISDF);
+
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,7 +105,7 @@ if (options.ISDFCauchy.isISDF)
     evOcc = ev(nv-nv_oper+1:nv);
     evUnocc = ev(nv+1:nv+nc_oper);
     
-    [COmegaCresult, time_c, relError] = ...
+    [COmegaCresult, ~, ~] = ...
           COmegaCstar(Phi, Psi, evOcc, evUnocc, options.ISDFCauchy.optionsCauchy);
     clear Phi Psi evOcc evUnocc;
     COmegaCresult = COmegaCresult * 4;
@@ -154,15 +123,12 @@ if (options.ISDFCauchy.isISDF)
     end
   end
   COmegaCresult = COmegaCresult / GWinfo.vol;
-  % Calculate ( (C*Omega*C)^(-1) ...
-  %                               - vcgzeta_mu' * Dcoul * vcgzeta_mu)^(-1) 
   epsg_main = inv(COmegaCresult) - vcgzeta_mu' * Dcoul * vcgzeta_mu; 
   timeforinveps = toc(startinveps);
   fprintf('Time for inveps = %.4f.\n', timeforinveps);
 
   
   startSigma = tic; 
-  Dcoul(1,1) = GWinfo.coulG0;
   % Calculate operator \Sigma_{COH}, \Sigma_{SEX_X}, and \Sigma_{X} formally.
   Phivs = psirvs(:, nv-nv_oper+1:nv); 
   Phiss = psirss(:, nv-nv_oper+1:nv+nc_oper); 
@@ -176,8 +142,6 @@ if (options.ISDFCauchy.isISDF)
   Sigma_sex_x = W1_mu .* (Phivs * Phivs'); 
   Sigma_coh   = W1_mu_1 .* (Phiss * Phiss');
   clear W1_mu vcDcoulvs vcDcoulss epsvcDcoulvs epsvcDcoulss;
-  vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
-  clear vsDcoulvs;
   timeForSigma = toc(startSigma);
   fprintf('Sigma operator time = %f.\n', timeForSigma);
 

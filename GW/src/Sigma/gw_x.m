@@ -32,38 +32,31 @@ for i = 1:numel(nameConstants)
 end
 
 GWinfor.Z = GWinfor.Z * sqrt(GWinfor.vol); % Turn to \int_V \abs{psi(r)}^2 dr = 1.
-Z     = GWinfor.Z;
 Dcoul = spdiags(GWinfor.coulG(:,4), 0, ng, ng) * ry2ev;
 gvec = GWinfor.gvec;
 Dcoul(1,1) = GWinfor.coulG0 * ry2ev;
 fprintf('nr = %d, ng = %d, n_oper = %d\n', nr, ng, n_oper);
 
-% Normalize the wavefunc in Fourier space.
-startC2R = tic;
-psir = zeros(nr, nv+nc);
-for iband = 1:nv+nc
-  fftbox1 = put_into_fftbox(Z(:, iband), gvec.idxnz, gvec.fftgrid);
-  fftbox1 = gvec.nfftgridpts / GWinfor.vol * do_FFT(fftbox1, gvec.fftgrid, 1);
-  psir(:, iband) = reshape(fftbox1, gvec.nfftgridpts, []);
-end
-timeforC2R = toc(startC2R);
-fprintf('Time for psir = %.4f.\n', timeforC2R)
-clear Z;
 
 if (options.ISDFCauchy.isISDF)
-  vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * options.ISDFCauchy.vsrank_ratio);
-  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Start ISDF
   % Generally, we have relations 
   %     Mr{xx} = xxrzeta_mu * Mrxx_mu;
-  optionsISDF = options.ISDFCauchy;
-
   startVS = tic;
-  vsgzeta_mu = zeros(ng, vsrank_mu);
-  optionsISDF.isdfoptions.rank = vsrank_mu;
-  [vsind_mu, vsgzeta_mu] = isdf_main('vs', conj(psir(:,nv-nv_oper+1:nv)), ...
-          (psir(:,nv-nv_ener+1:nv+nc_ener)), gvec, vol, optionsISDF);
+  optISDF = options.ISDFCauchy;
+  vsrank_mu = ceil(sqrt(nv_oper*n_ener)  * optISDF.vsrank_ratio);
+  optISDF.isdfoptions.rank = vsrank_mu;
+
+  psir = zeros(nr, nv+nc);
+  for iband = 1:nv+nc
+    fftbox1 = put_into_fftbox(GWinfor.Z(:, iband), gvec.idxnz, gvec.fftgrid);
+    fftbox1 = gvec.nfftgridpts / GWinfor.vol * do_FFT(fftbox1, gvec.fftgrid, 1);
+    psir(:, iband) = reshape(fftbox1, gvec.nfftgridpts, []);
+  end
+
+  [vsind_mu, vsgzeta_mu] = isdf_main('vs', GWinfor.Z, nv-nv_oper+1:nv, ...
+          nv-nv_ener+1:nv+nc_ener, gvec, vol, optISDF);
   vsgzeta_mu = conj(vsgzeta_mu);
   timeforVS = toc(startVS);
   fprintf('ISDF time = %.4f.\n', timeforVS);
@@ -75,18 +68,17 @@ if (options.ISDFCauchy.isISDF)
   Sigma_x    = vsDcoulvs .* conj(Phivs * Phivs'); 
 
   Psivs = conj(psirvs(:, nv-nv_ener+1:nv+nc_ener)); 
-  Ex    = Psivs' * Sigma_x * Psivs / GWinfor.vol;
+  Ex    = Psivs' * Sigma_x * Psivs / vol;
 else
   Ex = zeros(n_ener);
   for ioper = nv-nv_oper+1:nv
     Mgvn = mtxel_sigma(ioper, GWinfor, options.Groundstate, (nv-nv_ener+1:nv+nc_ener));
     Mgvn = conj(Mgvn);
     W1Mgvn = Dcoul * Mgvn;
-    Ex = Ex + Mgvn' * W1Mgvn / GWinfor.vol;
+    Ex = Ex + Mgvn' * W1Mgvn / vol;
   end
 end
 
 Ex = - real(diag(Ex));
-
 
 end % function
