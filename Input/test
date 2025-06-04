@@ -1,0 +1,12 @@
+&CONTROL
+  prefix = 'NaCl',
+  calculation = 'gw',
+  helper = 'summation'
+/
+
+&SYSTEM
+  ecutwfc = 50.0,
+  nbnd = 60,
+  sigma = 0.1,
+  gw_method = 'G0W0',
+/
