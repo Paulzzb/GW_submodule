@@ -63,8 +63,6 @@ nm_Womega_nm_list(:, :, :) = fourcenterintegral(GWinfo, options, 1, ...
             grid_imag);
 % end
 
-save('nmWnm.mat', 'nm_Womega_nm_list');
-nmWnm = load('nmWnm.mat');
 
 
 

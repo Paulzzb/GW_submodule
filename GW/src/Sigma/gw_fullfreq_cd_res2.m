@@ -115,12 +115,6 @@ nm_Womega_nm_list(:, :, :) = fourcenterintegral(GWinfo, options, 1, ...
 % Four-center integral calculated 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% save('nmWnm.mat', 'nm_Womega_nm_list');
-nmWnm = load('nmWnm.mat');
-nmWnm = nmWnm.nm_Womega_nm_list;
-for ifreq = 1:nfreq_real
-  norm(nmWnm(nv-nv_ener+1:nv+nc_ener, :, ifreq) - nm_Womega_nm_list(:, :, ifreq))
-end
 
 % Calculate residual energies 
 sres = zeros(n_ener, 1);
