@@ -1,8 +1,12 @@
 function config = read_input_param(filename)
-% 读取输入文件并解析为结构体，同时进行参数合法性检查
+% This function
+% 1. Reads the input file from filename
+% 2. Extracts the blocks and parameters
+% 3. Check validation
+% 4. Stores the parameters in a struct 'config'
 
 % GET PARAM DEFINITION
-def = param_def();
+def = allowed_param_list();
 
 % READ FILE
 fid = fopen(filename, 'r');
@@ -12,9 +16,30 @@ end
 content = fread(fid, '*char')';
 fclose(fid);
 
+% Remove comments
+content = regexprep(content, '%.*', '');
+
+% Define pattern for blocks
+blockPattern = '&(?<block>\w+)\s*\n(?<body>.*?)\nEND\s*&\k<block>';
+% blockPattern = '&(?<block>\w+)[^&]*?END\s*&\k<block>';
+
+% Extract blocks using case-insensitive match and dotall mode
+matches = regexp(content, blockPattern, 'names');
+
+% % Parse each match into block name and body
+% blocks = struct([]);
+% for i = 1:numel(matches)
+%     % Extract block name
+%     blkName = regexp(matches{i}, '&(\w+)', 'tokens', 'once');
+%     body = regexp(matches{i}, '.*?\n(.*)\nEND\s*&\w+', 'tokens', 'once');
+%     blocks(i).block = upper(blkName{1});
+%     blocks(i).body = strtrim(body{1});
+% end
+
+
 % GET BLOCKS
-pattern = '&(?<block>\w+)(?<body>.*?)\/';
-matches = regexp(content, pattern, 'names');
+% pattern = '&(?<block>\w+)(?<body>.*?)\/';
+    
 
 config = struct();
 for i = 1:numel(matches)
