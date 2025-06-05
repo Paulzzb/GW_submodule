@@ -370,7 +370,8 @@ a { color: #0077cc; text-decoration: none; }
 a:hover { text-decoration: underline; }
 </style>
 <h1 id="gwoptions-input-file-description">GWOptions Input File Description</h1>
-<p>This document describes all supported input blocks and parameters used to configure the GWOptions framework. Parameters are grouped by block (namelist-style) and include descriptions, expected types, and default values.</p>
+<p>This document describes all supported input blocks and parameters used to configure the GWOptions framework.
+Parameters are grouped by block (namelist-style) and include descriptions, expected types, and default values.</p>
 <hr>
 <h2 id="alphabetical-parameter-index">Alphabetical Parameter Index</h2>
 <h3 id="control">&amp;CONTROL</h3>
@@ -459,7 +460,7 @@ a:hover { text-decoration: underline; }
 <td>Path to ground state data directory</td>
 </tr>
 <tr>
-<td><a name="groundstate_type"></a><code>groundstate_type</code></td>
+<td><a name="groundstate_type"></a><a href="#appendix-sys-freq">groundstate_type</a></td>
 <td>string</td>
 <td>Yes</td>
 <td><code>kssolv</code></td>
@@ -632,7 +633,7 @@ a:hover { text-decoration: underline; }
 </thead>
 <tbody>
 <tr>
-<td><a name="isisdf"></a><code>isISDF</code></td>
+<td><a name="isisdf"></a><code>isisdf</code></td>
 <td>bool</td>
 <td>No</td>
 <td><code>true</code></td>
@@ -712,6 +713,27 @@ The algorithm to compute it is as follows:
 ...</p>
 <blockquote>
 <p><em>TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.</em></p>
+</blockquote>
+<hr>
+<h3 id="a-name%22gsinput%22a-requirements-for-different-groundstate-types"><a name="gs_input"></a> Requirements for different groundstate types</h3>
+<h4 id="groundstatetype--kssolv">groundstate_type = <code>kssolv</code></h4>
+<p>To use a KSSOLV-based ground state with GWOptions (CONTROL.groundstate_type='kssolv'), the following files must be saved under <code>groundstate_dir</code>:</p>
+<ul>
+<li><code>psi.mat</code> — Kohn-Sham wavefunctions (e.g. ψ_nk)</li>
+<li><code>eigval.mat</code> — eigenvalues for each band</li>
+<li><code>occ.mat</code> — occupation numbers</li>
+<li><em>(Optional)</em> <code>grid.mat</code>, <code>ham.mat</code>, etc. if required</li>
+</ul>
+<p><strong>We recommend calling a helper function <code>save_groundstate_to_GWformat.m</code> at the end of your KSSOLV simulation to save these in a standard format.</strong></p>
+<p><strong>A sample demo</strong></p>
+<pre class="hljs"><code><div><span class="hljs-comment">% Prepare KSSOLV-scf input</span>
+[mol,H,X0,info] = scf(mol, options_scf);
+fileName = <span class="hljs-string">'./groundstate_information.mat'</span>;
+save_groundstate_to_GWformat(mol, H, X0, info, fileName);
+</div></code></pre>
+<h4 id="groundstatetype--qe">groundstate_type = <code>qe</code></h4>
+<blockquote>
+<p>TODO: complete this part</p>
 </blockquote>
 <hr>
 <h2 id="notes">Notes</h2>

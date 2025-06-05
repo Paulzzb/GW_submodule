@@ -1,12 +1,11 @@
 &CONTROL
   prefix = 'NaCl',
-  calculation = 'gw',
-  helper = 'summation'
-/
+  isgw = 1, 
+  groundstate_dir = './',
+  groundstate_type = 'kssolv',
+END &CONTROL
 
-&SYSTEM
-  ecutwfc = 50.0,
-  nbnd = 60,
-  sigma = 0.1,
-  gw_method = 'G0W0',
-/
+% &SYSTEM
+%   number_bands_in_summation = 20,
+% END &SYSTEM
+

@@ -66,7 +66,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | <a name="output_dir"></a>`output_dir`    | string | No       | `'./'`        | Output directory                                |
 | <a name="prefix"></a>`prefix`            | string | No       | `'QP'`        | File name prefix                                |
 | <a name="groundstate_dir"></a>`groundstate_dir` | string | Yes | *none*       | Path to ground state data directory             |
-| <a name="groundstate_type"></a>`groundstate_type` | string | Yes | `kssolv`       | Software implementing groundstate calculation             |
+| <a name="groundstate_type"></a><a href="#appendix-sys-freq">groundstate_type</a> | string | Yes | `kssolv`       | Software implementing groundstate calculation             |
 | <a name="storage_dir"></a>`storage_dir`  | string | No       | `'./QP.save/'`   | Directory for intermediate quantities           |
 | <a name="outfile"></a>`outfile`          | string | No       | `'./GWoutput'`  | Output log file name                            |
 
@@ -135,6 +135,30 @@ The algorithm to compute it is as follows:
 ...
 > *TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.*
 
+---
+### <a name="gs_input"></a> Requirements for different groundstate types
+
+####  groundstate_type = `kssolv`
+To use a KSSOLV-based ground state with GWOptions (CONTROL.groundstate_type='kssolv'), the following files must be saved under `groundstate_dir`:
+
+- `psi.mat` — Kohn-Sham wavefunctions (e.g. ψ_nk)
+- `eigval.mat` — eigenvalues for each band
+- `occ.mat` — occupation numbers
+- *(Optional)* `grid.mat`, `ham.mat`, etc. if required
+
+**We recommend calling a helper function `save_groundstate_to_GWformat.m` at the end of your KSSOLV simulation to save these in a standard format.**
+
+**A sample demo**
+```matlab
+% Prepare KSSOLV-scf input
+[mol,H,X0,info] = scf(mol, options_scf);
+output_dir = './';
+save_groundstate_to_GWformat(mol, H, X0, info, output_dir);
+```
+
+####  groundstate_type = `qe`
+
+> TODO: complete this part
 ---
 
 ## Notes

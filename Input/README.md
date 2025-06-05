@@ -2,6 +2,8 @@
 构建如下的工作流
 [inputfile] → read_input_param() → struct(config) → convert_to_GWOptions(config) → GWOptions 实例（支持 display & 快捷访问）
 仍在构建中...
+后续的工作：需要完成一个输入值检测函数，用于read_input_param()中，检测输入值是否合法，并给出提示.
+
 
 ## Current framework
 GWOptionsFramework/
