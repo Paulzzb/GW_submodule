@@ -17,12 +17,12 @@ function input_driver(inputfile)
   % Step 3: Load groundstate info
   dirin = config.CONTROL.groundstate_dir;
   typein = config.CONTROL.groundstate_type;
-  GWinfor = load_groundstate_info(dirin, typein);
+  %%  GWinfor = load_groundstate_info(dirin, typein);
   
   % Step 4: Fill in defaults (standard + based on GWinfor)
-  config = complete_config_with_defaults(config, GWinfor);
+  %% config = complete_config_with_defaults(config, GWinfor);
   
   % Step 5: Build GWOptions and GWinfo
-  [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
+  %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
 
 end % function
