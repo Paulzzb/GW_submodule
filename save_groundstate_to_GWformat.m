@@ -9,6 +9,9 @@ vxc = getVhxc(mol, rhor);
 ev = info.Eigvals;
 occupation = X0.occ;
 psig = X0.psi;
+Vxc = [];
+reciprocal_grid_info = [];
+
 
 % Calculate Vxc(n)
 nb = length(ev); nr = length(vxc(:));
@@ -18,12 +21,23 @@ Vxc = zeros(nb, 1);
 for it=1:nb
   Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol)^2 / nr;
 end
+
+% Prepare reciprocal grid information
+ggrid = Ggrid(mol);
+C = mol.supercell;
+xyz = [ggrid.gkx, ggrid.gky, ggrid.gkz] * C' * 2 * pi;
+% KSSOLV use Hartree unit, and our code use Rydberg unit, so we need to convert it.
+reciprocal_grid_info = struct('xyz', xyz, 'idxnz', ggrid.idxnz, 'wfncut', 2*ggrid.ecut);
+  
+
+% Prepare groundstate struct and save
 groundstate.rhor = rhor;
 groundstate.Vxc = Vxc;
-groundstate.eigval = ev;
+groundstate.ev = ev;
 groundstate.psi = psig;
 groundstate.sys = sys;
 groundstate.occupation = occupation;
+groundstate.reciprocal_grid_info = reciprocal_grid_info;
 
 fileName = fullfile(dir, 'groundstate.mat');
 save(fileName, 'groundstate');

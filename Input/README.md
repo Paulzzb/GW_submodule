@@ -4,6 +4,7 @@
 仍在构建中...
 后续的工作：需要完成一个输入值检测函数，用于read_input_param()中，检测输入值是否合法，并给出提示.
 
+**自行查看minibzaverage.f90中怎么生成integrate的代码，对应vcoul_generator中的dvalue, 用于书写这里的construct_coulG0**
 
 ## Current framework
 GWOptionsFramework/

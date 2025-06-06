@@ -1,7 +1,7 @@
 &CONTROL
   prefix = 'NaCl',
   isgw = 1, 
-  groundstate_dir = './',
+  groundstate_dir = '../',
   groundstate_type = 'kssolv',
 END &CONTROL
 

@@ -1,6 +1,6 @@
 clear;
 %
-INFO_DIR = 'Si8/';
+INFO_DIR = 'NaCl/';
 % Please change the kspath to yours
 cfile = mfilename('fullpath');
 CPATH = fileparts(cfile);

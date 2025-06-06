@@ -13,16 +13,26 @@ function input_driver(inputfile)
   
   % Step 2: Validate required fields
   validate_required_params(config);
+
   
-  % Step 3: Load groundstate info
+  % Step 4: Load groundstate info, transform them into a uniform format
+  %         struct 'data'.
   dirin = config.CONTROL.groundstate_dir;
   typein = config.CONTROL.groundstate_type;
-  %%  GWinfor = load_groundstate_info(dirin, typein);
+  data = load_groundstate_info(dirin, typein);
+
+  % Step 3: Set default values in 'config', error if there exists invalid values.
+  config = set_default_param_value(config, data);
+
+
+  % Step 5: Construct GWinfo and GWOptions seperately
+  error('under construction')
+  GWinfor = construct_GWinfo(data, config);
+  GWoptions = construct_GWOptions(data, config);
+
   
-  % Step 4: Fill in defaults (standard + based on GWinfor)
-  %% config = complete_config_with_defaults(config, GWinfor);
   
-  % Step 5: Build GWOptions and GWinfo
+  % Step 6: save data to files 
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
 
 end % function

@@ -8,6 +8,9 @@ a:hover { text-decoration: underline; }
 This document describes all supported input blocks and parameters used to configure the GWOptions framework.
 Parameters are grouped by block (namelist-style) and include descriptions, expected types, and default values.
 
+**Default energy unit is Ry, ALWAYS.**
+**This could be really delicate!!!! Since codes use different unit for their cutoffs.**
+
 ---
 
 ## Alphabetical Parameter Index
@@ -24,11 +27,12 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 
 ### &SYSTEM
 <a href="#number_bands_in_summation">number_bands_in_summation</a> |
+<a href="#energy_band_index_min">energy_band_index_min</a> |
+<a href="#energy_band_index_max">energy_band_index_max</a> |
 
 ### &CUTOFFS
 <a href="#coulomb_truncation">coulomb_truncation_method</a> |
 <a href="#coulomb_cutoff">coulomb_cutoff</a> |
-<a href="#wavefunc_cutoff">wavefunc_cutoff</a> |
 <a href="#density_cutoff">density_cutoff</a> |
 
 ### &FREQUENCY
@@ -77,6 +81,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | Parameter                             | Type   | Required | Default    | Description                        |
 |----------------------------------------|--------|----------|------------|------------------------------------|
 | <a name="number_bands_in_summation"></a>`number_bands_in_summation` | int    | <a href="#appendix-sys-freq">system based</a> | `-1`          | Band count in summation            |
+| <a name="energy_band_index_min"></a>`energy_band_index_min` | int    | <a href="#appendix-sys-freq">system based</a> | `-1`          | Minimum band index for QP energies            |
+| <a name="energy_band_index_max"></a>`energy_band_index_max` | int    | <a href="#appendix-sys-freq">system based</a> | `-1`          | Maximum band index for QP energies            |
 
 ---
 
@@ -86,9 +92,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | Parameter           | Type   | Required | Default | Description                      |
 |---------------------|--------|----------|---------|----------------------------------|
 | <a name="coulomb_truncation"></a>`coulomb_truncation_method`         | string | No | `'spherical_truncation'` | Truncation method for Coulomb     |
-| <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for Coulomb potential     |
-| <a name="wavefunc_cutoff"></a>`wavefunc_cutoff` | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for wavefunctions         |
-| <a name="density_cutoff"></a>`density_cutoff`   | float  | No | = 2*`wavefunc_cutoff`  | Cutoff for density               |
+| <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for Coulomb potential **Could be danger, code is not stable about it**    |
+| <a name="density_cutoff"></a>`density_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for density               |
 
 ---
 ---
@@ -129,24 +134,23 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 
 ### <a name="appendix-sys-freq"></a> System-dependent parameters 
 
-The default value of `frequency_low_cutoff`, `coulomb_cutoff`, `wavefunc_cutoff` are not static.
+The default value of `frequency_low_cutoff`, `coulomb_cutoff`, `density_cutoff` are not static.
 They depend on the groundstate information provided by user in `groundstate_dir`.
 The algorithm to compute it is as follows:
-...
+
+- `coulomb_cutoff` is the wavefunction cutoff of the groundstate, and the `density_cutoff` is twice the wavefunction cutoff.
+- `frequency_low_cutoff` depends on the band energies.
+  - For insulating systems, the `frequency_low_cutoff` is set to the larger of the following two values: the energy difference between the HOMO and the lowest occupied band, and the energy difference between the highest unoccupied band calculated and the LUMO.
+  - For metallic systems, `frequency_low_cutoff` is set to the highest unoccupied band energy calculated minus the lowest occupied band energy.
+
 > *TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.*
 
 ---
 ### <a name="gs_input"></a> Requirements for different groundstate types
 
 ####  groundstate_type = `kssolv`
-To use a KSSOLV-based ground state with GWOptions (CONTROL.groundstate_type='kssolv'), the following files must be saved under `groundstate_dir`:
 
-- `psi.mat` — Kohn-Sham wavefunctions (e.g. ψ_nk)
-- `eigval.mat` — eigenvalues for each band
-- `occ.mat` — occupation numbers
-- *(Optional)* `grid.mat`, `ham.mat`, etc. if required
-
-**We recommend calling a helper function `save_groundstate_to_GWformat.m` at the end of your KSSOLV simulation to save these in a standard format.**
+**User should call a helper function `save_groundstate_to_GWformat` at the end of your KSSOLV simulation to save these in a standard format. Users should copy `save_groundstate_to_GWformat.m` to their working directory and change their demo in the following manner.**
 
 **A sample demo**
 ```matlab
