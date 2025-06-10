@@ -1,6 +1,14 @@
 % function vcoul = construct_vcoul(mill, supercell, amin, truncation)
 function vcoul = construct_vcoul(data, config)
-
+% construct_vcoul - construct the electrostatic potential from the charge density
+% config.CUTOFFS.coulomb_truncation_method = 
+%   = 0,  no truncation (3D)
+%   = 2,  0D spherical truncation
+%   = 4,  1D cell wire truncation
+%   = 5,  0D cell box truncation
+%   = 6,  2D slab truncation
+%   = 7,  supercell truncation (3D), experimental
+% 
 trun_method = config.CUTOFFS.coulomb_truncation_method;
 cutoff = config.CUTOFFS.coulomb_cutoff;
 eightpi = 8*pi;
@@ -33,17 +41,23 @@ else
 end
 
 % Calculate the coulomb potential
-ngcomb = length(Ggrid_coul.idxnz);
+% ngcomb = length(Ggrid_coul.idxnz);
 
 switch trun_method
   case 0  % No truncation (3D)
     vcoul = eightpi ./ qG2;        % v(q+G) = 8π / |q+G|²
     vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
-
+  case 2 % 
+    trunc_factor = 1-cos(sqrt(qG2) * amin)
+    vcoul = eightpi ./ qG2 .* trunc_factor;        % v(q+G) = 8π / |q+G|² * (1-)
+    vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
   case 4  % Wire truncation (1D)
     % Apply wire-truncated Coulomb potential
     % Formula (e.g., from Rozzi et al. 2006):
     % v(q+G) = 4π / |q+G|² * [1 - exp(-|q+G|*L) * (|q+G|*L + 1)]
+    msg = sprintf(['GW:construct_vcoul:trunc_method', 'Wire truncation not implemented yet']);
+    GWerror(msg);
+    % error('GW:construct_vcoul:trunc_method', 'Wire truncation not implemented yet');
     L = truncval(1); % length along non-periodic directions
     qGnorm = sqrt(qG2);
     trunc_factor = 1 - exp(-qGnorm * L) .* (qGnorm * L + 1);
@@ -52,6 +66,10 @@ switch trun_method
 
   case 5  % Box truncation (0D)
     % Use erfc-based cutoff (example form)
+    msg = sprintf(['GW:construct_vcoul:trunc_method', 'Box truncation not implemented yet']);
+    GWerror(msg);
+
+    error('GW:construct_vcoul:trunc_method', 'Box truncation not implemented yet');
     L = truncval(1);
     qGnorm = sqrt(qG2);
     vcoul = fourpi ./ qG2 .* (1 - exp(-qGnorm.^2 * L^2));
@@ -59,15 +77,23 @@ switch trun_method
 
   case 6  % Slab truncation (3D)
     % Slab truncation along z (say Gz = G(:,3))
+    msg = sprintf(['GW:construct_vcoul:trunc_method', 'Slab truncation not implemented yet']);
+    GWerror(msg);
+    error('GW:construct_vcoul:trunc_method', 'Slab truncation not implemented yet');
     Lz = truncval(3);
     Gz = qG(:,3);
     vcoul = eightpi ./ qG2 .* (1 - exp(-abs(Gz) * Lz));
     vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
+  case 7
+    msg = sprintf(['GW:construct_vcoul:trunc_method', 'Supercell truncation not implemented yet']);
+    GWerror(msg);
+    error('GW:construct_vcoul:trunc_method', 'Supercell truncation not implemented yet');
 
   otherwise
+    msg = sprintf(['Unsupported truncation type: %d', trunc_type]);
+    GWerror(msg);
     error('Unsupported truncation type: %d', trunc_type);
 end
-end;
 
 
 

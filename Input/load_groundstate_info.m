@@ -4,11 +4,12 @@ function data = load_groundstate_info(dirin, typein)
 % Step 1: Read raw data
 switch lower(typein)
   case 'kssolv'
-    data = load_kssolv_groundstate(dirin);
+  data = load_kssolv_groundstate(dirin);
   case 'qe'
-    data = load_qe_groundstate(dirin);
+  data = load_qe_groundstate(dirin);
   otherwise
-    error('Unsupported groundstate type: %s', typein);
+  msg = sprintf('Unsupported groundstate type: %s', typein);
+  GWerror(msg);
 end
 
 end
@@ -22,20 +23,23 @@ function data = load_kssolv_groundstate(dirin)
 filePath = fullfile(dirin, 'groundstate.mat');
 
 if ~exist(filePath, 'file')
-    error('groundstate.mat not found in directory: %s', dirin);
+  msg = sprintf('groundstate.mat not found in directory: %s', dirin);
+  GWerror(msg);
 end
 
 tmp = load(filePath);
 
 if ~isfield(tmp, 'groundstate')
-    error('groundstate.mat does not contain a variable named "groundstate".');
+  msg = 'groundstate.mat does not contain a variable named "groundstate".';
+  GWerror(msg);
 end
 
 required_fields = {'rhor', 'Vxc', 'ev', 'psi', 'sys', 'occupation', 'reciprocal_grid_info'};
 for k = 1:length(required_fields)
-    if ~isfield(tmp.groundstate, required_fields{k})
-        error('Missing field "%s" in groundstate structure.', required_fields{k});
-    end
+  if ~isfield(tmp.groundstate, required_fields{k})
+    msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});
+    GWerror(msg);
+  end
 end
 
 data = tmp.groundstate;

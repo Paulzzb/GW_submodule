@@ -67,7 +67,7 @@ ry2ev = 13.60569253;
 nv = options.nv;
 nc = options.nc;
 nbands = nv + nc;
-amin = options.amin
+amin = options.amin;
 ng = 0;
 nr = 0;
 

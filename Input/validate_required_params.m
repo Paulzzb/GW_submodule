@@ -2,17 +2,20 @@ function validate_required_params(config)
 
 % Validate CONTROL.groundstate_dir
 if ~isfield(config, 'CONTROL') || ~isfield(config.CONTROL, 'groundstate_dir')
-    error('[GW] Required field "CONTROL.groundstate_dir" in input file is missing.');
+  msg = 'Field "CONTROL.groundstate_dir" is missing in input file.';
+  GWerror(msg);
 end
 
 dir_path = config.CONTROL.groundstate_dir;
 if ~ischar(dir_path)
-    error('[GW] CONTROL.groundstate_dir must be a character vector or string.');
+  msg = 'Field "CONTROL.groundstate_dir" must be a character vector or string.';
+  GWerror(msg);
 end
 
 if ~exist(dir_path, 'dir')
-    error('[GW] Specified directory in field %s does not exist: %s', ...
-          'CONTROL.groundstate_dir', dir_path);
+  msg = sprintf('Specified directory in field %s does not exist: %s', ...
+        'CONTROL.groundstate_dir', dir_path);
+  GWerror(msg);
 end
 
 end

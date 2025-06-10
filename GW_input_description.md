@@ -31,7 +31,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#energy_band_index_max">energy_band_index_max</a> |
 
 ### &CUTOFFS
-<a href="#coulomb_truncation">coulomb_truncation_method</a> |
+<a href="#coulomb_truncation_method">coulomb_truncation_method</a> |
+<a href="#coulomb_truncation_parameter">coulomb_truncation_parameter</a> |
 <a href="#coulomb_cutoff">coulomb_cutoff</a> |
 <a href="#density_cutoff">density_cutoff</a> |
 
@@ -91,8 +92,9 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 
 | Parameter           | Type   | Required | Default | Description                      |
 |---------------------|--------|----------|---------|----------------------------------|
-| <a name="coulomb_truncation"></a>`coulomb_truncation_method`         | string | No | `'spherical_truncation'` | Truncation method for Coulomb     |
-| <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for Coulomb potential **Could be danger, code is not stable about it**    |
+| <a name="coulomb_truncation_method"></a>`coulomb_truncation_method`         | <a href="#appendix-trunc"> `spherical` </a> | No | `'spherical_truncation'` | Truncation method for Coulomb     |
+| <a name="coulomb_truncation_parameter></a>`coulomb_truncation_parameter`   | float  | No | 5.0  | Truncation parameter for Coulomb potential    |
+| <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float | No | 5.0  | Cutoff for Coulomb potential **Could be danger, code is not stable about it**    |
 | <a name="density_cutoff"></a>`density_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for density               |
 
 ---
@@ -120,7 +122,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 |------------------------|--------|----------|----------------|-------------------------------------|
 | <a name="isisdf"></a>`isisdf`                   | bool   | No | `true`        | Whether to enable ISDF              |
 | <a name="isdf_ratio"></a>`isdf_ratio`           | float  | No | `8.0`         | Global ISDF ratio                   |
-| <a name="isdf_ratio_type1"></a>`isdf_ratio_type1` | float | No | = `isdf_ratio` | Override ratio for ISDF type 1      |
+| <a name="isdf_ratio_type1"</a>`isdf_ratio_type1` | float | No | = `isdf_ratio` | Override ratio for ISDF type 1      |
 | <a name="isdf_ratio_type2"></a>`isdf_ratio_type2` | float | No | = `isdf_ratio` | Override ratio for ISDF type 2      |
 | <a name="isdf_ratio_type3"></a>`isdf_ratio_type3` | float | No | = `isdf_ratio` | Override ratio for ISDF type 3      |
 | <a name="exxmethod"></a>`exxmethod`             | string | No | `'kmeans'`    | Method for EXX                      |
@@ -144,6 +146,17 @@ The algorithm to compute it is as follows:
   - For metallic systems, `frequency_low_cutoff` is set to the highest unoccupied band energy calculated minus the lowest occupied band energy.
 
 > *TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.*
+
+### <a name="#appendix-trunc"> </a> Coulomb truncation
+> Todo : introduce different Coulomb truncation schemes and their corresponding parameters.
+Value of `coulomb_truncation_method` and corresponding method:
+
+- 0,  no truncation (3D)
+- 2,  0D spherical truncation
+- 4,  1D cell wire truncation **Ongoing**
+- 5,  0D cell box truncation **Ongoing**
+- 6,  2D slab truncation **Ongoing**
+- 7,  supercell truncation (3D), experimental **Ongoing**
 
 ---
 ### <a name="gs_input"></a> Requirements for different groundstate types

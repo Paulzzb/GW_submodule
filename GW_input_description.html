@@ -372,6 +372,8 @@ a:hover { text-decoration: underline; }
 <h1 id="gwoptions-input-file-description">GWOptions Input File Description</h1>
 <p>This document describes all supported input blocks and parameters used to configure the GWOptions framework.
 Parameters are grouped by block (namelist-style) and include descriptions, expected types, and default values.</p>
+<p><strong>Default energy unit is Ry, ALWAYS.</strong>
+<strong>This could be really delicate!!!! Since codes use different unit for their cutoffs.</strong></p>
 <hr>
 <h2 id="alphabetical-parameter-index">Alphabetical Parameter Index</h2>
 <h3 id="control">&amp;CONTROL</h3>
@@ -384,11 +386,13 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#storage_dir">storage_dir</a> |
 <a href="#outfile">outfile</a> |</p>
 <h3 id="system">&amp;SYSTEM</h3>
-<p><a href="#number_bands_in_summation">number_bands_in_summation</a> |</p>
+<p><a href="#number_bands_in_summation">number_bands_in_summation</a> |
+<a href="#energy_band_index_min">energy_band_index_min</a> |
+<a href="#energy_band_index_max">energy_band_index_max</a> |</p>
 <h3 id="cutoffs">&amp;CUTOFFS</h3>
-<p><a href="#coulomb_truncation">coulomb_truncation_method</a> |
+<p><a href="#coulomb_truncation_method">coulomb_truncation_method</a> |
+<a href="#coulomb_truncation_param">coulomb_truncation_param</a> |
 <a href="#coulomb_cutoff">coulomb_cutoff</a> |
-<a href="#wavefunc_cutoff">wavefunc_cutoff</a> |
 <a href="#density_cutoff">density_cutoff</a> |</p>
 <h3 id="frequency">&amp;FREQUENCY</h3>
 <p><a href="#frequency_dependence">frequency_dependence</a> |
@@ -502,6 +506,20 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td><code>-1</code></td>
 <td>Band count in summation</td>
 </tr>
+<tr>
+<td><a name="energy_band_index_min"></a><code>energy_band_index_min</code></td>
+<td>int</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td><code>-1</code></td>
+<td>Minimum band index for QP energies</td>
+</tr>
+<tr>
+<td><a name="energy_band_index_max"></a><code>energy_band_index_max</code></td>
+<td>int</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td><code>-1</code></td>
+<td>Maximum band index for QP energies</td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -518,31 +536,31 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 </thead>
 <tbody>
 <tr>
-<td><a name="coulomb_truncation"></a><code>coulomb_truncation_method</code></td>
-<td>string</td>
+<td><a name="coulomb_truncation_method"></a><code>coulomb_truncation_method</code></td>
+<td><a href="#appendix-trunc"> <code>spherical</code> </a></td>
 <td>No</td>
 <td><code>'spherical_truncation'</code></td>
 <td>Truncation method for Coulomb</td>
 </tr>
 <tr>
+<td><a name="coulomb_truncation_param"></a><code>coulomb_truncation_param</code></td>
+<td>float</td>
+<td>No</td>
+<td>5.0</td>
+<td>Truncation parameter for Coulomb potential</td>
+</tr>
+<tr>
 <td><a name="coulomb_cutoff"></a><code>coulomb_cutoff</code></td>
 <td>float</td>
 <td>No</td>
-<td><a href="#appendix-sys-freq">system based</a></td>
-<td>Cutoff for Coulomb potential</td>
-</tr>
-<tr>
-<td><a name="wavefunc_cutoff"></a><code>wavefunc_cutoff</code></td>
-<td>float</td>
-<td>No</td>
-<td><a href="#appendix-sys-freq">system based</a></td>
-<td>Cutoff for wavefunctions</td>
+<td>5.0</td>
+<td>Cutoff for Coulomb potential <strong>Could be danger, code is not stable about it</strong></td>
 </tr>
 <tr>
 <td><a name="density_cutoff"></a><code>density_cutoff</code></td>
 <td>float</td>
 <td>No</td>
-<td>= 2*<code>wavefunc_cutoff</code></td>
+<td><a href="#appendix-sys-freq">system based</a></td>
 <td>Cutoff for density</td>
 </tr>
 </tbody>
@@ -647,7 +665,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td>Global ISDF ratio</td>
 </tr>
 <tr>
-<td><a name="isdf_ratio_type1"></a><code>isdf_ratio_type1</code></td>
+<td>&lt;a name=&quot;isdf_ratio_type1&quot;</a><code>isdf_ratio_type1</code></td>
 <td>float</td>
 <td>No</td>
 <td>= <code>isdf_ratio</code></td>
@@ -707,29 +725,34 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <hr>
 <h2 id="%F0%9F%93%8E-appendix">📎 Appendix</h2>
 <h3 id="a-name%22appendix-sys-freq%22a-system-dependent-parameters"><a name="appendix-sys-freq"></a> System-dependent parameters</h3>
-<p>The default value of <code>frequency_low_cutoff</code>, <code>coulomb_cutoff</code>, <code>wavefunc_cutoff</code> are not static.
+<p>The default value of <code>frequency_low_cutoff</code>, <code>coulomb_cutoff</code>, <code>density_cutoff</code> are not static.
 They depend on the groundstate information provided by user in <code>groundstate_dir</code>.
-The algorithm to compute it is as follows:
-...</p>
+The algorithm to compute it is as follows:</p>
+<ul>
+<li><code>coulomb_cutoff</code> is the wavefunction cutoff of the groundstate, and the <code>density_cutoff</code> is twice the wavefunction cutoff.</li>
+<li><code>frequency_low_cutoff</code> depends on the band energies.
+<ul>
+<li>For insulating systems, the <code>frequency_low_cutoff</code> is set to the larger of the following two values: the energy difference between the HOMO and the lowest occupied band, and the energy difference between the highest unoccupied band calculated and the LUMO.</li>
+<li>For metallic systems, <code>frequency_low_cutoff</code> is set to the highest unoccupied band energy calculated minus the lowest occupied band energy.</li>
+</ul>
+</li>
+</ul>
 <blockquote>
 <p><em>TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.</em></p>
+</blockquote>
+<h3 id="a-name%22appendix-trunc%22-a-coulomb-truncation"><a name="#appendix-trunc"> </a> Coulomb truncation</h3>
+<blockquote>
+<p>Todo : introduce different Coulomb truncation schemes and their corresponding parameters.</p>
 </blockquote>
 <hr>
 <h3 id="a-name%22gsinput%22a-requirements-for-different-groundstate-types"><a name="gs_input"></a> Requirements for different groundstate types</h3>
 <h4 id="groundstatetype--kssolv">groundstate_type = <code>kssolv</code></h4>
-<p>To use a KSSOLV-based ground state with GWOptions (CONTROL.groundstate_type='kssolv'), the following files must be saved under <code>groundstate_dir</code>:</p>
-<ul>
-<li><code>psi.mat</code> — Kohn-Sham wavefunctions (e.g. ψ_nk)</li>
-<li><code>eigval.mat</code> — eigenvalues for each band</li>
-<li><code>occ.mat</code> — occupation numbers</li>
-<li><em>(Optional)</em> <code>grid.mat</code>, <code>ham.mat</code>, etc. if required</li>
-</ul>
-<p><strong>We recommend calling a helper function <code>save_groundstate_to_GWformat.m</code> at the end of your KSSOLV simulation to save these in a standard format.</strong></p>
+<p><strong>User should call a helper function <code>save_groundstate_to_GWformat</code> at the end of your KSSOLV simulation to save these in a standard format. Users should copy <code>save_groundstate_to_GWformat.m</code> to their working directory and change their demo in the following manner.</strong></p>
 <p><strong>A sample demo</strong></p>
 <pre class="hljs"><code><div><span class="hljs-comment">% Prepare KSSOLV-scf input</span>
 [mol,H,X0,info] = scf(mol, options_scf);
-fileName = <span class="hljs-string">'./groundstate_information.mat'</span>;
-save_groundstate_to_GWformat(mol, H, X0, info, fileName);
+output_dir = <span class="hljs-string">'./'</span>;
+save_groundstate_to_GWformat(mol, H, X0, info, output_dir);
 </div></code></pre>
 <h4 id="groundstatetype--qe">groundstate_type = <code>qe</code></h4>
 <blockquote>

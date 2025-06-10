@@ -26,8 +26,10 @@ function input_driver(inputfile)
 
 
   % Step 5: Construct GWinfo and GWOptions seperately
-  error('under construction')
+  % error('under construction')
   GWinfor = construct_GWinfo(data, config);
+  warning('GW:construct_GWOptions', 'still under construction.');
+  return
   GWoptions = construct_GWOptions(data, config);
 
   
