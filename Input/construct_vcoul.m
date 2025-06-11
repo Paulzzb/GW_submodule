@@ -9,7 +9,8 @@ function vcoul = construct_vcoul(data, config)
 %   = 6,  2D slab truncation
 %   = 7,  supercell truncation (3D), experimental
 % 
-trun_method = config.CUTOFFS.coulomb_truncation_method;
+trunc_method = config.CUTOFFS.coulomb_truncation_method;
+trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
 cutoff = config.CUTOFFS.coulomb_cutoff;
 eightpi = 8*pi;
 fourpi = 4*pi;
@@ -31,7 +32,7 @@ qG2 = sum(Gcart.^2, 2);
 if (cutoff < wfncut)
   Ggrid_coul= [];
   % Filter where G² <= cutoff
-  new_idx = find(G2 <= cutoff);
+  new_idx = find(qG2 <= cutoff);
   Ggrid_coul.xyz = xyz(new_idx,:);
   Ggrid_coul.idxnz = idxnz(new_idx,:);
   Gcart = Gcart(new_idx,:);
@@ -43,12 +44,12 @@ end
 % Calculate the coulomb potential
 % ngcomb = length(Ggrid_coul.idxnz);
 
-switch trun_method
+switch trunc_method
   case 0  % No truncation (3D)
     vcoul = eightpi ./ qG2;        % v(q+G) = 8π / |q+G|²
     vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
   case 2 % 
-    trunc_factor = 1-cos(sqrt(qG2) * amin)
+    trunc_factor = 1-cos(sqrt(qG2) * trunc_param);
     vcoul = eightpi ./ qG2 .* trunc_factor;        % v(q+G) = 8π / |q+G|² * (1-)
     vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
   case 4  % Wire truncation (1D)
@@ -90,9 +91,9 @@ switch trun_method
     error('GW:construct_vcoul:trunc_method', 'Supercell truncation not implemented yet');
 
   otherwise
-    msg = sprintf(['Unsupported truncation type: %d', trunc_type]);
+    msg = sprintf(['Unsupported truncation type: %d', trunc_method]);
     GWerror(msg);
-    error('Unsupported truncation type: %d', trunc_type);
+    error('Unsupported truncation type: %d', trunc_method);
 end
 
 

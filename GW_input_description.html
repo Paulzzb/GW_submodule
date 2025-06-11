@@ -391,7 +391,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#energy_band_index_max">energy_band_index_max</a> |</p>
 <h3 id="cutoffs">&amp;CUTOFFS</h3>
 <p><a href="#coulomb_truncation_method">coulomb_truncation_method</a> |
-<a href="#coulomb_truncation_param">coulomb_truncation_param</a> |
+<a href="#coulomb_truncation_parameter">coulomb_truncation_parameter</a> |
 <a href="#coulomb_cutoff">coulomb_cutoff</a> |
 <a href="#density_cutoff">density_cutoff</a> |</p>
 <h3 id="frequency">&amp;FREQUENCY</h3>
@@ -539,11 +539,11 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td><a name="coulomb_truncation_method"></a><code>coulomb_truncation_method</code></td>
 <td><a href="#appendix-trunc"> <code>spherical</code> </a></td>
 <td>No</td>
-<td><code>'spherical_truncation'</code></td>
+<td>2</td>
 <td>Truncation method for Coulomb</td>
 </tr>
 <tr>
-<td><a name="coulomb_truncation_param"></a><code>coulomb_truncation_param</code></td>
+<td><a name="coulomb_truncation_parameter"></a><code>coulomb_truncation_parameter</code></td>
 <td>float</td>
 <td>No</td>
 <td>5.0</td>
@@ -742,8 +742,17 @@ The algorithm to compute it is as follows:</p>
 </blockquote>
 <h3 id="a-name%22appendix-trunc%22-a-coulomb-truncation"><a name="#appendix-trunc"> </a> Coulomb truncation</h3>
 <blockquote>
-<p>Todo : introduce different Coulomb truncation schemes and their corresponding parameters.</p>
+<p>Todo : introduce different Coulomb truncation schemes and their corresponding parameters.
+Value of <code>coulomb_truncation_method</code> and corresponding method:</p>
 </blockquote>
+<ul>
+<li>0,  no truncation (3D)</li>
+<li>2,  0D spherical truncation</li>
+<li>4,  1D cell wire truncation <strong>Ongoing</strong></li>
+<li>5,  0D cell box truncation <strong>Ongoing</strong></li>
+<li>6,  2D slab truncation <strong>Ongoing</strong></li>
+<li>7,  supercell truncation (3D), experimental <strong>Ongoing</strong></li>
+</ul>
 <hr>
 <h3 id="a-name%22gsinput%22a-requirements-for-different-groundstate-types"><a name="gs_input"></a> Requirements for different groundstate types</h3>
 <h4 id="groundstatetype--kssolv">groundstate_type = <code>kssolv</code></h4>

@@ -92,8 +92,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 
 | Parameter           | Type   | Required | Default | Description                      |
 |---------------------|--------|----------|---------|----------------------------------|
-| <a name="coulomb_truncation_method"></a>`coulomb_truncation_method`         | <a href="#appendix-trunc"> `spherical` </a> | No | `'spherical_truncation'` | Truncation method for Coulomb     |
-| <a name="coulomb_truncation_parameter></a>`coulomb_truncation_parameter`   | float  | No | 5.0  | Truncation parameter for Coulomb potential    |
+| <a name="coulomb_truncation_method"></a>`coulomb_truncation_method`         | <a href="#appendix-trunc"> `spherical` </a> | No | 2 | Truncation method for Coulomb     |
+| <a name="coulomb_truncation_parameter"></a>`coulomb_truncation_parameter`   | float  | No | 5.0  | Truncation parameter for Coulomb potential    |
 | <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float | No | 5.0  | Cutoff for Coulomb potential **Could be danger, code is not stable about it**    |
 | <a name="density_cutoff"></a>`density_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for density               |
 

@@ -27,14 +27,20 @@ function input_driver(inputfile)
 
   % Step 5: Construct GWinfo and GWOptions seperately
   % error('under construction')
-  GWinfor = construct_GWinfo(data, config);
-  warning('GW:construct_GWOptions', 'still under construction.');
-  return
+  GWgroundstate = construct_GWinfo(data, config);
+  % warning('GW:construct_GWOptions', 'still under construction.');
+  % return
   GWoptions = construct_GWOptions(data, config);
 
   
   
   % Step 6: save data to files 
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
+  dir = config.CONTROL.storage_dir;
+  fName = fullfile(dir, 'GWinput.mat');
+  if ~exist(dir, 'dir')
+    mkdir(dir);
+  end
+  save(fName, 'GWgroundstate', 'GWoptions', 'config');
 
 end % function

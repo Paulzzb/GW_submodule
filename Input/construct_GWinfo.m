@@ -1,4 +1,4 @@
-function GWinfor = struct2GWinfo(data, config)
+function GWinfor = construct_GWinfo(data, config)
 % Convert from data to @GWinfor
 %         data contains fields: 'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation',
 %                               'reciprocal_grid_info'.
@@ -34,10 +34,10 @@ gvecinput = [];
 gvecinput.n1 = sys.n1;
 gvecinput.n2 = sys.n2;
 gvecinput.n3 = sys.n3;
-gvecinput.ecut = config.CUTOFFS.coulomb_cutoff;
+gvecinput.ecut = config.CUTOFFS.coulomb_cutoff / 2;
 gvecinput.supercell = sys.supercell;
 GWinfor.gvec = gvec(gvecinput);
-GWinfor.idxnz = idxnz; 
+% GWinfor.idxnz = idxnz; 
  
 
 % If config.FREQUENCY.frequency_dependence == 1 --> GPP approximation
@@ -62,16 +62,16 @@ GWinfor.Z = psig;
 
 % Calculate wavefunction on real grid !!
 % based on psig, data.reciprocal_grid_info, and sys
-n123 = n1*n2*n3; nb = size(psig, 2);
-psir = zeros(n123, nb);
-idxnz = data.reciprocal_grid_info.idxnz;
-fftgrid = [n1, n2, n3];
-ifftscal = nr / sys.vol;
-for iband = 1:nb
-  fftbox1 = put_into_fftbox(psig(:, iband), idxnz, fftgrid);
-  fftbox1 = ifftscal * do_FFT(fftbox1, fftgrid, 1);
-  psir(:, iband) = reshape(fftbox1, n123, []);
-end
-GWinfor.psir = psir;
+% n123 = sys.n1*sys.n2*sys.n3; nb = size(psig, 2);
+% psir = zeros(n123, nb);
+% idxnz = data.reciprocal_grid_info.idxnz;
+% fftgrid = [sys.n1, sys.n2, sys.n3];
+% ifftscal = n123 / sys.vol;
+% for iband = 1:nb
+%   fftbox1 = put_into_fftbox(psig(:, iband), idxnz, fftgrid);
+%   fftbox1 = ifftscal * do_FFT(fftbox1, fftgrid, 1);
+%   psir(:, iband) = reshape(fftbox1, n123, []);
+% end
+% GWinfor.psir = psir;
 
 end

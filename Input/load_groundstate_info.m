@@ -34,7 +34,7 @@ if ~isfield(tmp, 'groundstate')
   GWerror(msg);
 end
 
-required_fields = {'rhor', 'Vxc', 'ev', 'psi', 'sys', 'occupation', 'reciprocal_grid_info'};
+required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info'};
 for k = 1:length(required_fields)
   if ~isfield(tmp.groundstate, required_fields{k})
     msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});

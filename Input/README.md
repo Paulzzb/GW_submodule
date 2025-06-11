@@ -1,15 +1,22 @@
-### what is doing
-构建如下的工作流
-[inputfile] → read_input_param() → struct(config) → convert_to_GWOptions(config) → GWOptions 实例（支持 display & 快捷访问）
-仍在构建中...
-进度：
 
-- GWOptions四个子区块，完成了Constant部分，需要完成ISDF和GWCal部分
-- 需要完成GWOptions的display函数，支持关键信息快捷访问
+## 进度：
 
-**自行查看minibzaverage.f90中怎么生成integrate的代码，对应vcoul_generator中的dvalue, 用于书写这里的construct_coulG0**
-**讨论关于Coulomb里面的选择**
+**已完成**
 
+- [ ] Input文件夹的重构，以input_driver.m为主函数的从文件到格式化存储的数据
+- [ ] 建设./testInput 内置测试demo，测试输入和用户手册
+
+**待完成**
+
+- [ ] 搁置GWOptions.GWCal和.Groundstate的开发（觉得原有的结构不甚合理）
+
+**需讨论**
+
+- **讨论关于Coulomb里面的选择**
+- **自行查看minibzaverage.f90中怎么生成integrate的代码，对应vcoul_generator中的dvalue, 用于书写这里的construct_coulG0**
+
+### 注释
+- 有些其他代码仍然用的是ha单位（例如@gvec中的ecut，现在为了减少修改爆炸，所以暂时直接在gvec前将结果/2）
 
 ## Current framework
 GWOptionsFramework/

@@ -1,2 +1,3 @@
 function out = construct_GWOptions(data, config)
-  out = GWOptions();
+  out = GWOptions(data, config);
+end % EOF
