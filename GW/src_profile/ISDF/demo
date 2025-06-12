@@ -1,0 +1,39 @@
+C1g = zeros(gvec.ng, rk);
+fprintf('\n[ISDF] Generating helper functions in G-space...\n');
+total_iter = ceil(rk / step);
+est_total_time = -1;
+
+for i = 1:step:rk
+  iter_idx = ceil(i / step);
+  if iter_idx == 2
+    startfirstiter = tic;
+  end
+
+  if i + step < rk
+    irange = i:i+step-1;
+  else
+    irange = i:rk;
+  end
+
+  tmpr = (Phi * phi(irange, :)') .* (Psi * psi(irange, :)');
+  for j = 0:length(irange)-1
+    fftbox1 = reshape(tmpr(:, j+1), gvec.fftgrid);
+    fftbox1 = do_FFT(fftbox1, gvec.fftgrid, 1) * vol;
+    C1g(:, i+j) = get_from_fftbox(gvec.idxnz, fftbox1, gvec.fftgrid);
+  end
+
+  if iter_idx == 6
+    time_per_step = toc(startfirstiter) / 4;
+    est_total_time = time_per_step * total_iter;
+    fprintf('[ISDF] Estimated total time: %.1f seconds\n', est_total_time);
+  end
+
+  % Progress bar
+  if est_total_time > 0
+    elapsed_time = (iter_idx - 1) * time_per_step;
+    fprintf('[ISDF] Progress: %3d%% | Elapsed: %.1fs / Estimated: %.1fs\n', ...
+        round(100 * (iter_idx-1) / total_iter), elapsed_time, est_total_time);
+  else
+    fprintf('[ISDF] Progress: %3d%%\n', round(100 * (iter_idx-1) / total_iter));
+  end
+end

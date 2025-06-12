@@ -6,6 +6,7 @@ function gw_startup()
 % CPATH = mfilename('fullpath');
 % CPATH = fileparts(CPATH);
 % CPATH = [CPATH, '/'];
+restoredefaultpath;
 
 setappdata(0, 'PackageRoot', fileparts(mfilename('fullpath')));
 
@@ -13,23 +14,20 @@ disp(['GW module root path set to: ', getappdata(0, 'PackageRoot')]);
 
 CPATH = [getappdata(0, 'PackageRoot'), '/'];
 
+addpath(genpath([CPATH 'common/']));
 
+addpath(genpath([CPATH 'driver_profile/']));
 
-% Folder for all utility functions
-addpath(genpath([CPATH 'util/']));
+addpath(genpath([CPATH 'input/']));
 
-% Foulder for all source files recursively
-addpath(genpath([CPATH 'src/']));
+addpath(genpath([CPATH 'src_profile/']));
 
-% Foulder for all external files recursively
-addpath(genpath([CPATH 'test/']));
+addpath(genpath([CPATH 'GW_profile/']));
 
-% Foulder for all source files recursively
-addpath(genpath([CPATH 'example/']));
+addpath(genpath([CPATH 'test_profile/']));
 
-% Foulder for all source files recursively
-addpath(genpath([CPATH 'data/']));
-% addpath(genpath([CPATH 'structure']));
+addpath(genpath([CPATH 'util_profile/']));
+
 
 % Choose a version (default CPU)
 % version = switchver('CPU');

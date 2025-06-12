@@ -1,4 +1,4 @@
-function opt = set_ISDFCauchy(data, config)
+function opt = setISDFCauchy(data, config)
 
 def = default_ISDFCauchy();
 
@@ -18,5 +18,6 @@ opt.isdfoptions.weight = config.ISDF.weight;
 opt.isdfoptions.seed = config.ISDF.seed;
 opt.isdfoptions.init = config.ISDF.init;
 opt.isdfoptions.sys = data.sys;
+% opt.isdfoptions.rank = data.sys;
 
 end % EOF

@@ -3,6 +3,7 @@
   isgw = 1, 
   groundstate_dir = './',
   groundstate_type = 'kssolv',
+  storage_dir = '../'
 END &CONTROL
 
 % &SYSTEM

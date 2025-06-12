@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>GW_input_description.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<style>
+a { color: #0077cc; text-decoration: none; }
+a:hover { text-decoration: underline; }
+</style>
+<h1 id="gwoptions-input-file-description">GWOptions Input File Description</h1>
+<p>This document describes all supported input blocks and parameters used to configure the GWOptions framework.
+Parameters are grouped by block (namelist-style) and include descriptions, expected types, and default values.</p>
+<p><strong>Default energy unit is Ry, ALWAYS.</strong>
+<strong>This could be really delicate!!!! Since codes use different unit for their cutoffs.</strong></p>
+<hr>
+<h2 id="alphabetical-parameter-index">Alphabetical Parameter Index</h2>
+<h3 id="control">&amp;CONTROL</h3>
+<p><a href="#isgw">isgw</a> |
+<a href="#isbse">isbse</a> |
+<a href="#output_dir">output_dir</a> |
+<a href="#prefix">prefix</a> |
+<a href="#groundstate_dir">groundstate_dir</a> |
+<a href="#groundstate_type">groundstate_type</a> |
+<a href="#storage_dir">storage_dir</a> |
+<a href="#outfile">outfile</a> |</p>
+<h3 id="system">&amp;SYSTEM</h3>
+<p><a href="#number_bands_in_summation">number_bands_in_summation</a> |
+<a href="#energy_band_index_min">energy_band_index_min</a> |
+<a href="#energy_band_index_max">energy_band_index_max</a> |</p>
+<h3 id="cutoffs">&amp;CUTOFFS</h3>
+<p><a href="#coulomb_truncation_method">coulomb_truncation_method</a> |
+<a href="#coulomb_truncation_parameter">coulomb_truncation_parameter</a> |
+<a href="#coulomb_cutoff">coulomb_cutoff</a> |
+<a href="#density_cutoff">density_cutoff</a> |</p>
+<h3 id="frequency">&amp;FREQUENCY</h3>
+<p><a href="#frequency_dependence">frequency_dependence</a> |
+<a href="#frequency_dependence_method">frequency_dependence_method</a> |
+<a href="#frequency_low_cutoff">frequency_low_cutoff</a> |
+<a href="#delta_frequency">delta_frequency</a> |
+<a href="#number_imaginary_freqs">number_imaginary_freqs</a> |
+<a href="#eta">eta</a> |
+<a href="#cd_int_method">cd_int_method</a> |
+<a href="#cd_res_method">cd_res_method</a> |</p>
+<h3 id="isdf">&amp;ISDF</h3>
+<p><a href="#isisdf">isisdf</a> |
+<a href="#isdf_ratio">isdf_ratio</a> |
+<a href="#isdf_ratio_type1">isdf_ratio_type1</a> |
+<a href="#isdf_ratio_type2">isdf_ratio_type2</a> |
+<a href="#isdf_ratio_type3">isdf_ratio_type3</a> |
+<a href="#exxmethod">exxmethod</a> |
+<a href="#seed">seed</a> |
+<a href="#init">init</a> |
+<a href="#weight">weight</a> |
+<a href="#sys">sys</a> |</p>
+<hr>
+<h2 id="namelist">Namelist</h2>
+<h3 id="namelist-control">Namelist: &amp;CONTROL</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a name="isgw"></a><code>isgw</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>1</code></td>
+<td>Enable GW calculation</td>
+</tr>
+<tr>
+<td><a name="isbse"></a><code>isbse</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>Enable BSE calculation</td>
+</tr>
+<tr>
+<td><a name="output_dir"></a><code>output_dir</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'./'</code></td>
+<td>Output directory</td>
+</tr>
+<tr>
+<td><a name="prefix"></a><code>prefix</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'QP'</code></td>
+<td>File name prefix</td>
+</tr>
+<tr>
+<td><a name="groundstate_dir"></a><code>groundstate_dir</code></td>
+<td>string</td>
+<td>Yes</td>
+<td><em>none</em></td>
+<td>Path to ground state data directory</td>
+</tr>
+<tr>
+<td><a name="groundstate_type"></a><a href="#appendix-sys-freq">groundstate_type</a></td>
+<td>string</td>
+<td>Yes</td>
+<td><code>kssolv</code></td>
+<td>Software implementing groundstate calculation</td>
+</tr>
+<tr>
+<td><a name="storage_dir"></a><code>storage_dir</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'./QP.save/'</code></td>
+<td>Directory for intermediate quantities</td>
+</tr>
+<tr>
+<td><a name="outfile"></a><code>outfile</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'./GWoutput'</code></td>
+<td>Output log file name</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="namelist-system">Namelist: &amp;SYSTEM</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a name="number_bands_in_summation"></a><code>number_bands_in_summation</code></td>
+<td>int</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td><code>-1</code></td>
+<td>Band count in summation</td>
+</tr>
+<tr>
+<td><a name="energy_band_index_min"></a><code>energy_band_index_min</code></td>
+<td>int</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td><code>-1</code></td>
+<td>Minimum band index for QP energies</td>
+</tr>
+<tr>
+<td><a name="energy_band_index_max"></a><code>energy_band_index_max</code></td>
+<td>int</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td><code>-1</code></td>
+<td>Maximum band index for QP energies</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="namelist-cutoffs">Namelist: &amp;CUTOFFS</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a name="coulomb_truncation_method"></a><code>coulomb_truncation_method</code></td>
+<td><a href="#appendix-trunc"> <code>spherical</code> </a></td>
+<td>No</td>
+<td>2</td>
+<td>Truncation method for Coulomb</td>
+</tr>
+<tr>
+<td><a name="coulomb_truncation_parameter"></a><code>coulomb_truncation_parameter</code></td>
+<td>float</td>
+<td>No</td>
+<td>5.0</td>
+<td>Truncation parameter for Coulomb potential</td>
+</tr>
+<tr>
+<td><a name="coulomb_cutoff"></a><code>coulomb_cutoff</code></td>
+<td>float</td>
+<td>No</td>
+<td>5.0</td>
+<td>Cutoff for Coulomb potential <strong>Could be danger, code is not stable about it</strong></td>
+</tr>
+<tr>
+<td><a name="density_cutoff"></a><code>density_cutoff</code></td>
+<td>float</td>
+<td>No</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td>Cutoff for density</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<hr>
+<h2 id="namelist-frequency">Namelist: &amp;FREQUENCY</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a name="frequency_dependence"></a><code>frequency_dependence</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>Whether to compute frequency-dependence</td>
+</tr>
+<tr>
+<td><a name="frequency_dependence_method"></a><code>frequency_dependence_method</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>Method to compute frequency-dependence</td>
+</tr>
+<tr>
+<td><a name="frequency_low_cutoff"></a><code>frequency_low_cutoff</code></td>
+<td>float</td>
+<td>No</td>
+<td><a href="#appendix-sys-freq">system based</a></td>
+<td>Low freq cutoff (computed from system info)</td>
+</tr>
+<tr>
+<td><a name="delta_frequency"></a><code>delta_frequency</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>2</code></td>
+<td>Frequency step</td>
+</tr>
+<tr>
+<td><a name="number_imaginary_freqs"></a><code>number_imaginary_freqs</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>15</code></td>
+<td>Number of imaginary frequencies</td>
+</tr>
+<tr>
+<td><a name="eta"></a><code>eta</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>1e-4</code></td>
+<td>Broadening</td>
+</tr>
+<tr>
+<td><a name="cd_int_method"></a><code>cd_int_method</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>CD integration method</td>
+</tr>
+<tr>
+<td><a name="cd_res_method"></a><code>cd_res_method</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>CD resolution method</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="namelist-isdf">Namelist: &amp;ISDF</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a name="isisdf"></a><code>isisdf</code></td>
+<td>bool</td>
+<td>No</td>
+<td><code>true</code></td>
+<td>Whether to enable ISDF</td>
+</tr>
+<tr>
+<td><a name="isdf_ratio"></a><code>isdf_ratio</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>8.0</code></td>
+<td>Global ISDF ratio</td>
+</tr>
+<tr>
+<td>&lt;a name=&quot;isdf_ratio_type1&quot;</a><code>isdf_ratio_type1</code></td>
+<td>float</td>
+<td>No</td>
+<td>= <code>isdf_ratio</code></td>
+<td>Override ratio for ISDF type 1</td>
+</tr>
+<tr>
+<td><a name="isdf_ratio_type2"></a><code>isdf_ratio_type2</code></td>
+<td>float</td>
+<td>No</td>
+<td>= <code>isdf_ratio</code></td>
+<td>Override ratio for ISDF type 2</td>
+</tr>
+<tr>
+<td><a name="isdf_ratio_type3"></a><code>isdf_ratio_type3</code></td>
+<td>float</td>
+<td>No</td>
+<td>= <code>isdf_ratio</code></td>
+<td>Override ratio for ISDF type 3</td>
+</tr>
+<tr>
+<td><a name="exxmethod"></a><code>exxmethod</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'kmeans'</code></td>
+<td>Method for EXX</td>
+</tr>
+<tr>
+<td><a name="seed"></a><code>seed</code></td>
+<td>int</td>
+<td>No</td>
+<td><code>0</code></td>
+<td>Random seed</td>
+</tr>
+<tr>
+<td><a name="init"></a><code>init</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'wrs'</code></td>
+<td>Initialization strategy</td>
+</tr>
+<tr>
+<td><a name="weight"></a><code>weight</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>'add'</code></td>
+<td>Weighting strategy</td>
+</tr>
+<tr>
+<td><a name="sys"></a><code>sys</code></td>
+<td>struct</td>
+<td>No</td>
+<td><code>[]</code></td>
+<td>System placeholder object</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%F0%9F%93%8E-appendix">📎 Appendix</h2>
+<h3 id="a-name%22appendix-sys-freq%22a-system-dependent-parameters"><a name="appendix-sys-freq"></a> System-dependent parameters</h3>
+<p>The default value of <code>frequency_low_cutoff</code>, <code>coulomb_cutoff</code>, <code>density_cutoff</code> are not static.
+They depend on the groundstate information provided by user in <code>groundstate_dir</code>.
+The algorithm to compute it is as follows:</p>
+<ul>
+<li><code>coulomb_cutoff</code> is the wavefunction cutoff of the groundstate, and the <code>density_cutoff</code> is twice the wavefunction cutoff.</li>
+<li><code>frequency_low_cutoff</code> depends on the band energies.
+<ul>
+<li>For insulating systems, the <code>frequency_low_cutoff</code> is set to the larger of the following two values: the energy difference between the HOMO and the lowest occupied band, and the energy difference between the highest unoccupied band calculated and the LUMO.</li>
+<li>For metallic systems, <code>frequency_low_cutoff</code> is set to the highest unoccupied band energy calculated minus the lowest occupied band energy.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><em>TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.</em></p>
+</blockquote>
+<h3 id="a-name%22appendix-trunc%22-a-coulomb-truncation"><a name="#appendix-trunc"> </a> Coulomb truncation</h3>
+<blockquote>
+<p>Todo : introduce different Coulomb truncation schemes and their corresponding parameters.
+Value of <code>coulomb_truncation_method</code> and corresponding method:</p>
+</blockquote>
+<ul>
+<li>0,  no truncation (3D)</li>
+<li>2,  0D spherical truncation</li>
+<li>4,  1D cell wire truncation <strong>Ongoing</strong></li>
+<li>5,  0D cell box truncation <strong>Ongoing</strong></li>
+<li>6,  2D slab truncation <strong>Ongoing</strong></li>
+<li>7,  supercell truncation (3D), experimental <strong>Ongoing</strong></li>
+</ul>
+<hr>
+<h3 id="a-name%22gsinput%22a-requirements-for-different-groundstate-types"><a name="gs_input"></a> Requirements for different groundstate types</h3>
+<h4 id="groundstatetype--kssolv">groundstate_type = <code>kssolv</code></h4>
+<p><strong>User should call a helper function <code>save_groundstate_to_GWformat</code> at the end of your KSSOLV simulation to save these in a standard format. Users should copy <code>save_groundstate_to_GWformat.m</code> to their working directory and change their demo in the following manner.</strong></p>
+<p><strong>A sample demo</strong></p>
+<pre class="hljs"><code><div><span class="hljs-comment">% Prepare KSSOLV-scf input</span>
+[mol,H,X0,info] = scf(mol, options_scf);
+output_dir = <span class="hljs-string">'./'</span>;
+save_groundstate_to_GWformat(mol, H, X0, info, output_dir);
+</div></code></pre>
+<h4 id="groundstatetype--qe">groundstate_type = <code>qe</code></h4>
+<blockquote>
+<p>TODO: complete this part</p>
+</blockquote>
+<hr>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>All parameter names are case-insensitive.</li>
+<li>Input follows a namelist-style format (<code>&amp;BLOCK ... /</code>).</li>
+<li>Comments starting with <code>!</code> or <code>#</code> are ignored.</li>
+</ul>
+
+</body>
+</html>

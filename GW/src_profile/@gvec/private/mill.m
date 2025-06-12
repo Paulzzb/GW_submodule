@@ -25,7 +25,7 @@ gkind = [gkxind, gkyind, gkzind];
 rcplat = 2*pi*inv(supercell);
 gkvec = gkind*rcplat';
 gkabs = sum(gkvec.^2, 2);
-idxnz = find(gkabs <= 2*ecut);
+idxnz = find(gkabs <= ecut);
 
 gvec_in.idxnz = idxnz;
 gvec_in.ng = length(gvec_in.idxnz);

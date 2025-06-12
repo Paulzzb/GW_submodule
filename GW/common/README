@@ -1,0 +1,27 @@
+Some common used functions.
+
+COmegaCstar:
+  Calculate C * Omega^{-1} * C' with Cauchy integral method,
+  where C_{ij, k} = conj(psi_i(r_k))psi_j(r_k) 
+  and Omega_{ij, ij} = epsilon_i - epsilon_j.
+  CURRENTLY ONLY OMEGA = 0 IS SUPPORTED.
+
+do_FFT & get_from_fftbox & put_into_fftbox & gvec_to_fft_index:
+  a set of functions to do FFT.
+
+ellipjc & ellipkkp:
+  a set of functions to support COmegaCstar.
+
+find_vector:
+  used in exact_CH and gw_gpp.
+  scalarized function to find index iout to satisfy
+    gvec(iout, :) = kk;
+
+freqgen: 
+  Generate frequency grid and corresponding weight function in
+  full-frequency calculation gw_fullfreq_cd*
+  
+  
+
+
+
