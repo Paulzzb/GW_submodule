@@ -4,7 +4,7 @@ Constantstruct = default_constant();
 
 % Set system based values
 nv = data.sys.ne / 2;
-nb = size(data.ev);
+nb = legnth(data.ev);
 nc = nb - nv; 
 Constantstruct.nv = nv; 
 Constantstruct.nc = nc; 

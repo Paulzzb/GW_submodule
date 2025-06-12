@@ -5,10 +5,8 @@ classdef GWinfo
     supercell;
     bdot;
     qk;
-    ntot 
     vol
     ne 
-    nv 
     gvec
     gvec2
     gvecrho
@@ -17,6 +15,10 @@ classdef GWinfo
     idxnz
     ev
     Z
+    psir
+    % delete below later
+    ntot 
+    nv 
     aqs
   end
 

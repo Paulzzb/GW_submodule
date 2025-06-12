@@ -14,14 +14,6 @@ classdef GWOptions
     Groundstate
   end
 
-%   properties (Constant)
-%     nv; nv_ener; nv_oper; nc; nc_ener; nc_oper; n_oper; n_ener; ...
-%     ng; nr; ne; vol; Fouriercell; ...
-%     TOL_ZERO; TOL_SMALL; INF; bdot; ...
-%     ry2ev; ...
-%     qk; 
-%   
-%   end
   
   methods
     function options_out = GWOptions(options_in, sys)
