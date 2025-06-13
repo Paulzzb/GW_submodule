@@ -17,6 +17,7 @@ classdef GWinfo
     psig
     psir
     Ggrid4psig 
+    occupation
   end
 
   properties (SetAccess = protected)

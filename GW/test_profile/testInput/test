@@ -6,7 +6,12 @@
   storage_dir = '../'
 END &CONTROL
 
-% &SYSTEM
-%   number_bands_in_summation = 20,
-% END &SYSTEM
+&SYSTEM
+  number_bands_in_summation = 35,
+END &SYSTEM
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_cutoff = 20.0
+END &CUTOFFS
 

@@ -24,6 +24,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#groundstate_type">groundstate_type</a> |
 <a href="#storage_dir">storage_dir</a> |
 <a href="#outfile">outfile</a> |
+<a href="#log_level">log_level</a> |
 
 ### &SYSTEM
 <a href="#number_bands_in_summation">number_bands_in_summation</a> |
@@ -73,7 +74,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | <a name="groundstate_dir"></a>`groundstate_dir` | string | Yes | *none*       | Path to ground state data directory             |
 | <a name="groundstate_type"></a><a href="#appendix-sys-freq">groundstate_type</a> | string | Yes | `kssolv`       | Software implementing groundstate calculation             |
 | <a name="storage_dir"></a>`storage_dir`  | string | No       | `'./QP.save/'`   | Directory for intermediate quantities           |
-| <a name="outfile"></a>`outfile`          | string | No       | `'./GWoutput'`  | Output log file name                            |
+| <a name="outfile"></a>`outfile`          | string | No       | `'./GWoutput'`  | Output energy file name                            |
+| <a name="log_level"></a>`log_level`          | string | No       | `1`  | level of log |
 
 ---
 

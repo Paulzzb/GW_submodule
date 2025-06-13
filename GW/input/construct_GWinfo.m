@@ -34,7 +34,7 @@ gvecinput = [];
 gvecinput.n1 = sys.n1;
 gvecinput.n2 = sys.n2;
 gvecinput.n3 = sys.n3;
-gvecinput.ecut = config.CUTOFFS.coulomb_cutoff / 2;
+gvecinput.ecut = config.CUTOFFS.coulomb_cutoff;
 gvecinput.supercell = sys.supercell;
 GWinfor.gvec = gvec(gvecinput);
 % GWinfor.idxnz = idxnz; 
@@ -60,19 +60,7 @@ GWinfor.Vxc = data.Vxc * ha2ry;
 GWinfor.ev = data.ev * ha2ry;
 GWinfor.psig = psig;
 GWinfor.Ggrid4psig = data.reciprocal_grid_info;
+GWinfor.occupation = data.occupation;
 
-% Calculate wavefunction on real grid !!
-% based on psig, data.reciprocal_grid_info, and sys
-% n123 = sys.n1*sys.n2*sys.n3; nb = size(psig, 2);
-% psir = zeros(n123, nb);
-% idxnz = data.reciprocal_grid_info.idxnz;
-% fftgrid = [sys.n1, sys.n2, sys.n3];
-% ifftscal = n123 / sys.vol;
-% for iband = 1:nb
-%   fftbox1 = put_into_fftbox(psig(:, iband), idxnz, fftgrid);
-%   fftbox1 = ifftscal * do_FFT(fftbox1, fftgrid, 1);
-%   psir(:, iband) = reshape(fftbox1, n123, []);
-% end
-% GWinfor.psir = psir;
 
 end

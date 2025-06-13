@@ -1,80 +1,105 @@
-function Ex = gw_x(GWinfor, config, options)
-% This file will be final version for the full-frequency GW calculation.
-% Generally speaking, user should not directly call this function, instead
-% call this indirectly by calling through gwCalculation->gw_fullfreq_cd.
-
-% Description
-%   Calculate the exchange part of the self-energies (or frequency-free part).
-%   This code only computes the integral on the imaginary axis,  
-
-% Parameters
-%   Input:
-%   GWinfor: class @GWinfor, contains ground-state information.
-%   options: class @GWOptions, contains necessary parameters for the calculation.
-%   Output:
-%   Ex: the integral on imaginary axis, size nbandener*1.
-
-% Structure 
-%   The code is organized as followed:
-%   0. Initialize inputs.
-%   1. if isdf, do isdf.
-%   2. Calculate the self-energies
+function Ex = gw_x(GWinfor, config)
+% gw_x -> Compute the static exchange (Hartree-Fock) self-energy correction.
 %
+% This function computes the exchange contribution (Σ_x) to the GW
+% self-energy, based on either standard formulation or the Interpolative 
+% Separable Density Fitting (ISDF) approximation.
+%
+% Inputs:
+%   GWinfor - Struct of class @GWinfor, containing ground-state data:
+%       .gvec      : Reciprocal grid info (FFT grid, indices)
+%       .vol       : Unit cell volume
+%       .coulG     : G-space Coulomb potential
+%       .coulG0    : Special treatment of G=0 component
+%       .psir      : Wavefunctions in real space
+%       .occupation: Orbital occupation numbers
+%   config - Struct of class @GWOptions, containing:
+%       .SYSTEM.energy_band_index_min / max: band index range
+%       .ISDF.isisdf: flag to use ISDF
+%       .ISDFCauchy : ISDF options (e.g., rank, seed, method)
+%
+% Output:
+%   Ex - Column vector (n × 1) of exchange corrections for bands n in [min, max]
+%
+% Note:
+%   The exchange energy is computed as:
+%     Ex_n = -⟨ψ_n | Σ_x | ψ_n⟩
+%   Units: electron-Volts (eV)
+
+
+msg = sprintf('[Exchange] Start computing Σ_x (exchange part)...\n');
+GWlog(msg, 0);
+tStart = tic;
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
 for i = 1:numel(nameConstants)
-    fieldname = nameConstants{i};
-    value = default_Constant.(fieldname);    
-    if ~isempty(value)
-      strEval = sprintf('%s = %.16f;', fieldname, value);
-      eval(strEval);
-    end
+  eval(sprintf('%s = %.16f;', nameConstants{i}, default_Constant.(nameConstants{i})));
 end
 
+
+% Basic setup
 ng = GWinfor.gvec.ng; % corresponds to Dcoul
-
-% In the GWinfor, the coulomb matrix is in Rydberg unit.
-Dcoul = spdiags(GWinfor.coulG, 0, ng, ng) * ry2ev;
-Dcoul(1,1) = GWinfor.coulG0 * ry2ev;
-
+nbmin = config.SYSTEM.energy_band_index_min;
+nbmax = config.SYSTEM.energy_band_index_max;
+nv = find(GWinfor.occupation > 1 - TOL_SMALL, 1, 'last');
+vol = GWinfor.vol;
 gvec = GWinfor.gvec;
 psir = GWinfor.psir;
 
+msg = sprintf('[Exchange] Using band range [%d, %d], %d valence bands detected.\n', ...
+         nbmin, nbmax, nv);
+GWlog(msg);
 
-if (options.isISDF)
+% Construct Coulomb matrix in sparse form, unit: eV
+Dcoul = spdiags(GWinfor.coulG, 0, ng, ng) * ry2ev;
+Dcoul(1,1) = GWinfor.coulG0 * ry2ev;
+
+
+
+if (config.ISDF.isisdf)
+  msg = sprintf('[Exchange] Using ISDF approximation for Σ_x.\n');
+  GWlog(msg, 0);
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Start ISDF
-  % Generally, we have relations 
-  %   Mr{xx} = xxrzeta_mu * Mrxx_mu;
-  startVS = tic;
-  optISDF = options;
-
+  tISDF = tic;
   
-  [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, nv-nv_oper+1:nv, ...
-      nv-nv_ener+1:nv+nc_ener, gvec, vol, optISDF);
+  optISDF = config.ISDFCauchy;
+  
+  % Perform ISDF
+  [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
+      nbmin:nbmax, gvec, vol, optISDF);
   vsgzeta_mu = conj(vsgzeta_mu);
-  timeforVS = toc(startVS);
-  fprintf('ISDF time = %.4f.\n', timeforVS);
+  msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
+  GWlog(msg, 1);
 
 
+  % Compute Σ_x
   psirvs = psir(vsind_mu, :);
-  Phivs = psirvs(:, nv-nv_oper+1:nv); 
+  Phivs = psirvs(:, 1:nv); 
   vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
   Sigma_x  = vsDcoulvs .* conj(Phivs * Phivs'); 
 
-  Psivs = conj(psirvs(:, nv-nv_ener+1:nv+nc_ener)); 
+  Psivs = conj(psirvs(:, nbmin:nbmax)); 
   Ex  = Psivs' * Sigma_x * Psivs / vol;
+
 else
-  Ex = zeros(n_ener);
-  for ioper = nv-nv_oper+1:nv
-  Mgvn = mtxel_sigma(ioper, GWinfor, options.Groundstate, (nv-nv_ener+1:nv+nc_ener));
-  Mgvn = conj(Mgvn);
-  W1Mgvn = Dcoul * Mgvn;
-  Ex = Ex + Mgvn' * W1Mgvn / vol;
+% --- Standard exchange calculation without ISDF ---
+  msg = sprintf('[Exchange] Using standard Σ_x calculation.\n');
+  GWlog(msg, 0);
+  Ex = zeros(nbmax-nbmin+1);
+  tStandard = tic;
+  for ioper = 1:nv
+    Mgvn = mtxel_sigma(ioper, GWinfor, nbmin:nbmax);
+    Mgvn = conj(Mgvn);
+    W1Mgvn = Dcoul * Mgvn;
+    Ex = Ex + Mgvn' * W1Mgvn / vol;
   end
+  msg = sprintf('[Exchange] Standard loop completed in %.2f seconds.\n', toc(tStandard));
+  GWlog(msg, 1);
 end
 
 Ex = - real(diag(Ex));
+msg = sprintf('[Exchange] Finished. Total time: %.2f seconds.\n', toc(tStart));
+GWlog(msg, 0);
 
 end % function

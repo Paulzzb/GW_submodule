@@ -1,6 +1,6 @@
 function [ind_mu, zeta_mu] = isdf_main(type, Phir, nlist, mlist, gvec, vol, optionsISDF)
-  fprintf('\n==================================================\n');
-  fprintf('     ISDF Computation     \n');
+  GWlog('\n==================================================\n');
+  GWlog('     ISDF Computation     \n');
 
   def = filename_map();
   switch type
@@ -19,45 +19,58 @@ function [ind_mu, zeta_mu] = isdf_main(type, Phir, nlist, mlist, gvec, vol, opti
     otherwise
       error("type should be 'vc', 'vs', or 'ss'");    
   end
-  optionsISDF.isdfoptions.rank = sqrt(length(nlist) * length(mlist)) * ratio;
-  fprintf('ISDF Type: %s\n', msg);
-  fprintf('==================================================\n');
+  optionsISDF.isdfoptions.rank = ceil(sqrt(length(nlist) * length(mlist)) * ratio);
+  msg = sprintf('ISDF Type: %s\n', msg);
+  GWlog(msg, 1);
+  GWlog('==================================================\n');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % varification of inputs
-  fprintf('[Step 1] Verifying inputs...\n');
+  GWlog('[Step 1] Verifying inputs...\n', 2);
   flag = isdf_checkInputs(fName, type, Phir, nlist, mlist, gvec, vol, optionsISDF);
 % Read or Calculate
   if flag
     % success, read and out
-    fprintf('[Step 2] Cached ISDF result found. Loading from %s...\n', fName);
+    msg = sprintf('[Step 2] Cached ISDF result found. Loading from %s...\n', fName);
+    GWlog(msg, 2);
     load(fName, 'ind_mu', 'zeta_mu');
-    fprintf('Loaded interpolative indices and helper functions.\n');
+    msg = sprintf('Loaded interpolative indices and helper functions.\n');
+    GWlog(msg, 2);
   else
-    fprintf('[Step 2] No valid cache found. Starting ISDF calculation...\n');
+    msg = sprintf('[Step 2] No valid cache found. Starting ISDF calculation...\n');
+    GWlog(msg, 2);
     % Step 3: Prepare wavefunctions
-    fprintf('[Step 3] Preparing wavefunctions in real space...\n');
+    msg = sprintf('[Step 3] Preparing wavefunctions in real space...\n');
+    GWlog(msg, 2);
     psi = conj(Phir(:, nlist));
     phi = Phir(:, mlist);
 
     % Step 4: Compute interpolation points
-    fprintf('[Step 4] Generating interpolation points...\n');
+    msg = sprintf('[Step 4] Generating interpolation points...\n');
+    GWlog(msg, 2);
     ind_mu = isdf_indices(psi, phi, optionsISDF);
-    fprintf('Number of interpolation points: %d\n', length(ind_mu));
+    msg = sprintf('Number of interpolation points: %d\n', length(ind_mu));
+    GWlog(msg, 1);
 
     % Step 5: Compute helper functions
-    fprintf('[Step 5] Constructing helper functions...\n');
+    msg = sprintf('[Step 5] Constructing helper functions...\n');
+    GWlog(msg, 2);
     zeta_mu = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
-    fprintf('Helper functions constructed.\n');
+    msg = sprintf('Helper functions constructed.\n');
+    GWlog(msg, 2);
 
     % Step 6: Save results
-    fprintf('[Step 6] Saving ISDF results to %s...\n', fName);
+    msg = sprintf('[Step 6] Saving ISDF results to %s...\n', fName);
+    GWlog(msg, 2)
     ISDFinputs = struct('Phir', Phir, 'nlist', nlist, 'mlist', mlist, 'gvec', gvec, 'vol', vol, 'optionsISDF', optionsISDF);
     save(fName, 'ISDFinputs', 'ind_mu', 'zeta_mu');
-    fprintf('ISDF results saved.\n');
+    msg = sprintf('ISDF results saved.\n');
+    GWlog(msg, 2);
   end
 
-  fprintf('ISDF processing completed.\n');
-  fprintf('==================================================\n');
+  msg = sprintf('ISDF processing completed.\n');
+  GWlog(msg)
+  msg = sprintf('==================================================\n');
+  GWlog(msg)
 end % function

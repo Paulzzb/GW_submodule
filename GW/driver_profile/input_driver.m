@@ -37,6 +37,8 @@ function input_driver(inputfile)
   if ~exist(dir, 'dir')
     mkdir(dir);
   end
+  
+  config.ISDFCauchy = GWoptions.ISDFCauchy;
   save(fName, 'GWgroundstate', 'GWoptions', 'config');
 
   % Step 7: display input and groundstate information

@@ -5,4 +5,5 @@ function def = filename_map()
   def.isdfvc = 'isdf_typevc.mat';
   def.isdfvs = 'isdf_typevs.mat';
   def.isdfss = 'isdf_typess.mat';
+  def.QPenergy = 'QPenergy';
 end % EOF

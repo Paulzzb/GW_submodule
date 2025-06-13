@@ -10,6 +10,7 @@ end
 
 vol = GWinfo.vol;
 gvec = GWinfo.gvec;
+ng = gvec.ng;
 
 aqstemp = complex(0.0, 0.0) * zeros(ng, length(sum_range));
 
