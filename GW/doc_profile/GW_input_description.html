@@ -385,7 +385,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#groundstate_type">groundstate_type</a> |
 <a href="#storage_dir">storage_dir</a> |
 <a href="#outfile">outfile</a> |
-<a href="#verbose">verbose</a> |</p>
+<a href="#log_level">log_level</a> |</p>
 <h3 id="system">&amp;SYSTEM</h3>
 <p><a href="#number_bands_in_summation">number_bands_in_summation</a> |
 <a href="#energy_band_index_min">energy_band_index_min</a> |
@@ -402,8 +402,9 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#delta_frequency">delta_frequency</a> |
 <a href="#number_imaginary_freqs">number_imaginary_freqs</a> |
 <a href="#eta">eta</a> |
-<a href="#cd_int_method">cd_int_method</a> |
-<a href="#cd_res_method">cd_res_method</a> |</p>
+<a href="#cd_integration_method">cd_integration_method</a> |
+<a href="#cd_residual_method">cd_residual_method</a> |
+<a href="#cd_int_parameter">cd_integration_parameter</a> |</p>
 <h3 id="isdf">&amp;ISDF</h3>
 <p><a href="#isisdf">isisdf</a> |
 <a href="#isdf_ratio">isdf_ratio</a> |
@@ -483,14 +484,14 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td>string</td>
 <td>No</td>
 <td><code>'./GWoutput'</code></td>
-<td>Output log file name</td>
+<td>Output energy file name</td>
 </tr>
 <tr>
-<td><a name="verbose"></a><code>verbose</code></td>
+<td><a name="log_level"></a><code>log_level</code></td>
 <td>string</td>
 <td>No</td>
-<td>1</td>
-<td>level of output</td>
+<td><code>1</code></td>
+<td>level of log</td>
 </tr>
 </tbody>
 </table>
@@ -544,8 +545,8 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 </thead>
 <tbody>
 <tr>
-<td><a name="coulomb_truncation_method"></a><code>coulomb_truncation_method</code></td>
-<td><a href="#appendix-trunc"> <code>spherical</code> </a></td>
+<td><a name="coulomb_truncation_method"></a><a href="#appendix-trunc"> <code>coulomb_truncation_method</code> </a></td>
+<td>float</td>
 <td>No</td>
 <td>2</td>
 <td>Truncation method for Coulomb</td>
@@ -630,14 +631,21 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td>Broadening</td>
 </tr>
 <tr>
-<td><a name="cd_int_method"></a><code>cd_int_method</code></td>
+<td><a name="cd_int_method"></a><code>cd_integration_method</code></td>
 <td>int</td>
 <td>No</td>
 <td><code>0</code></td>
 <td>CD integration method</td>
 </tr>
 <tr>
-<td><a name="cd_res_method"></a><code>cd_res_method</code></td>
+<td><a name="cd_int_parameter"></a><code>cd_integration_parameter</code></td>
+<td>float</td>
+<td>No</td>
+<td><code>2 (Ry)</code></td>
+<td>CD integration parameter</td>
+</tr>
+<tr>
+<td><a name="cd_res_method"></a><code>cd_residual_method</code></td>
 <td>int</td>
 <td>No</td>
 <td><code>0</code></td>
@@ -673,7 +681,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <td>Global ISDF ratio</td>
 </tr>
 <tr>
-<td>&lt;a name=&quot;isdf_ratio_type1&quot;</a><code>isdf_ratio_type1</code></td>
+<td><a name="isdf_ratio_type1"></a><code>isdf_ratio_type1</code></td>
 <td>float</td>
 <td>No</td>
 <td>= <code>isdf_ratio</code></td>
@@ -748,7 +756,7 @@ The algorithm to compute it is as follows:</p>
 <blockquote>
 <p><em>TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.</em></p>
 </blockquote>
-<h3 id="a-name%22appendix-trunc%22-a-coulomb-truncation"><a name="#appendix-trunc"> </a> Coulomb truncation</h3>
+<h3 id="a-name%22appendix-trunc%22-a-coulomb-truncation"><a name="appendix-trunc"> </a> Coulomb truncation</h3>
 <blockquote>
 <p>Todo : introduce different Coulomb truncation schemes and their corresponding parameters.
 Value of <code>coulomb_truncation_method</code> and corresponding method:</p>

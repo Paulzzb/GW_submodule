@@ -35,25 +35,26 @@ GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
       GWerror(['GW', 'GPP calculation is not implemented yet.']);
       % gw_gpp_kssolv(GWinfo, options);
     case 2
-      GWerror(['GW', 'fullfrequency calculation is not implemented yet.']);
-      % if options.GWCal.freq_dep_method == 0 % Current Disabled.
-      %   gw_fullfreq_ra(GWinfo, options);
-      % elseif options.GWCal.freq_dep_method == 2
-      %   % gw_fullfreq_cd(GWinfo, GWOptions);
-      %   % if (options.ISDFCauchy.isISDF == true)
-      %   %   GWenergy.Eres = gw_fullfreq_cd_res_ISDF(GWinfo, options);
-      %   %   GWenergy.Eint = gw_fullfreq_cd_int_ISDF(GWinfo, options);
-      %   % else
-      %   %   GWenergy.Eres = gw_fullfreq_cd_res(GWinfo, options);
-      %   %   GWenergy.Eint = gw_fullfreq_cd_int(GWinfo, options);
-      %   % end
-      %   GWenergy.Eres = gw_fullfreq_cd_res2(GWinfo, options);
-      %   GWenergy.Eint = gw_fullfreq_cd_int2(GWinfo, options);
-      % else
-      %   error('Error Not support now!');
-      % end
+      config = generate_frequency(GWinfo, config);
+      
+      if config.FREQUENCY.frequency_dependence_method == 0 % Current Disabled.
+        msg = sprintf('Implementing real axis approximation');
+        GWlog(msg, 0);
+        msg = sprintf('GW calculation under real axis approximation is developing');
+        GWerror(msg);
+        gw_fullfreq_ra(GWinfo, config);
+      elseif config.FREQUENCY.frequency_dependence_method == 2
+        GWenergy.Eres = gw_fullfreq_cd_res(GWinfo, config);
+        GWenergy.Eint = gw_fullfreq_cd_int(GWinfo, config);
+      else
+        msg = sprintf('config.FREQUENCY.frequency_dependence_method = %d is not supported', ...
+        config.FREQUENCY.frequency_dependence_method);
+        GWerror(msg);
+      end
+      % GWerror(['GW', 'fullfrequency calculation is not implemented yet.']);
     otherwise
-      GWerror('config.FREQUENCY.frequency_dependence is not supported');
+      GWerror('config.FREQUENCY.frequency_dependence = %d is not supported', ...
+               config.FREQUENCY.frequency_dependence);
   end
 
   % Degeneracy

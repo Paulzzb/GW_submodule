@@ -61,12 +61,13 @@ elseif (config.FREQUENCY.frequency_dependence == 2)
   if (config.FREQUENCY.frequency_low_cutoff < 0)
     % Now only insulaters are supported, and consider spin degeneracy only.
     nv = data.sys.ne / 2;
-    ev = data.ev;
+    ha2ry = 2.0;
+    ev = ha2ry * data.ev; % Remember input ev is Ha, while we hope all parameters are in Ry.
     nbmax = max(config.SYSTEM.energy_band_index_max, ...
                 config.SYSTEM.number_bands_in_summation);
     tmp1 = ev(nv) - ev(1); tmp2 = ev(nbmax) - ev(nv+1);
 
-    config.FREQUENCY.frequency_low_cutoff = max(tmp1, tmp2); 
+    config.FREQUENCY.frequency_low_cutoff = max(tmp1, tmp2) * 1.25; 
   end
 end
 

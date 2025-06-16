@@ -44,8 +44,9 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#delta_frequency">delta_frequency</a> |
 <a href="#number_imaginary_freqs">number_imaginary_freqs</a> |
 <a href="#eta">eta</a> |
-<a href="#cd_int_method">cd_int_method</a> |
-<a href="#cd_res_method">cd_res_method</a> |
+<a href="#cd_integration_method">cd_integration_method</a> |
+<a href="#cd_residual_method">cd_residual_method</a> |
+<a href="#cd_int_parameter">cd_integration_parameter</a> |
 
 ### &ISDF
 <a href="#isisdf">isisdf</a> |
@@ -94,7 +95,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 
 | Parameter           | Type   | Required | Default | Description                      |
 |---------------------|--------|----------|---------|----------------------------------|
-| <a name="coulomb_truncation_method"></a>`coulomb_truncation_method`         | <a href="#appendix-trunc"> `spherical` </a> | No | 2 | Truncation method for Coulomb     |
+| <a name="coulomb_truncation_method"></a><a href="#appendix-trunc"> `coulomb_truncation_method` </a>         | float | No | 2 | Truncation method for Coulomb     |
 | <a name="coulomb_truncation_parameter"></a>`coulomb_truncation_parameter`   | float  | No | 5.0  | Truncation parameter for Coulomb potential    |
 | <a name="coulomb_cutoff"></a>`coulomb_cutoff`   | float | No | 5.0  | Cutoff for Coulomb potential **Could be danger, code is not stable about it**    |
 | <a name="density_cutoff"></a>`density_cutoff`   | float  | No | <a href="#appendix-sys-freq">system based</a>  | Cutoff for density               |
@@ -108,13 +109,14 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | Parameter                     | Type   | Required | Default             | Description                                |
 |-------------------------------|--------|----------|----------------------|--------------------------------------------|
 | <a name="frequency_dependence"></a>`frequency_dependence`         | int    | No | `0`       | Whether to compute frequency-dependence   |
-| <a name="frequency_dependence_method"></a>`frequency_dependence_method` | int | No | `0`       | Method to compute frequency-dependence    |
+| <a name="frequency_dependence_method"></a>`frequency_dependence_method` | int | No | `2`       | Method to compute frequency-dependence    |
 | <a name="frequency_low_cutoff"></a>`frequency_low_cutoff`         | float  | No | <a href="#appendix-sys-freq">system based</a> | Low freq cutoff (computed from system info) |
 | <a name="delta_frequency"></a>`delta_frequency`                   | float  | No | `2`       | Frequency step                            |
 | <a name="number_imaginary_freqs"></a>`number_imaginary_freqs`     | int    | No | `15`      | Number of imaginary frequencies           |
 | <a name="eta"></a>`eta`                                           | float  | No | `1e-4`    | Broadening                                |
-| <a name="cd_int_method"></a>`cd_int_method`                       | int    | No | `0`       | CD integration method                     |
-| <a name="cd_res_method"></a>`cd_res_method`                       | int    | No | `0`       | CD resolution method                      |
+| <a name="cd_int_method"></a>`cd_integration_method`                       | int    | No | `0`       | CD integration method                     |
+| <a name="cd_int_parameter"></a>`cd_integration_parameter`                       | float | No |  `2 (Ry)`   | CD integration parameter                     |
+| <a name="cd_res_method"></a>`cd_residual_method`                       | int    | No | `0`       | CD resolution method                      |
 
 ---
 
@@ -124,7 +126,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 |------------------------|--------|----------|----------------|-------------------------------------|
 | <a name="isisdf"></a>`isisdf`                   | bool   | No | `true`        | Whether to enable ISDF              |
 | <a name="isdf_ratio"></a>`isdf_ratio`           | float  | No | `8.0`         | Global ISDF ratio                   |
-| <a name="isdf_ratio_type1"</a>`isdf_ratio_type1` | float | No | = `isdf_ratio` | Override ratio for ISDF type 1      |
+| <a name="isdf_ratio_type1"></a>`isdf_ratio_type1` | float | No | = `isdf_ratio` | Override ratio for ISDF type 1      |
 | <a name="isdf_ratio_type2"></a>`isdf_ratio_type2` | float | No | = `isdf_ratio` | Override ratio for ISDF type 2      |
 | <a name="isdf_ratio_type3"></a>`isdf_ratio_type3` | float | No | = `isdf_ratio` | Override ratio for ISDF type 3      |
 | <a name="exxmethod"></a>`exxmethod`             | string | No | `'kmeans'`    | Method for EXX                      |
@@ -149,7 +151,7 @@ The algorithm to compute it is as follows:
 
 > *TODO: Insert algorithm description for estimating frequency_low_cutoff based on sys structure.*
 
-### <a name="#appendix-trunc"> </a> Coulomb truncation
+### <a name="appendix-trunc"> </a> Coulomb truncation
 > Todo : introduce different Coulomb truncation schemes and their corresponding parameters.
 Value of `coulomb_truncation_method` and corresponding method:
 

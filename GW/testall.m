@@ -9,6 +9,6 @@ cd test_profile/testisdf
 testISDF
 cd ../../
 
-cd test_profile/testhf
-testhf
+cd test_profile/testgw
+testgw
 cd ../../

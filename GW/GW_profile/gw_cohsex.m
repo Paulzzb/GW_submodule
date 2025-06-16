@@ -75,10 +75,10 @@ if (config.ISDF.isisdf)
   vsgzeta_mu = conj(vsgzeta_mu);
 
   [vcind_mu, vcgzeta_mu] = isdf_main('vc', psir, 1:nv, ...
-      nv:nsum, gvec, vol, optISDF);
-  vsgzeta_mu = conj(vsgzeta_mu);
+      nv+1:nsum, gvec, vol, optISDF);
+  vcgzeta_mu = conj(vcgzeta_mu);
 
-  [ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, 1:nv, ...
+  [ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, 1:nsum, ...
       nbmin:nbmax, gvec, vol, optISDF);
   ssgzeta_mu = conj(ssgzeta_mu);
 

@@ -22,8 +22,9 @@ freq_low_cutoff = config.FREQUENCY.frequency_low_cutoff;
 delta_frequency = config.FREQUENCY.delta_frequency;
 number_imaginary_freqs = config.FREQUENCY.number_imaginary_freqs;
 eta = config.FREQUENCY.eta;
-cd_int_method = config.FREQUENCY.cd_int_method;
-cd_res_method = config.FREQUENCY.cd_res_method;
+cd_integration_method = config.FREQUENCY.cd_integration_method;
+cd_integration_parameter = config.FREQUENCY.cd_integration_parameter;
+cd_residual_method = config.FREQUENCY.cd_residual_method;
 
 % Some default values
 add_w0_freq = true;
