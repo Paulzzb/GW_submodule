@@ -29,7 +29,7 @@ function input_driver(inputfile)
   GWgroundstate = construct_GWinfo(data, config);
   GWoptions = construct_GWOptions(data, config);
 
-  % Step 6: save data to files 
+  % Step 5: save data to files 
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
   dir = config.CONTROL.storage_dir;
   def = filename_map();
