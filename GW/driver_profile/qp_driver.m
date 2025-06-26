@@ -35,28 +35,32 @@ if config.CONTROL.isgw
   GWenergy = qpgw(GWinfo, config);
 end % config.&CONTROL.isgw
 
+% finish timing and wrap up
+timeQP = toc(startQP);
+msg = sprintf('quasiparticle calculation finished. total time: %.2f seconds.', timeQP);
+QPlog(msg, 0);
 % GW method done
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Post-processing
+QP_postprocess(GWenergy)
+% % step 3: energy shift to account for degeneracy, etc.
+% QPlog('post-processing QP energy shift...', 1);
+% GWenergy = shiftenergy(GWenergy);
+% QPlog('energy shift completed.', 2);
 
-% Step 3: Energy shift to account for degeneracy, etc.
-QPlog('Post-processing QP energy shift...', 1);
-GWenergy = shiftenergy(GWenergy);
-QPlog('Energy shift completed.', 2);
+% % step 4: compute final e_QP and output
+% QPlog('computing final quasiparticle energies...', 1);
+% GWenergy = getEqp(GWenergy);
 
-% Step 4: Compute final E_qp and output
-QPlog('Computing final quasiparticle energies...', 1);
-GWenergy = getEqp(GWenergy);
+% msg = sprintf('saving QP-energies results to output file %s...', ...
+%               GWenergy.fout);
+% QPlog(msg, 1);
+% GWfout(GWenergy);
 
-msg = sprintf('Saving QP-energies results to output file %s...', ...
-              GWenergy.fout);
-QPlog(msg, 1);
-GWfout(GWenergy);
-
-% Finish timing and wrap up
-timeQP = toc(startQP);
-msg = sprintf('Quasiparticle calculation finished. Total time: %.2f seconds.', timeQP);
-QPlog(msg, 0);
-
+% % finish timing and wrap up
+% timeQP = toc(startQP);
+% msg = sprintf('quasiparticle calculation finished. total time: %.2f seconds.', timeQP);
+% QPlog(msg, 0);
 
 
 end % main function
