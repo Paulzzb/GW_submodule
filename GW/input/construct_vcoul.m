@@ -57,7 +57,7 @@ switch trunc_method
     % Formula (e.g., from Rozzi et al. 2006):
     % v(q+G) = 4π / |q+G|² * [1 - exp(-|q+G|*L) * (|q+G|*L + 1)]
     msg = sprintf(['GW:construct_vcoul:trunc_method', 'Wire truncation not implemented yet']);
-    GWerror(msg);
+    QPerror(msg);
     % error('GW:construct_vcoul:trunc_method', 'Wire truncation not implemented yet');
     L = truncval(1); % length along non-periodic directions
     qGnorm = sqrt(qG2);
@@ -68,7 +68,7 @@ switch trunc_method
   case 5  % Box truncation (0D)
     % Use erfc-based cutoff (example form)
     msg = sprintf(['GW:construct_vcoul:trunc_method', 'Box truncation not implemented yet']);
-    GWerror(msg);
+    QPerror(msg);
 
     error('GW:construct_vcoul:trunc_method', 'Box truncation not implemented yet');
     L = truncval(1);
@@ -79,7 +79,7 @@ switch trunc_method
   case 6  % Slab truncation (3D)
     % Slab truncation along z (say Gz = G(:,3))
     msg = sprintf(['GW:construct_vcoul:trunc_method', 'Slab truncation not implemented yet']);
-    GWerror(msg);
+    QPerror(msg);
     error('GW:construct_vcoul:trunc_method', 'Slab truncation not implemented yet');
     Lz = truncval(3);
     Gz = qG(:,3);
@@ -87,12 +87,12 @@ switch trunc_method
     vcoul(qG2 < tol_zero) = 0;           % avoid div-by-zero
   case 7
     msg = sprintf(['GW:construct_vcoul:trunc_method', 'Supercell truncation not implemented yet']);
-    GWerror(msg);
+    QPerror(msg);
     error('GW:construct_vcoul:trunc_method', 'Supercell truncation not implemented yet');
 
   otherwise
     msg = sprintf(['Unsupported truncation type: %d', trunc_method]);
-    GWerror(msg);
+    QPerror(msg);
     error('Unsupported truncation type: %d', trunc_method);
 end
 

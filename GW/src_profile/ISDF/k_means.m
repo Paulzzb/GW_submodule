@@ -136,8 +136,8 @@ while true
   end
   if iteration == 1
     timefirst = toc(timefirst);
-    fprintf("Time for first iteration = %6.2f.\n", timefirst);
-    fprintf("Max Time = %6.2f.\n", timefirst * max_iteration);
+%     fprintf("Time for first iteration = %6.2f.\n", timefirst);
+%     fprintf("Max Time = %6.2f.\n", timefirst * max_iteration);
   end
   iteration = iteration + 1;
   lastCentroids_ind_mu = newCentroids_ind_mu;

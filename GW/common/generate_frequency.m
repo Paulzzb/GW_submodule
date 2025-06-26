@@ -51,10 +51,10 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
       end
     case 1
       msg = sprintf('FREQUENCY.cd_residual_method = %d is under developing', config.FREQUENCY.cd_residual_method);
-      GWerror(msg);
+      QPerror(msg);
     otherwise
       msg = sprintf('FREQUENCY.cd_residual_method = %d not supported', config.FREQUENCY.cd_residual_method);
-      GWerror(msg);
+      QPerror(msg);
   end
   
   
@@ -82,20 +82,20 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
       end
     case 1 % Gauss-Legendre
       msg = sprintf('FREQUENCY.cd_integration_method = %d is under developing', config.FREQUENCY.cd_integration_method);
-      GWerror(msg);
+      QPerror(msg);
     otherwise
       msg = sprintf('FREQUENCY.cd_integration_method = %d not supported', config.FREQUENCY.cd_integration_method);
-      GWerror(msg);
+      QPerror(msg);
   end
 elseif ((config.FREQUENCY.frequency_dependence_method == 0) || ...
         (config.FREQUENCY.frequency_dependence_method == 1))
   msg = sprintf('FREQUENCY.frequency_dependence_method = %d is frequency independent.\nReturning ...', config.FREQUENCY.frequency_dependence_method);
-  GWlog(msg);
+  QPlog(msg);
   return
 else
   msg = sprintf('FREQUENCY.frequency_dependence_method = %d is under developing.\n', ...
    config.FREQUENCY.frequency_dependence_method);
-  GWerror(msg);
+  QPerror(msg);
 end % if frequency_dependence == 2
 
 
@@ -107,10 +107,10 @@ config.freqinfo.coeff_imag_func = coeff_imag_func;
 
 msg = sprintf('Frequency grid generated with %d real and %d imaginary frequencies\n', ...
               nrealfreq, nimagfreq);
-GWlog(msg);
+QPlog(msg);
 msg = sprintf('Method to generate real frequencies: %d\n', res_method);
-GWlog(msg);
+QPlog(msg);
 msg = sprintf('Method to generate imaginary frequencies: %d\n', int_method);
-GWlog(msg);
+QPlog(msg);
 
 end % EOF

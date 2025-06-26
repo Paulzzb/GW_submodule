@@ -48,7 +48,7 @@ for i = 1:numel(matches)
 
   if ~isfield(def, blockName)
   msg = sprintf('BLOCK NAME NOT DEFINED: %s', blockName);
-  GWerror(msg);
+  QPerror(msg);
   end
 
   lines = regexp(blockText, '[\n\r]+', 'split');
@@ -68,7 +68,7 @@ for i = 1:numel(matches)
 
   if ~ismember(key, def.(blockName))
     msg = sprintf('BLOCK "%s" HAS INVALID PARAMETER: %s', blockName, key);
-    GWerror(msg);
+    QPerror(msg);
   end
 
   val = str2double(valStr);

@@ -29,7 +29,7 @@ function sres = gw_fullfreq_cd_res(GWinfo, config)
 %     5.     Check if it is residual, add to sres.
 %          end 
 %        end 
-
+cleanup = QPlog_push('Fullfreq-CD-Residual');
 % 0. Initialize
 % Initialize constant from options.Constant
 % 0. Initialize
@@ -48,7 +48,7 @@ nsum = config.SYSTEM.number_bands_in_summation;
 nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
 if (nv >= nsum)
   msg = sprintf('Number of valence bands = %d >= Number of bands in summation = %d', nv, nsum);
-  GWerror(msg)
+  QPerror(msg)
 end
 
 

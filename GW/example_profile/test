@@ -1,0 +1,21 @@
+&CONTROL
+  prefix = 'NaCl',
+  isgw = 1, 
+  groundstate_dir = './',
+  groundstate_type = 'kssolv',
+  storage_dir = './',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 35,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 2,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_cutoff = 20.0
+END &CUTOFFS
+

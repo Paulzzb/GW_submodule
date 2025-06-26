@@ -98,9 +98,9 @@ switch lower(options.exxmethod)
         weight_square=weight.^2;
         
         % Do kmeans
-        tic
+        % tic
         ind_mu = k_means(rk, weight_square, options);
-        toc
+        % toc
         % tic
         % ind_mu = k_means_hpc(rk, weight_square, options);
         % toc

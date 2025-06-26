@@ -9,7 +9,7 @@ switch lower(typein)
   data = load_qe_groundstate(dirin);
   otherwise
   msg = sprintf('Unsupported groundstate type: %s', typein);
-  GWerror(msg);
+  QPerror(msg);
 end
 
 end
@@ -24,21 +24,21 @@ filePath = fullfile(dirin, 'groundstate.mat');
 
 if ~exist(filePath, 'file')
   msg = sprintf('groundstate.mat not found in directory: %s', dirin);
-  GWerror(msg);
+  QPerror(msg);
 end
 
 tmp = load(filePath);
 
 if ~isfield(tmp, 'groundstate')
   msg = 'groundstate.mat does not contain a variable named "groundstate".';
-  GWerror(msg);
+  QPerror(msg);
 end
 
 required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info'};
 for k = 1:length(required_fields)
   if ~isfield(tmp.groundstate, required_fields{k})
     msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});
-    GWerror(msg);
+    QPerror(msg);
   end
 end
 

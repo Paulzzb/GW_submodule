@@ -50,9 +50,9 @@ nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
 nsum = config.SYSTEM.number_bands_in_summation;
 if (nsum <= nv)
   msg = sprintf('[COHSEX] System has %d valence bands, while use %d bands for summation.\n', nv, nsum);
-  GWlog(msg, 0);
+  QPlog(msg, 0);
   msg = sprintf('[COHSEX] Number of valence bands should be smaller than number_bands_in_summation.\n');
-  GWerror(msg);
+  QPerror(msg);
 end
 vol = GWinfo.vol;
 gvec = GWinfo.gvec;
@@ -60,7 +60,7 @@ psir = GWinfo.psir;
 
 msg = sprintf('[COHSEX] Using band range [%d, %d], %d valence bands detected.\n', ...
          nbmin, nbmax, nv);
-GWlog(msg);
+QPlog(msg);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -25,6 +25,7 @@ function sint = gw_fullfreq_cd_int(GWinfo, config)
 %     4.     Multiply the coefficient and add the result to sint  
 %          end 
 %        end 
+cleanup = QPlog_push('Fullfreq-CD-Integral');
 
 
 startintgral = tic;

@@ -28,7 +28,7 @@ function Ex = gw_x(GWinfor, config)
 
 
 msg = sprintf('[Exchange] Start computing Σ_x (exchange part)...\n');
-GWlog(msg, 0);
+QPlog(msg, 0);
 tStart = tic;
 
 default_Constant = constant_map();
@@ -49,7 +49,7 @@ psir = GWinfor.psir;
 
 msg = sprintf('[Exchange] Using band range [%d, %d], %d valence bands detected.\n', ...
          nbmin, nbmax, nv);
-GWlog(msg);
+QPlog(msg);
 
 % Construct Coulomb matrix in sparse form, unit: eV
 Dcoul = spdiags(GWinfor.coulG, 0, ng, ng) * ry2ev;
@@ -59,7 +59,7 @@ Dcoul(1,1) = GWinfor.coulG0 * ry2ev;
 
 if (config.ISDF.isisdf)
   msg = sprintf('[Exchange] Using ISDF approximation for Σ_x.\n');
-  GWlog(msg, 0);
+  QPlog(msg, 0);
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   tISDF = tic;
   
@@ -70,7 +70,7 @@ if (config.ISDF.isisdf)
       nbmin:nbmax, gvec, vol, optISDF);
   vsgzeta_mu = conj(vsgzeta_mu);
   msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
-  GWlog(msg, 1);
+  QPlog(msg, 1);
 
 
   % Compute Σ_x
@@ -85,7 +85,7 @@ if (config.ISDF.isisdf)
 else
 % --- Standard exchange calculation without ISDF ---
   msg = sprintf('[Exchange] Using standard Σ_x calculation.\n');
-  GWlog(msg, 0);
+  QPlog(msg, 0);
   Ex = zeros(nbmax-nbmin+1);
   tStandard = tic;
   for ioper = 1:nv
@@ -95,11 +95,11 @@ else
     Ex = Ex + Mgvn' * W1Mgvn / vol;
   end
   msg = sprintf('[Exchange] Standard loop completed in %.2f seconds.\n', toc(tStandard));
-  GWlog(msg, 1);
+  QPlog(msg, 1);
 end
 
 Ex = - real(diag(Ex));
 msg = sprintf('[Exchange] Finished. Total time: %.2f seconds.\n', toc(tStart));
-GWlog(msg, 0);
+QPlog(msg, 0);
 
 end % function

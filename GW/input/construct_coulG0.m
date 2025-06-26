@@ -14,7 +14,7 @@ switch trunc_method
     coulG0 = fourpi * trunc_factor^2;
   otherwise
     msg = sprintf('Unsupported truncation type: %d', trunc_method);
-    GWerror(msg);
+    QPerror(msg);
 end
 
   

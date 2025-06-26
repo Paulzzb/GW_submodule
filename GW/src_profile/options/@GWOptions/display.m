@@ -4,7 +4,7 @@ function display(obj)
     msg = ('--- GWOptions Summary ---\n');
     fprintf(msg);
     msg = sprintf('Still under development\n');
-    GWerror(msg);
+    QPerror(msg);
     % if isfield(obj.Constant, 'prefix')
         % fprintf('prefix: %s\n', obj.Constant.prefix);
     % end

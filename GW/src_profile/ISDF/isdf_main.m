@@ -1,76 +1,79 @@
 function [ind_mu, zeta_mu] = isdf_main(type, Phir, nlist, mlist, gvec, vol, optionsISDF)
-  GWlog('\n==================================================\n');
-  GWlog('     ISDF Computation     \n');
+  
+  cleanup = QPlog_push('ISDF');
+
 
   def = filename_map();
+
+  % Determine ISDF type and related settings
   switch type
     case 'vc'
       fName = def.isdfvc;
-      msg = 'Occupied states with Unoccupied states';
+      outstr = 'Occupied states and Unoccupied states';
       ratio = optionsISDF.vcrank_ratio;
     case 'vs'
       fName = def.isdfvs;
-      msg = 'Occupied states with All states';
+      outstr = 'Occupied states and All states';
       ratio = optionsISDF.vsrank_ratio;
     case 'ss'
       fName = def.isdfss;
-      msg = 'All states with All states';
+      outstr = 'All states and All states';
       ratio = optionsISDF.ssrank_ratio;
     otherwise
-      error("type should be 'vc', 'vs', or 'ss'");    
+      msg = sprintf("ISDF 'type' should be 'vc', 'vs', or 'ss'");
+      QPerror(msg);    
   end
+
+  % Estimate rank for ISDF approximation
   optionsISDF.isdfoptions.rank = ceil(sqrt(length(nlist) * length(mlist)) * ratio);
-  msg = sprintf('ISDF Type: %s\n', msg);
-  GWlog(msg, 1);
-  GWlog('==================================================\n');
+
+  msg = sprintf('ISDF started');
+  QPlog(msg, 0);
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% varification of inputs
-  GWlog('[Step 1] Verifying inputs...\n', 2);
+  % Step 1: Verify input validity and check for existing result
+  QPlog(sprintf(' Verifying inputs...'), 2);
   flag = isdf_checkInputs(fName, type, Phir, nlist, mlist, gvec, vol, optionsISDF);
-% Read or Calculate
+
   if flag
-    % success, read and out
-    msg = sprintf('[Step 2] Cached ISDF result found. Loading from %s...\n', fName);
-    GWlog(msg, 2);
+    % Step 2 (cached): Load existing result
     load(fName, 'ind_mu', 'zeta_mu');
-    msg = sprintf('Loaded interpolative indices and helper functions.\n');
-    GWlog(msg, 2);
+    msg = sprintf('Cached ISDF result found. Loading from %s...', fName);
+    QPlog(msg, 2);
   else
-    msg = sprintf('[Step 2] No valid cache found. Starting ISDF calculation...\n');
-    GWlog(msg, 2);
-    % Step 3: Prepare wavefunctions
-    msg = sprintf('[Step 3] Preparing wavefunctions in real space...\n');
-    GWlog(msg, 2);
+    % Step 2 (no cache): Start new ISDF computation
+    msg = sprintf('No valid cache found. Starting ISDF calculation...');
+    QPlog(msg, 2);
+
+    % Step 3: Read wavefunctions in real space
+
     psi = conj(Phir(:, nlist));
     phi = Phir(:, mlist);
 
-    % Step 4: Compute interpolation points
-    msg = sprintf('[Step 4] Generating interpolation points...\n');
-    GWlog(msg, 2);
+    % Step 3: Compute interpolation points
+    msg = sprintf('Generating interpolation points...');
+    QPlog(msg, 2);
     ind_mu = isdf_indices(psi, phi, optionsISDF);
-    msg = sprintf('Number of interpolation points: %d\n', length(ind_mu));
-    GWlog(msg, 1);
 
-    % Step 5: Compute helper functions
-    msg = sprintf('[Step 5] Constructing helper functions...\n');
-    GWlog(msg, 2);
+    % Step 4: Construct helper functions (zeta_mu)
+    msg = sprintf('Constructing helper functions...');
+    QPlog(msg, 2);
     zeta_mu = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
-    msg = sprintf('Helper functions constructed.\n');
-    GWlog(msg, 2);
+    msg = sprintf('Helper functions constructed successfully.');
+    QPlog(msg, 2);
 
-    % Step 6: Save results
-    msg = sprintf('[Step 6] Saving ISDF results to %s...\n', fName);
-    GWlog(msg, 2)
-    ISDFinputs = struct('Phir', Phir, 'nlist', nlist, 'mlist', mlist, 'gvec', gvec, 'vol', vol, 'optionsISDF', optionsISDF);
+    % Step 5: Save result to file
+    msg = sprintf('Saving ISDF results to %s...', fName);
+    QPlog(msg, 2);
+    ISDFinputs = struct('Phir', Phir, 'nlist', nlist, 'mlist', mlist, ...
+              'gvec', gvec, 'vol', vol, 'optionsISDF', optionsISDF);
     save(fName, 'ISDFinputs', 'ind_mu', 'zeta_mu');
-    msg = sprintf('ISDF results saved.\n');
-    GWlog(msg, 2);
+    msg = sprintf('ISDF results saved successfully.');
+    QPlog(msg, 2);
   end
 
-  msg = sprintf('ISDF processing completed.\n');
-  GWlog(msg)
-  msg = sprintf('==================================================\n');
-  GWlog(msg)
+  rank = optionsISDF.isdfoptions.rank;
+  msg = sprintf('ISDF completed, Type: %s, Number of helper functions: %d', outstr, rank);
+  QPlog(msg, 1);
+
 end % function

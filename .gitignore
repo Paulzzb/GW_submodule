@@ -1,6 +1,7 @@
 ./GW/*
 
 !./GW/*/
+!./GW/doc_profile/*
 
 !./GW/*.m
 # ./GW/test/**/*.mat

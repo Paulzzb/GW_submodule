@@ -7,7 +7,7 @@ function fftbox = do_FFT(fftbox, Nfft, sign)
     fftbox = fftn(fftbox, Nfft);   % Forward FFT
   else
     msg = 'sign is not 1 or -1 in do_FFT';
-    GWerror(msg);
+    QPerror(msg);
   end
 end
 

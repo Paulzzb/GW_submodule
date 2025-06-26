@@ -27,7 +27,9 @@ function zetag = isdf_kernelg(Phi, Psi, ind_mu, gvec, vol)
 %     2. Calculate C1 = (Phi*phi').*(Psi*psi');
 %     3. Do iFFT to C1, C1g = iFFT(C1);
 %     4. Calculate helper functions to zetag = C1g / C2;
-
+cleanup = QPlog_push('ISDF-helper');
+msg = sprintf('Generating helper functions in G-space...');
+QPlog(msg, 2);
 
 [m1, n1] = size(Phi);
 [m2, n2] = size(Psi);
@@ -35,13 +37,13 @@ ng = gvec.ng;
 step = 25;
 
 if m1 ~= m2
-  msg = 'Wrong inputs: row dimensions of Phi and Psi do not match!\n';
-  GWerror(msg);
+  msg = 'Wrong inputs: row dimensions of Phi and Psi do not match!';
+  QPerror(msg);
 end
 m = m1;
 if length(ind_mu) > m
-  msg = 'Wrong inputs: ind_mu is too long!\n';
-  GWerror(msg);
+  msg = 'Wrong inputs: ind_mu is too long!';
+  QPerror(msg);
 end
 
 rk=length(ind_mu);
@@ -50,16 +52,13 @@ psi=Psi(ind_mu,:);
 C2=(phi*phi').*(psi*psi');
 
 
-fprintf('\n[ISDF] Generating helper functions in G-space...\n');
-rank_mu = length(ind_mu);
+
+
 total_iter = ceil(rk / step);
 est_total_time = -1;
 
 
 C1g = zeros(gvec.ng, rk);
-
-
-
 for i = 1:step:rk
   iter_idx = ceil(i / step);
 
@@ -83,16 +82,19 @@ for i = 1:step:rk
   if iter_idx == 6 
     time_per_step = toc(startfirstiter) / 4;
     est_total_time = time_per_step * total_iter;
-    fprintf('[ISDF helper] Estimated total time: %.1f seconds\n', est_total_time);
+    msg = sprintf('Estimated total time: %.1f seconds', est_total_time);
+    QPlog(msg, 2);
   end
 
   % Progress bar
   if est_total_time > 0
     elapsed_time = (iter_idx - 1) * time_per_step;
-    fprintf('[ISDF helper] Progress: %3d%% | Elapsed: %.1fs / Estimated: %.1fs\n', ...
+    msg = sprintf('Progress: %3d%% | Elapsed: %.1fs / Estimated: %.1fs', ...
         round(100 * (iter_idx-1) / total_iter), elapsed_time, est_total_time);
+    QPlog(msg, 2);
   else
-    fprintf('[ISDF helper] Progress: %3d%%\n', round(100 * (iter_idx-1) / total_iter));
+    msg = sprintf('Progress: %3d%%', round(100 * (iter_idx-1) / total_iter));
+    QPlog(msg, 2);
   end
 end
 
