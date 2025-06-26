@@ -25,6 +25,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#storage_dir">storage_dir</a> |
 <a href="#outfile">outfile</a> |
 <a href="#log_level">log_level</a> |
+<a href="#log_file">log_file</a> |
 
 ### &SYSTEM
 <a href="#number_bands_in_summation">number_bands_in_summation</a> |
@@ -77,6 +78,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | <a name="storage_dir"></a>`storage_dir`  | string | No       | `'./QP.save/'`   | Directory for intermediate quantities           |
 | <a name="outfile"></a>`outfile`          | string | No       | `'./GWoutput'`  | Output energy file name                            |
 | <a name="log_level"></a>`log_level`          | string | No       | `1`  | level of log |
+| <a name="log_file"></a> `log_file`          | string | No       | `[]`  | output file of logging, to command line windows if empty |
 
 ---
 
