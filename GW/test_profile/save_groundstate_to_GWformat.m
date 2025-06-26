@@ -29,7 +29,7 @@ C = mol.supercell;
 xyz = round([ggrid.gkx, ggrid.gky, ggrid.gkz] * C' / 2 / pi);
 % KSSOLV use Hartree unit, and our code use Rydberg unit, so we need to convert it.
 reciprocal_grid_info = struct('xyz', xyz, 'idxnz', ggrid.idxnz, 'wfncut', ha2ry*ggrid.ecut, ...
-'nfftgrid', [mol.n1, mol.n2, mol.n3], 'vol', mol.vol);
+'fftgrid', [mol.n1, mol.n2, mol.n3], 'vol', mol.vol);
   
 % Transform
 % Prepare groundstate struct and save
