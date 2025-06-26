@@ -2,7 +2,7 @@
 
 !./GW/*/
 
-!GW/*.m
+!./GW/*.m
 # ./GW/test/**/*.mat
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
