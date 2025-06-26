@@ -42,7 +42,7 @@ QPlog(msg, 0);
 % GW method done
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Post-processing
-QP_postprocess(GWenergy)
+qp_postprocess(GWenergy)
 % % step 3: energy shift to account for degeneracy, etc.
 % QPlog('post-processing QP energy shift...', 1);
 % GWenergy = shiftenergy(GWenergy);
