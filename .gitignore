@@ -4,7 +4,10 @@
 !./GW/doc_profile/*
 
 !./GW/*.m
-# ./GW/test/**/*.mat
+
+
+!./GW/*.md
+!./GW/*.html
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
 # !./GW/test/data/Si8/IntermediateFiles/molinfo.mat
