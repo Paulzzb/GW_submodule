@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>class_reference.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="introduction-and-reference-of-classes-in-qp-source-code">Introduction and reference of classes in QP source code</h1>
+<p>We introduce three class in source code, named @GWinfo, @gvec, and @QPenergy.
+They are used to</p>
+<ul>
+<li>@GWinfo: save groundstate informations.</li>
+<li>@gvec: save reciprocal space information.</li>
+<li>@QPenergy: save quasiparticle energies' information</li>
+</ul>
+<p>For the convenience of developers to query, we summarize the important information as follows</p>
+<hr>
+<hr>
+<h2 id="gwinfo">@GWinfo</h2>
+<h3 id="a-class-introduction">A. Class introduction</h3>
+<p><code>@GWinfo</code> is a core data structure in the software package that stores all ground-state information required for quasiparticle (QP) calculations.
+Its primary function is to serve as an information carrier, transferring ground-state data between <code>input_driver</code> and <code>qp_driver</code>,
+and also acting as a key interface within <code>qp_driver</code>.</p>
+<p>Parameter Convention</p>
+<p><code>Ncoul</code>: Number of reciprocal space grid points under the given Coulomb cutoff.</p>
+<h3 id="b-properties-list">B. Properties list</h3>
+<p><a href="#coulg">coulG</a> |
+<a href="#coulg0">coulG0</a> |
+<a href="#supercell">supercell</a> |
+<a href="#bdot">bdot</a> |
+<a href="#qk">qk</a> |
+<a href="#vol">vol</a> |
+<a href="#ne">ne</a> |
+<a href="#gvec">gvec</a> |
+<a href="#gvec2">gvec2</a> |
+<a href="#gvecrho">gvecrho</a> |
+<a href="#vxc">Vxc</a> |
+<a href="#rho">rho</a> |
+<a href="#idxnz">idxnz</a> |
+<a href="#ev">ev</a> |
+<a href="#psig">psig</a> |
+<a href="#psir">psir</a> |
+<a href="#ggrid4psig">Ggrid4psig</a> |
+<a href="#occupation">occupation</a> |</p>
+<hr>
+<h3 id="c-properties-details">C. Properties details</h3>
+<h4 id="coulg">coulG</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (Ncoul, 1)
+Description: Coulomb kernel under specific approximation method
+and specific truncation in reciprocal space
+</div></code></pre>
+<h4 id="coulg0">coulG0</h4>
+<pre class="hljs"><code><div>Type       : Double 
+Size       : scalar
+Description: Coulomb potential at q=G=0
+</div></code></pre>
+<h4 id="supercell">supercell</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (3, 3)
+Description: Supercell lattice matrix in real space, C = [a1, a2, a3]'
+</div></code></pre>
+<h4 id="bdot-deprivated-not-initialized">bdot (Deprivated, not initialized)</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (3, 3)
+Description: A matrix to perform vector dot in reciprocial space.
+Note       : Suppose B = [b1, b2, b3] is reciprocal space
+primitive vectors, then bdot = B'*B.
+</div></code></pre>
+<h4 id="qk-deprivated-not-initialized">qk (Deprivated, not initialized)</h4>
+<pre class="hljs"><code><div>&gt; Todo
+Type       : Double 
+Size       : ...
+Description: 
+Note       : 
+</div></code></pre>
+<h4 id="vol">vol</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : scalar
+Description: Volume of the supercell
+</div></code></pre>
+<h4 id="ne-deprivated-not-initialized">ne (Deprivated, not initialized)</h4>
+<pre class="hljs"><code><div>Type       : integer
+Size       : scalar
+Description: Total number of electrons
+</div></code></pre>
+<h4 id="gvec">gvec</h4>
+<pre class="hljs"><code><div>Type       : @gvec 
+Size       : Not applicable 
+Description: Reciprocal lattice vector information, see (#@gvec) for detail
+Note       : Used in expansion of wavefunctions
+</div></code></pre>
+<h4 id="gvec2-deprivated-not-initialized">gvec2 (Deprivated, not initialized)</h4>
+<pre class="hljs"><code><div>Type       : @gvec
+Size       : 
+Description: Was used on description of wavefunctions grid in reciprocal space.
+Note       : 
+</div></code></pre>
+<h4 id="gvecrho">gvecrho</h4>
+<pre class="hljs"><code><div>Type       : @gvec
+Size       : Unknown
+Description: reciprocal vectors grid, used for charge density (typically finer grid)
+Note       : Different cutoff from wavefunction basis
+</div></code></pre>
+<h4 id="vxc">Vxc</h4>
+<pre class="hljs"><code><div>Type       : Double 
+Size       : (Number of required bands, 1)
+Description: Exchange-correlation potential in real space
+Note       : Imported from ground-state solver output
+</div></code></pre>
+<h4 id="rho">rho</h4>
+<pre class="hljs"><code><div>Type       : Double Complex
+Size       : (gvecrho.ng, 1)
+Description: Charge density in reciprocal space, always used with gvecrho
+Note       : 
+</div></code></pre>
+<h4 id="idxnz-deprivated-not-initialized">idxnz (Deprivated, not initialized)</h4>
+<pre class="hljs"><code><div>Type       : Integer 
+Size       : 
+Description: 
+Note       : 
+</div></code></pre>
+<h4 id="ev">ev</h4>
+<pre class="hljs"><code><div>Type       : Double 
+Size       : (nband, 1)
+Description: ground-state band energies
+</div></code></pre>
+<h4 id="ggrid4psig">Ggrid4psig</h4>
+<pre class="hljs"><code><div>Type       : struct 
+Size       : Not appliable  
+Description: Grid mapping information between truncated G-vectors and real-space grid
+Note       : Use get_wavefunc_real(psig, Ggrid4psig) to get psir
+</div></code></pre>
+<h4 id="psig">psig</h4>
+<pre class="hljs"><code><div>Type       : Double Complex
+Size       : Not important (hhh) 
+Description: Wavefunctions in reciprocal space 
+Note       : Use get_wavefunc_real(psig, Ggrid4psig) to get psir
+</div></code></pre>
+<h4 id="psir">psir</h4>
+<pre class="hljs"><code><div>Type       : complex array
+Size       :  
+Description: Wavefunctions in real space
+Note       : Use get_wavefunc_real(psig, Ggrid4psig) to get psir.
+Empty when outputed from input_driver, initialized in qp_driver.
+</div></code></pre>
+<h4 id="occupation">occupation</h4>
+<pre class="hljs"><code><div>Type       : Double 
+Size       : (nband, 1)
+Description: Band occupation numbers (0 to 1)
+Note       : Determines which bands are treated as occupied/unoccupied
+</div></code></pre>
+<hr>
+<h3 id="c-functions-and-routines">C. Functions and routines</h3>
+<p>Currently, @GWinfo is a 'storage' room.
+Please just use GWinfo.property_name to extract information.</p>
+<hr>
+<hr>
+<h2 id="gvec">@gvec</h2>
+<h3 id="a-class-introduction">A. Class Introduction</h3>
+<p><code>@gvec</code> is a class that contains information about the truncated reciprocal-space grids.
+Developers typically invoke it to perform a forward or backward FFT through
+a set of functions provided in the folder <code>QP_root/common</code>.</p>
+<h3 id="b-properties-list">B. Properties List</h3>
+<p><a href="#ng">ng</a> |<br>
+<a href="#fftgrid">fftgrid</a> |<br>
+<a href="#nfftgridpts">nfftgridpts</a> |<br>
+<a href="#idxnz">idxnz</a> |<br>
+<a href="#components">components</a> |</p>
+<hr>
+<h3 id="c-properties-details">C. Properties Details</h3>
+<h4 id="ng">ng</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : Scalar
+Description: Number of reciprocal grid vectors remaining after applying the energy cutoff
+</div></code></pre>
+<h4 id="fftgrid">fftgrid</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : (3, 1)
+Description: Inital real-space grid size in each direction (n1, n2, n3)
+</div></code></pre>
+<h4 id="nfftgridpts">nfftgridpts</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : Scalar
+Description: Total number of FFT grid points, e.g., n1*n2*n3
+</div></code></pre>
+<h4 id="idxnz">idxnz</h4>
+<pre class="hljs"><code><div>Type       : Integer Array
+Size       : (ng, 1)
+Description: Linear index mapping of retained grid points (1:ng) to the full FFT grid (n1, n2, n3).
+Note: We use MATLAB convention
+</div></code></pre>
+<blockquote>
+<p>Todo: implementing detail</p>
+</blockquote>
+<h4 id="components">components</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : (ng, 3)
+Description: Component-wise mapping of grid points in 3D space, i.e., (i1, i2, i3) with i1 ∈ [1,n1] etc.
+</div></code></pre>
+<hr>
+<h3 id="d-functions-and-routines">D. Functions and Routines</h3>
+<p>To construct a <code>@gvec</code> object:</p>
+<pre class="hljs"><code><div>gvec_obj = gvec(gvecinput)
+</div></code></pre>
+<p>Where <code>gvecinput</code> must contain:</p>
+<ul>
+<li><code>n1, n2, n3</code>: FFT grid dimensions</li>
+<li><code>ecut</code>: Energy cutoff for grid point truncation</li>
+<li><code>supercell</code>: Lattice matrix in real space</li>
+</ul>
+<hr>
+<hr>
+<h2 id="qpenergy">@QPenergy</h2>
+<h3 id="a-class-introduction">A. Class Introduction</h3>
+<p><code>@QPenergy</code> is the primary data structure that stores and organizes all quasiparticle (QP) energy-related outputs during and after the quasiparticle calculation.<br>
+It is initialized in <code>qp_driver</code>, and acts as a central container passed through <code>qp_driver</code> and post-processing stage.
+Post-processing functions like <code>getEqp</code>, <code>shiftenergy</code>, and <code>GWfout</code> and contained in this class.
+<strong>All the energies have unit ev</strong></p>
+<hr>
+<h3 id="b-properties-list">B. Properties List</h3>
+<p><a href="#bandindices">bandindices</a> |
+<a href="#freq_dep">freq_dep</a> |
+<a href="#freq_dep_method">freq_dep_method</a> |
+<a href="#ev">ev</a> |
+<a href="#ex">Ex</a> |
+<a href="#esex_x">Esex_x</a> |
+<a href="#ecoh">Ecoh</a> |
+<a href="#eres">Eres</a> |
+<a href="#eint">Eint</a> |
+<a href="#sig">Sig</a> |
+<a href="#vxc">Vxc</a> |
+<a href="#eqp">Eqp</a> |
+<a href="#tol_degeneracy">TOL_DEGENERACY</a> |
+<a href="#fout">fout</a></p>
+<hr>
+<h3 id="c-properties-details">C. Properties Details</h3>
+<h4 id="bandindices">bandindices</h4>
+<pre class="hljs"><code><div>Type       : Integer Array
+Size       : (nbands_out)
+Description: Indices of bands involved in QP calculation,
+parsed by parameters energy_band_index_min and energy_band_index_max from user-provide input
+</div></code></pre>
+<h4 id="freqdep">freq_dep</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : Scalar
+Description: Frequency-dependence type (0=static, 1=GPP, 2=full-frequency)
+</div></code></pre>
+<h4 id="freqdepmethod">freq_dep_method</h4>
+<pre class="hljs"><code><div>Type       : Integer
+Size       : Scalar
+Description: Method used for frequency grid generation
+</div></code></pre>
+<h4 id="ev">ev</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: DFT eigenvalues of selected bands
+</div></code></pre>
+<h4 id="ex">Ex</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Exchange energy for each band
+</div></code></pre>
+<h4 id="esexx">Esex_x</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Static screened exchange component (freq_dep = 0 or 1)
+</div></code></pre>
+<h4 id="ecoh">Ecoh</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Coulomb hole contribution (freq_dep = 0 or 1)
+</div></code></pre>
+<h4 id="eres">Eres</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Residue term from full-frequency GW (freq_dep = 2)
+</div></code></pre>
+<h4 id="eint">Eint</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Integral term from full-frequency GW (freq_dep = 2)
+</div></code></pre>
+<h4 id="sig">Sig</h4>
+<pre class="hljs"><code><div>Type       : Struct or Cell
+Size       : varies
+Description: Self-energy function evaluated at selected bands
+</div></code></pre>
+<h4 id="vxc">Vxc</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Exchange-correlation energies from ground-state calculation
+</div></code></pre>
+<h4 id="eqp">Eqp</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : (nband_out, 1)
+Description: Final quasiparticle energy bands (after correction)
+</div></code></pre>
+<h4 id="toldegeneracy">TOL_DEGENERACY</h4>
+<pre class="hljs"><code><div>Type       : Double
+Size       : Scalar (constant)
+Description: Tolerance for detecting energy degeneracies, on default 1e-6*13.60569
+</div></code></pre>
+<h4 id="fout">fout</h4>
+<pre class="hljs"><code><div>Type       : String
+Size       : Scalar
+Description: Default file name to write QP energy output
+</div></code></pre>
+<hr>
+<hr>
+<h3 id="4-changing-log">4. Changing log</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Name</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-06-27</td>
+<td>Zhengbang</td>
+<td>Initialize</td>
+</tr>
+</tbody>
+</table>
+<hr>
+
+</body>
+</html>
