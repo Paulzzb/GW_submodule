@@ -6,9 +6,9 @@ INFO_DIR = './';
 cfile = mfilename('fullpath');
 CPATH = fileparts(cfile);
 CPATH = [CPATH, '/'];
-KS_DIR    = ['D:/kssolvGW/GW_submodule/hefeikssolv/'];
-% KS_DIR = '..\..\..\kssolv_20250413\'
-QP_DIR = '..\..\'
+% KS_DIR    = ['D:/kssolvGW/GW_submodule/hefeikssolv/'];
+KS_DIR = '..\..\..\kssolv\';
+QP_DIR = '..\..\';
 molinfile = [CPATH, INFO_DIR, 'setmol.m'];
 scfinfile = [CPATH, INFO_DIR, 'setscf.m'];
 addpath('../') % Add savefunc into search path

@@ -1,5 +1,5 @@
-function QP_postprocess(GWenergy)
-  cleanup = QPlog_push('QP-postprocess');
+function qp_postprocess(GWenergy)
+  cleanup = QPlog_push('qp-postprocess');
 
   QPlog('begin post-processing of QP energy...', 0);
 
