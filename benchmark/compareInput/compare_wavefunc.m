@@ -1,1 +1,0 @@
-function compare_wavefunc()

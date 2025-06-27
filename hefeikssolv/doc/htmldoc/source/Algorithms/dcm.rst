@@ -1,3 +1,0 @@
-Direct Constrained Minimization
-===============================
-
