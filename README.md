@@ -18,7 +18,7 @@ It aims to provide a research-grade, flexible infrastructure for developing, tes
 
 1. Clone or download this repository:
    ```bash
-   git clone https://your.git.repo/QP-GW.git
+   git clone -b profile --single-branch git@github.com:Paulzzb/GW_submodule.git 
    cd QP-GW
 
 ## Documentation
