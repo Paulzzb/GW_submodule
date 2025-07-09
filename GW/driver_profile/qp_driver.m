@@ -12,6 +12,9 @@ config = TEMP.config;
 cleanup = QPlog_push('qp_driver');
 QPlog_showtag(true);
 QPlog_verbose(config.CONTROL.log_level);
+if ~isempty(config.CONTROL.log_file)
+  QPlog_logfile(config.CONTROL.log_file);
+end
 QPlog('QP driver started', 0);
 startQP = tic;
 
@@ -34,12 +37,22 @@ QPlog('Quasiparticle energy structure initialized.', 2);
 if config.CONTROL.isgw
   GWenergy = qpgw(GWinfo, config);
 end % config.&CONTROL.isgw
+% GW method done
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% [Developer Hook] Insert your custom module calls below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Example: call your module if enabled in config
+if isfield(config.CONTROL, 'enable_your_module') && config.CONTROL.enable_your_module
+  QPlog('Your module is enabled. Starting execution...', 1);
+  GWenergy = your_kernel(GWinfo, config);
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 % finish timing and wrap up
 timeQP = toc(startQP);
 msg = sprintf('quasiparticle calculation finished. total time: %.2f seconds.', timeQP);
 QPlog(msg, 0);
-% GW method done
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Post-processing
 qp_postprocess(GWenergy)

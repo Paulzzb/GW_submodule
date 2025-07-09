@@ -32,7 +32,7 @@ QPstartup;  % 自动配置路径（仅添加 .m 文件）
 
 ### Step 2：准备输入文件
 
-假设你已使用 `kssolv` 进行基态计算，可添加如下内容保存数据：
+假设你已使用 `kssolv` 进行基态计算 (若未完成，可执行`QP_root/test_profile/test_groundstate`文件夹下的`testground.m`) , 可添加如下内容保存数据：
 
 ```matlab
 [mol,H,X0,info] = scf(mol, options_scf);

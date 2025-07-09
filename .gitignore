@@ -2,6 +2,7 @@
 
 !./GW/*/
 !./GW/doc_profile/*
+!./GW/test_profile/TMP_FILE/*
 
 !./GW/*.m
 
