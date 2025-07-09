@@ -1,4 +1,4 @@
 cd ../testInput
 testinput
 cd ../testgw
-qp_driver('../')
+qp_driver('../testInput')
