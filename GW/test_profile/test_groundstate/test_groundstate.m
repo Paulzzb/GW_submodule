@@ -9,6 +9,7 @@ CPATH = [CPATH, '/'];
 % KS_DIR    = ['D:/kssolvGW/GW_submodule/hefeikssolv/'];
 KS_DIR = '..\..\..\kssolv\';
 QP_DIR = '..\..\';
+SAVE_DIR = '../TMP_FILES';
 molinfile = [CPATH, INFO_DIR, 'setmol.m'];
 scfinfile = [CPATH, INFO_DIR, 'setscf.m'];
 addpath('../') % Add savefunc into search path
@@ -27,6 +28,6 @@ cd(CPATH);
 run(molinfile);
 run(scfinfile);
 [mol,H,X0,info] = scf(mol, options_scf);
-save_groundstate_to_GWformat(mol, H, X0, info, './');
+save_groundstate_to_GWformat(mol, H, X0, info, SAVE_DIR);
 
 

@@ -1,9 +1,10 @@
 &CONTROL
   prefix = 'NaCl',
   isgw = 1, 
-  groundstate_dir = './',
+  groundstate_dir = '../TMP_FILES',
   groundstate_type = 'kssolv',
-  storage_dir = '../'
+  storage_dir = '../TMP_FILES',
+  log_file = 'QPlog',
 END &CONTROL
 
 &SYSTEM

@@ -1,3 +1,8 @@
+FILE_DIR = '../TMP_FILES';
+CPATH = fileparts(mfilename('fullpath'));
+
+cd(FILE_DIR);
+
 def = filename_map();
 load(def.GWinput);
 
@@ -10,3 +15,4 @@ gvec = GWgroundstate.gvec; vol = GWgroundstate.vol;
 optionsISDF = GWoptions.ISDFCauchy;
 [ind_mu, zeta_mu] = isdf_main(type, GWgroundstate.psir, nlist, mlist, gvec, vol, optionsISDF);
 
+cd(CPATH);

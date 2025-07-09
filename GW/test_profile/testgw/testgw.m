@@ -1,4 +1,7 @@
 cd ../testInput
 testinput
 cd ../testgw
-qp_driver('../testInput')
+
+cd ../TMP_FILES;
+qp_driver('./');
+cd ../testgw;
