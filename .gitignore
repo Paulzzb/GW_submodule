@@ -1,6 +1,6 @@
 ./GW/*
 ./TMP/*
-./GW/test_profile/TMP_FILE/*
+./GW/test_profile/TMP_FILES/*
 !./GW/*/
 !./GW/doc_profile/*
 
