@@ -1,0 +1,13 @@
+#!/bin/sh
+
+middlewarePath=$(readlink -f $(dirname $0))
+
+matlabHome=${HOME}/MATLAB/R2021a
+
+/usr/bin/invoke_app "$@" -t kssolv \
+                         -C "matlab -softwareopengl -desktop -r 'run @tool/KSSOLV_startup.m'" \
+                         -c filexfer \
+                         -u matlab-2021a \
+                         -w captive \
+                         -r none \
+                         -d ${matlabHome}

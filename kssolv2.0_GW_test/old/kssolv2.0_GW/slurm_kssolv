@@ -1,0 +1,14 @@
+#!/bin/sh
+#SBATCH -J kssolv
+#SBATCH -o job-%j.log
+#SBATCH -e job-%j.err
+#SBATCH -N 1 
+#SBATCH -p short
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=48
+
+module load matlab/R2020a
+#module load gcc/4.9.4
+#cd /public/home/jlyang/zhangqian/work/kssolv/tddft/test
+matlab -nodisplay -nodesktop -nosplash -r test_o2_222_spin_gw > log
+#matlab -nodisplay -nodesktop -nosplash -r test_si2222_spin_bgw > log

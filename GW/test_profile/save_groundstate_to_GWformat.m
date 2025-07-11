@@ -4,15 +4,15 @@ function save_groundstate_to_GWformat(mol, H, X0, info, dir)
 % 2. Concrete them as a struct, save it into fileName  
 ha2ry = 2.0;
 
-nkpts = 1; nspin = 1; nspinor = 1;
+nkibz = 1; nspin = 1; nspinor = 1;
 %% Change the following part
-kpts = [0,0,0];
-groundstate.nkpts = nkpts;
-groundstate.kpts = kpts;
+kibz = [0,0,0];
+groundstate.nkibz = nkibz;
+groundstate.kibz = kibz;
 groundstate.nspin = nspin;
 groundstate.nspinor = nspinor;
-fprintf('save_groundstate_to_GWformat: nkpts = %d, nspin = %d\n, nspinor = %d.\n', nkpts, nspin, nspinor);
-fprintf('Current set nkpts, nspin, and nspinor always 1\n');
+fprintf('save_groundstate_to_GWformat: nkibz = %d, nspin = %d\n, nspinor = %d.\n', nkibz, nspin, nspinor);
+fprintf('Current set nkibz, nspin, and nspinor always 1\n');
 %%
 
 sys = initsys(mol);
@@ -37,13 +37,13 @@ end
 % Prepare reciprocal grid information
 ggrid = Ggrid(mol);
 C = mol.supercell;
-xyz = cell(nkpts, 1);
-for ik = 1:nkpts
+xyz = cell(nkibz, 1);
+for ik = 1:nkibz
   xyz{ik} = round([ggrid.gkx, ggrid.gky, ggrid.gkz] * C' / 2 / pi);
 end
 % KSSOLV use Hartree unit, and our code use Rydberg unit, so we need to convert it.
-idxnz = cell(nkpts, 1);
-for ik = 1:nkpts
+idxnz = cell(nkibz, 1);
+for ik = 1:nkibz
   idxnz{ik} = ggrid.idxnz;
 end
 
@@ -57,9 +57,9 @@ reciprocal_grid_info.idxnz = idxnz;
 groundstate.rhor = rhor;
 groundstate.Vxc = Vxc;
 groundstate.ev = ev;
-psig_cell = cell(nkpts, nspin);
+psig_cell = cell(nkibz, nspin);
 for ispin = 1:nspin
-  for ikpt = 1:nkpts
+  for ikpt = 1:nkibz
     psig_cell{ikpt, ispin} = psig;
   end
 end

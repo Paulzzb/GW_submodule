@@ -34,7 +34,7 @@ if ~isfield(tmp, 'groundstate')
   QPerror(msg);
 end
 
-required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkpts', 'nspin', 'kpts', 'nspinor'};
+required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkibz', 'nspin', 'kibz', 'nspinor'};
 for k = 1:length(required_fields)
   if ~isfield(tmp.groundstate, required_fields{k})
     msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});
@@ -57,7 +57,6 @@ data.Vxc = myneed.vxc;
 data.ev = myneed.ev;
 data.psig = myneed.psig;
 data.sys = myneed.sys;
-fprintf("data.sys need construction.\n");
 data.occupation = myneed.occupation;
 reciprocal_grid_info = struct();
 reciprocal_grid_info.fftgrid = [myneed.n1, myneed.n2, myneed.n3];
@@ -69,6 +68,9 @@ fprintf("Later, check units of wfncut!\n");
 
 
 data.reciprocal_grid_info = reciprocal_grid_info;
+data.nkpts = myneed.nkpts
+data.kpts = myneed.kpts
+%  'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkpts', 'nspin', 'kpts', 'nspinor'};
 
 
 end

@@ -26,6 +26,7 @@ coefs = [
 xyzlist = coefs*C';
 
 funct = {'PZ','PW','PBE','HSE06','PBE0','HF','LC-WPBE','LC-PBE0'};
+funct = {'PZ'};
 nspin = {1,2,4};
 refer = {
     {-2.2614644421165e+00, -2.2614644421695e+00, -2.2614644421922e+00},...
@@ -45,7 +46,7 @@ for fi = 1:size(funct,2)
     %
     mol = Molecule('supercell',C, 'atomlist',atomlist, 'xyzlist',xyzlist, ...
         'ecut',15, 'name','H2', 'funct',funct{fi}, 'n1',36, 'n2',36, 'n3',36, ...
-        'extranbnd',0, 'nspin',nspin{ni});
+        'extranbnd',18, 'nspin',nspin{ni});
     %
     % 5. Configure the options
     %

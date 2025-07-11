@@ -4,7 +4,7 @@ function GWinfor = construct_GWinfo(data, config)
 %                               'reciprocal_grid_info'.
 
 % Step 1: Extract data
-nkpts = data.nkpts;
+nkibz = data.nkibz;
 nspin = data.nspin;
 nspinor = data.nspinor;
 
@@ -16,7 +16,7 @@ psig = data.psig;
 sys = data.sys;
 occupation = data.occupation;
 reciprocal_grid_info = data.reciprocal_grid_info;
-kpts = data.kpts;
+kibz = data.kibz;
 
 % Step 2: Convert to @GWinfo
 % @GWinfo contains fields: coulG, coulG0, supercell, bdot, qk, ntot(number of total band calculated),
@@ -42,15 +42,15 @@ gvecinput.ecut = config.CUTOFFS.coulomb_cutoff;
 gvecinput.supercell = sys.supercell;
 GWinfor.gvec = gvec(gvecinput);
 
-GWinfor.gvec_list = cell(nkpts, 1);
-for ik = 1:nkpts
+GWinfor.gvec_list = cell(nkibz, 1);
+for ik = 1:nkibz
   gvecinput = [];
   gvecinput.n1 = sys.n1;
   gvecinput.n2 = sys.n2;
   gvecinput.n3 = sys.n3;
   gvecinput.ecut = config.CUTOFFS.coulomb_cutoff;
   gvecinput.supercell = sys.supercell;
-  gvecinput.qpoint = kpts(ik, :);
+  gvecinput.qpoint = kibz(ik, :);
   GWinfor.gvec_list{ik} = gvec(gvecinput);
 end
 % GWinfor.idxnz = idxnz; 

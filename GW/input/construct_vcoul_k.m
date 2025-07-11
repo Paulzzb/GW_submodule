@@ -18,11 +18,11 @@ trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
 supercell = data.sys.supercell;
 recip_lattice = 2*pi*inv(supercell'); % rows are b1, b2, b3
 
-nkpts = data.nkpts;
-qpoint_list = data.kpts;
-vcoul_cell = cell(nkpts, 1);
+nkibz = data.nkibz;
+qpoint_list = data.kibz;
+vcoul_cell = cell(nkibz, 1);
 
-for ik = 1:nkpts
+for ik = 1:nkibz
   gvec = gvec_list{ik};
   qpoint = qpoint_list(ik, :);
   Gcart = gvec.components * recip_lattice;

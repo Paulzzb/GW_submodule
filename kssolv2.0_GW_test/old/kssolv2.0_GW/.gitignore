@@ -1,0 +1,12 @@
+*~
+*.mat
+.DS_Store
+.dropbox.attr
+
+*.aux
+*.blg
+*.bbl
+*.log
+*.toc
+
+**/build/
