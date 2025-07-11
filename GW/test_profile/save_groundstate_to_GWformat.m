@@ -6,7 +6,8 @@ ha2ry = 2.0;
 
 sys = initsys(mol);
 rhor = H.rho;
-vxc = getVhxc(mol, rhor);
+% vxc = getVhxc(mol, rhor);
+[~, vxc] = getVhxc(mol, rhor);
 ev = info.Eigvals;
 occupation = X0.occ;
 psig = X0.psi;
@@ -20,7 +21,8 @@ F = KSFFT(mol);
 psir = F' * X0.psi;
 Vxc = zeros(nb, 1);
 for it=1:nb
-  Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol)^2 / nr;
+  Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol) / nr;
+  % Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol)^2 / nr;
 end
 
 % Prepare reciprocal grid information
