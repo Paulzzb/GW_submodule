@@ -1,0 +1,22 @@
+&CONTROL
+  prefix = 'O2',
+  isgw = 1, 
+  groundstate_dir = '../TMP_FILES/o2_222_spin',
+  groundstate_type = 'qe',
+  storage_dir = '../TMP_FILES',
+  log_file = 'QPlog',
+END &CONTROL
+
+! &SYSTEM
+!   number_bands_in_summation = 35,
+! END &SYSTEM
+! 
+! &FREQUENCY
+!   frequency_dependence = 2,
+! END &FREQUENCY
+! 
+! &CUTOFFS
+!   coulomb_truncation_parameter = 5.0
+!   coulomb_cutoff = 20.0
+! END &CUTOFFS
+

@@ -34,7 +34,7 @@ if ~isfield(tmp, 'groundstate')
   QPerror(msg);
 end
 
-required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info'};
+required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkpts', 'nspin', 'kpts', 'nspinor'};
 for k = 1:length(required_fields)
   if ~isfield(tmp.groundstate, required_fields{k})
     msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});
@@ -49,6 +49,27 @@ end
 function data = load_qe_groundstate(dirin)
 % load_qe_groundstate - Load groundstate data from a QE pw.x output.
 % User must have previously run a QE pw.x calculation.
-error('load_qe_groundstate not implemented yet.');
+myneed = load_qe_from_folder(dirin);
+% error('load_qe_groundstate not implemented yet.');
+data = struct();
+data.rhor = myneed.rhor;
+data.Vxc = myneed.vxc;
+data.ev = myneed.ev;
+data.psig = myneed.psig;
+data.sys = myneed.sys;
+fprintf("data.sys need construction.\n");
+data.occupation = myneed.occupation;
+reciprocal_grid_info = struct();
+reciprocal_grid_info.fftgrid = [myneed.n1, myneed.n2, myneed.n3];
+reciprocal_grid_info.vol = myneed.vol;
+reciprocal_grid_info.idxnz = myneed.idxnz;
+reciprocal_grid_info.wfncut = myneed.wfncut;
+reciprocal_grid_info.xyz = myneed.mill;
+fprintf("Later, check units of wfncut!\n");
+
+
+data.reciprocal_grid_info = reciprocal_grid_info;
+
+
 end
 

@@ -1,5 +1,4 @@
-% function vcoul = construct_vcoul(mill, supercell, amin, truncation)
-function vcoul = construct_vcoul(data, config)
+function vcoul_cell = construct_vcoul_k(data, config, gvec_list)
 % construct_vcoul - construct the electrostatic potential from the charge density
 % config.CUTOFFS.coulomb_truncation_method = 
 %   = 0,  no truncation (3D)
@@ -8,41 +7,30 @@ function vcoul = construct_vcoul(data, config)
 %   = 5,  0D cell box truncation
 %   = 6,  2D slab truncation
 %   = 7,  supercell truncation (3D), experimental
-% 
-trunc_method = config.CUTOFFS.coulomb_truncation_method;
-trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
-cutoff = config.CUTOFFS.coulomb_cutoff;
+
 eightpi = 8*pi;
 fourpi = 4*pi;
 tol_zero = 1e-10;
 
+trunc_method = config.CUTOFFS.coulomb_truncation_method;
+trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
 
-idxnz = data.reciprocal_grid_info.idxnz{1};
-xyz = data.reciprocal_grid_info.xyz{1};
-wfncut = data.reciprocal_grid_info.wfncut;
- 
-% Convert to Cartesian coordinates in Ang^-1
 supercell = data.sys.supercell;
 recip_lattice = 2*pi*inv(supercell'); % rows are b1, b2, b3
-Gcart = xyz * recip_lattice;
-% Compute |q+G|^2, where q=[0 0 0] currently
-qG2 = sum(Gcart.^2, 2);                 
- 
-% Select desired reciprocal vectors under coulomb_cutoff if coulomb_cutoff < wfncut
-if (cutoff < wfncut)
-  Ggrid_coul= [];
-  % Filter where G² <= cutoff
-  new_idx = find(qG2 <= cutoff);
-  Ggrid_coul.xyz = xyz(new_idx,:);
-  Ggrid_coul.idxnz = idxnz(new_idx,:);
-  Gcart = Gcart(new_idx,:);
-  qG2 = qG2(new_idx,:);
-else
-  Ggrid_coul = data.reciprocal_grid_info; 
-end
 
-% Calculate the coulomb potential
-% ngcomb = length(Ggrid_coul.idxnz);
+nkpts = data.nkpts;
+qpoint_list = data.kpts;
+vcoul_cell = cell(nkpts, 1);
+
+for ik = 1:nkpts
+  gvec = gvec_list{ik};
+  qpoint = qpoint_list(ik, :);
+  Gcart = gvec.components * recip_lattice;
+  % Compute |q+G|^2, where q=[0 0 0] currently
+  qG = qpoint + Gcart;
+  qG2 = sum(qG.^2, 2);                 
+   
+  % Calculate the coulomb potential
 
   switch trunc_method
     case 0  % No truncation (3D)
@@ -95,7 +83,8 @@ end
       QPerror(msg);
       error('Unsupported truncation type: %d', trunc_method);
   end
-
+  vcoul_cell{ik} = vcoul;
+end % for ik
 
 
 end % EOF

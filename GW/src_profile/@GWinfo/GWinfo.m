@@ -1,14 +1,14 @@
 classdef GWinfo 
   properties (SetAccess = public)
     coulG;
+    coulG_list;
     coulG0;
     supercell;
     bdot;
-    qk;
     vol
     ne 
     gvec
-    gvec2
+    gvec_list
     gvecrho
     Vxc
     rho
@@ -18,6 +18,12 @@ classdef GWinfo
     psir
     Ggrid4psig 
     occupation
+
+    % nkpts
+    % kpts
+    % nspin
+    % nspinor
+
   end
 
   properties (SetAccess = protected)

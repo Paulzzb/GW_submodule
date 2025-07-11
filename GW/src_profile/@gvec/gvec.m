@@ -62,6 +62,10 @@ classdef gvec
       gvec_out.nfftgridpts = n1 * n2 * n3;
 
       
+      if ~isfield(gvecinput, 'qpoint') 
+        gvecinput.qpoint = [0, 0, 0]; % Then it is suitable for original non-kpoints code.
+      end
+
       if isfield(gvecinput, 'ecut') 
         flagecut= 1;
       else

@@ -10,6 +10,7 @@ n2 = mill_in.n2;
 n3 = mill_in.n3;
 supercell = mill_in.supercell;
 ecut = mill_in.ecut;
+qpoint = mill_in.qpoint;
 
 
 [gkxind, gkyind, gkzind] = ...
@@ -24,8 +25,9 @@ gkzind = gkzind(:);
 gkind = [gkxind, gkyind, gkzind];
 rcplat = 2*pi*inv(supercell);
 gkvec = gkind*rcplat';
-gkabs = sum(gkvec.^2, 2);
-idxnz = find(gkabs <= ecut);
+qgkvec = gkvec + qpoint;
+qgkabs = sum(qgkvec.^2, 2);
+idxnz = find(qgkabs <= ecut);
 
 gvec_in.idxnz = idxnz;
 gvec_in.ng = length(gvec_in.idxnz);
