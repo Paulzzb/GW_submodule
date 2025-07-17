@@ -9,6 +9,7 @@ nspin = data.nspin;
 nspinor = data.nspinor;
 
 
+
 rhor = data.rhor;
 Vxc = data.Vxc;
 ev = data.ev;
@@ -28,6 +29,8 @@ ry2ev = 13.60569253;
 GWinfor = GWinfo();
 
 
+GWinfor.nspin = nspin;
+GWinfor.nspinor = nspinor;
 
 % Compute other values
 bmatrix = 2*pi*inv(sys.supercell');
@@ -58,7 +61,14 @@ end
 % Compute Coulomb interaction
 coulG_list = construct_vcoul_k(data, config, GWinfor.gvec_list);
 coulG0 = construct_coulG0(data, config);
-coulG = construct_vcoul(data, config);
+
+% set coulG to fit single-kpoints code
+if (config.CONTROL.enable_k_points > 0)
+  coulG = coulG_list{1};
+  fprintf("Formly, fill coulG with coulG_list{1}")
+else
+  coulG = coulG_list{1};
+end
 
 % If config.FREQUENCY.frequency_dependence == 1 --> GPP approximation
 % Prepare rho(G) using rho(R) and config.CUTOFFS.density_cutoff
@@ -82,6 +92,29 @@ GWinfor.ev = data.ev * ha2ry;
 GWinfor.psig = psig;
 GWinfor.Ggrid4psig = data.reciprocal_grid_info;
 GWinfor.occupation = data.occupation;
+bvec = 2*pi*inv(sys.supercell);
+GWinfor.bvec = bvec;
+GWinfor.bdot = GWinfor.bvec * GWinfor.bvec.';
+
+% Symmetric information if needed
+
+if config.CONTROL.enable_k_points
+  syms = data.syms;
+  % Get symmetry information
+  GWinfor.symminfo = symminfo(syms.ntran, syms.ntranq, syms.mtrx, syms.nrot, syms.indsub, syms.kgzero);
+  % Use irreducible k-points to generate full-kpoints set
+  [GWinfor.bz_samp] = bz_sampling(data.nkibz, data.kibz, bvec, data.kweight);
+  GWinfor.bz_samp = fullbz(GWinfor.bz_samp, GWinfor.symminfo, GWinfor.gvec);
+  % Mapping G-Go with fft_grid
+  GWinfor.mapping = setmapping(GWinfor);
+  % GWinfor.gvec = setGomap(GWinfor.gvec, GWinfor.bz_samp.nGo);
+  % Mapping rotation
+  % GWinfor.gvec = setsymmGmap(GWinfor);
+end
+
+% Construct rhoG if needed
+% if config.CONTROL.enable_density == 1
+% end
 
 
 end

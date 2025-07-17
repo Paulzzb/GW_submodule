@@ -68,9 +68,14 @@ fprintf("Later, check units of wfncut!\n");
 
 
 data.reciprocal_grid_info = reciprocal_grid_info;
-data.nkpts = myneed.nkpts
-data.kpts = myneed.kpts
-%  'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkpts', 'nspin', 'kpts', 'nspinor'};
+data.nkibz = myneed.nkibz;
+data.kibz = myneed.kibz;
+data.kweight = myneed.kweight;
+data.nspin = myneed.nspin;
+data.nspinor = myneed.nspinor;
+
+symm = myneed.syms;
+data.syms = symm;
 
 
 end

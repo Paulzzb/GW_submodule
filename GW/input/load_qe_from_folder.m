@@ -5,8 +5,8 @@ function myneed = load_qe_from_folder(qepath)
 %
 % INPUT:        qepath  -  
 %               
-% OUTPUT:       klist   - [nkpts x 3] k-point coordinates in fractional units
-%               weight  - [nkpts x 1] integration weights
+% OUTPUT:       klist   - [nkibz x 3] k-point coordinates in fractional units
+%               weight  - [nkibz x 1] integration weights
 %
 % AUTHOR:       Wu, Wentiao, and Meng, Xinyong (Write original code)
 % CONTRIBUTORS: Zhou, Zhengbang (Modify code to this module)
@@ -68,15 +68,15 @@ function myneed = load_qe_from_folder(qepath)
     qgrid=data.getElementsByTagName('qpoint_grid').item(0).getAttributes;
     nqs=str2num([qgrid.item(0).getTextContent,qgrid.item(1).getTextContent,qgrid.item(2).getTextContent]);
   end
-  nkpts=str2double(data.getElementsByTagName('nk').item(0).getTextContent);
-  %kptsobj=data.getElementsByTagName('starting_k_points').item(0).getElementsByTagName('k_point');
-  kptsobj=data.getElementsByTagName('k_point');
+  nkibz=str2double(data.getElementsByTagName('nk').item(0).getTextContent);
+  %kibzobj=data.getElementsByTagName('starting_k_points').item(0).getElementsByTagName('k_point');
+  kibzobj=data.getElementsByTagName('k_point');
   
-  %kpoints=zeros(nkpts,3);
-  weight=zeros(nkpts,1);
-  for i=1:nkpts
-    %kpoints(i,:)=str2num(kptsobj.item(i-1).getTextContent);
-    weight(i)=str2double(kptsobj.item(i-1).getAttributes.item(0).getTextContent);
+  %kpoints=zeros(nkibz,3);
+  weight=zeros(nkibz,1);
+  for i=1:nkibz
+    %kpoints(i,:)=str2num(kibzobj.item(i-1).getTextContent);
+    weight(i)=str2double(kibzobj.item(i-1).getAttributes.item(0).getTextContent);
   end
   weight=weight/sum(weight);
   %kpoints = round(kpoints, 4);
@@ -89,7 +89,7 @@ function myneed = load_qe_from_folder(qepath)
     % atomlist=[atomlist, Atom(structure.item(i).getAttribute('name').toCharArray')];
   end
   
-  ev = zeros(nbnd,nkpts,nspin);
+  ev = zeros(nbnd,nkibz,nspin);
 
   efermi = str2double(data.getElementsByTagName('fermi_energy').item(0).getTextContent);
   
@@ -104,7 +104,7 @@ function myneed = load_qe_from_folder(qepath)
   rho=ifftn(rhog3d)*n1*n2*n3;
 
   
-  for ik=1:nkpts
+  for ik=1:nkibz
     if nspin==2
       wfcname=[qepath,'/wfcdw',num2str(ik),'.hdf5'];
     else
@@ -118,12 +118,12 @@ function myneed = load_qe_from_folder(qepath)
     mill{1,ik}=millqe;
   end
   
-  Qcell=cell([nkpts nspin]);
+  Qcell=cell([nkibz nspin]);
   kpoints = [];
   kpoints_up = [];
   kpoints_dw = [];
   
-  for ik=1:nkpts
+  for ik=1:nkibz
     if nspin==2
       for ispin=1:nspin
         if ispin==1
@@ -215,7 +215,7 @@ function myneed = load_qe_from_folder(qepath)
   myneed.ne = nelec;
   myneed.nspin = nspin;
   myneed.nspinor = nspinor;
-  myneed.nkibz = nkpts;
+  myneed.nkibz = nkibz;
   myneed.n1 = n1;
   myneed.n2 = n2;
   myneed.n3 = n3;
@@ -228,20 +228,23 @@ function myneed = load_qe_from_folder(qepath)
   sys.n3 = n3;
   sys.supercell = supercell;
   sys.qk = kpoints;
+  sys.vol = det(supercell);
   myneed.sys = sys;  
   
   % Things to recover the wavefunctions on real space.
   myneed.psig = Qcell;
   myneed.wfncut = ecutwfc;
   myneed.mill = mill_k';
-  idxnz = cell(nkpts, nspin);
-  for ik = 1:nkpts
+  idxnz = cell(nkibz, 1);
+  for ik = 1:nkibz
+    mill = mill_k{ik};
     idxnz{ik} = mill2nl(mill,n1,n2,n3);
   end
   myneed.idxnz = idxnz;
   
   % kpoints
   myneed.kibz = kpoints;
+  myneed.kweight = weight;
 %   gr = fullbz(sys, syms, true);
 %   myneed.kbz = gr.f;
 %   myneed.ind_ikbz2ikibz = gr.indr;
@@ -254,21 +257,21 @@ function myneed = load_qe_from_folder(qepath)
   myneed.rhor = rho; 
   myneed.rhog3d = rhog3d; 
   myneed.ev = ev*2;
-  vxc_ = zeros(nbnd,nkpts,nspin);
-  for ikpts = 1:nkpts
+  vxc_ = zeros(nbnd,nkibz,nspin);
+  for ikibz = 1:nkibz
     if (nspin == 1)
-      vxc_(:, ikpts) = vxc.value(1:nspin:end, ikpts);
+      vxc_(:, ikibz) = vxc.value(1:nspin:end, ikibz);
     else
       for ispin = 1:nspin
-        vxc_(:, ikpts, ispin) = vxc.value(ispin:nspin:end, ikpts);
+        vxc_(:, ikibz, ispin) = vxc.value(ispin:nspin:end, ikibz);
       end
     end
   end
   myneed.vxc = vxc_;
   
-  occ_ = zeros(nbnd,nkpts,nspin);
+  occ_ = zeros(nbnd,nkibz,nspin);
   occ_data=data.getElementsByTagName('band_structure').item(0).getElementsByTagName('occupations');
-  for ik = 1:nkpts
+  for ik = 1:nkibz
       occ = str2double(split(strtrim(string(occ_data.item(ik-1).getTextContent))));
       occ = reshape(occ, [], nspin);
       occ_(:, ik, :) = occ;

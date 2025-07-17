@@ -24,7 +24,7 @@ wfncut = data.reciprocal_grid_info.wfncut;
 % Convert to Cartesian coordinates in Ang^-1
 supercell = data.sys.supercell;
 recip_lattice = 2*pi*inv(supercell'); % rows are b1, b2, b3
-Gcart = xyz * recip_lattice;
+Gcart = double(xyz) * recip_lattice;
 % Compute |q+G|^2, where q=[0 0 0] currently
 qG2 = sum(Gcart.^2, 2);                 
  
