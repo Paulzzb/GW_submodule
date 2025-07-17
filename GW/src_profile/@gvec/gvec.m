@@ -33,11 +33,19 @@ classdef gvec
   % properties (SetAccess = protected)
   properties (SetAccess = public)
     components
-    index_vec
     ng
     nfftgridpts
     fftgrid
     idxnz
+    
+    % with respecting to gmapping :
+    % gvec.component(ii, :) - Go_list(jj, :) = fullfftgrid(G0_mappling(ii, jj))
+    nGo          (1,1) {mustBeInteger}% number of Go vector
+    Go_list      (:,:)                % [nGo x 3] G0 vectors
+    G0_mapping   (:,:) {mustBeInteger}% [nGo x 1]
+
+    % g_rot   (:, :) {mustBeInteger}       % [ng x nrot]
+    g_rot                             % cell [nrot, 1]
   end
 
   
@@ -94,30 +102,6 @@ classdef gvec
         ng = gvec_out.ng;
       end      
 
-      gvec_out.index_vec = zeros(n1*n2*n3, 1);
-      gvec_out.index_vec(gvec_out.idxnz) = (1:ng)';
-
-  %     gvec_out.from = method;
-
-  %     switch lower(method)
-  %       case 'kssolv'
-  %         grid = Ggrid(mol, ecut);
-  %         ng = grid.ng;
-  %         coulG = [grid.gkx, grid.gky, grid.gkz] * mol.supercell / (2*pi);
-  %         coulG = round(coulG);
-  %         gvec_out.components = coulG;
-  %         gvec_out.index_vec = zeros(mol.n1 * mol.n2 * mol.n3, 1);
-  %         gvec_out.index_vec(grid.idxnz) = (1:ng)';
-  %         gvec_out.ng = ng;
-  %         gvec_out.nfftgridpts = prod([mol.n1, mol.n2, mol.n3]);
-  %         gvec_out.fftgrid = [mol.n1, mol.n2, mol.n3];
-  %         gvec_out.idxnz = grid.idxnz;
-  %         % gvec_out = finalize_kssolv(mol, ecut, gvec_out);
-  %       case 'bgw'
-  %         % gvec_out = finalize_bgw(mol, dir, gvec_out);
-  %       otherwise
-  %         error('Method for gvec is not supported!')
-  %     end
     end % function gvec
   end % method
 

@@ -20,6 +20,7 @@ qpoint = mill_in.qpoint;
 gkxind = gkxind(:);
 gkyind = gkyind(:);
 gkzind = gkzind(:);
+idlist = 1:length(gkxind);
 
 
 gkind = [gkxind, gkyind, gkzind];
@@ -29,9 +30,22 @@ qgkvec = gkvec + qpoint;
 qgkabs = sum(qgkvec.^2, 2);
 idxnz = find(qgkabs <= ecut);
 
-gvec_in.idxnz = idxnz;
-gvec_in.ng = length(gvec_in.idxnz);
-gvec_in.components = [gkxind(idxnz), gkyind(idxnz), gkzind(idxnz)];
+% Sort according to |G|.^2
+gkxind = gkxind(idxnz);
+gkyind = gkyind(idxnz);
+gkzind = gkzind(idxnz);
+idlist = idlist(idxnz);
+
+qgkabs = qgkabs(idxnz);
+[~, sort_ind] = sort(qgkabs);
+
+
+
+
+
+gvec_in.idxnz = idxnz(sort_ind);
+gvec_in.ng = length(idxnz);
+gvec_in.components = [gkxind(sort_ind), gkyind(sort_ind), gkzind(sort_ind)];
 
 
 end % EOF

@@ -5,6 +5,7 @@ classdef GWinfo
     coulG0;
     supercell;
     bdot;
+    bvec;
     vol
     ne 
     gvec
@@ -18,12 +19,16 @@ classdef GWinfo
     psir
     Ggrid4psig 
     occupation
+    
+    symminfo
+    bz_samp
 
     % nkpts
     % kpts
-    % nspin
-    % nspinor
+    nspin
+    nspinor
 
+    mapping
   end
 
   properties (SetAccess = protected)

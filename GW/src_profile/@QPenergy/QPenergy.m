@@ -15,6 +15,10 @@ classdef QPenergy
     Eqp
     TOL_DEGENERACY = 1e-6 * 13.60569253;
     fout;
+
+    kpt         (:, 3)        = [0,0,0]
+    kptweights  (:, 1)        = 1
+
   end
 
   methods

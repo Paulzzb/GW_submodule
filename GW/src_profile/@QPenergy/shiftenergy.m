@@ -13,6 +13,10 @@ function obj = shiftenergy(obj)
   Ex = obj.Ex;
 
 
+  if (size(obj.ev) ~= n)
+    msg = fprintf("For multi-kpoints, still under construction!\n");
+    GWerror(msg);
+  end
   ndeg = zeros(n, 1);
   nl = 1;
   ndeg(nl) = 1;
