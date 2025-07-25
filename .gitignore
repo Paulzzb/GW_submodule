@@ -3,6 +3,7 @@
 ./GW/test_profile/TMP_FILES/*
 !./GW/*/
 !./GW/doc_profile/*
+./GW/doc_profile/latex
 
 !./GW/*.m
 
