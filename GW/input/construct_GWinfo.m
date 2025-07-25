@@ -59,7 +59,7 @@ end
 % GWinfor.idxnz = idxnz; 
  
 % Compute Coulomb interaction
-coulG_list = construct_vcoul_k(data, config, GWinfor.gvec_list);
+coulG_list = construct_vcoul_k(data, config, GWinfor.gvec);
 coulG0 = construct_coulG0(data, config);
 
 % set coulG to fit single-kpoints code

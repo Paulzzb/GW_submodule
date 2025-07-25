@@ -41,10 +41,10 @@ function mapping = setRgridmap(mapping, GWinfor)
     for i3 = 1:n3
       for i2 = 1:n2
         for i1 = 1:n1
-          iv = mtrx * [i1; i2; i3];
+          iv = [i1, i2, i3] * mtrx;
           count = count+1;
           i5 = 1 + mod(iv(1), n1) + mod(iv(2), n2)*n1 + mod(iv(3), n3)*n1*n2;
-          tmpind(count) = i5;
+          tmpind(i5) = count;
         end % for i3
       end % for i2
     end % for i1

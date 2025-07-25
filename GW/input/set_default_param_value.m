@@ -39,10 +39,10 @@ if (config.CUTOFFS.coulomb_cutoff < 0)
   config.CUTOFFS.coulomb_cutoff = data.reciprocal_grid_info.wfncut;
 end
 
-if (config.CUTOFFS.coulomb_cutoff > data.reciprocal_grid_info.wfncut)
-  error("&SYSTEM->coulomb_cutoff = %8.2f Ry should be no bigger than wavefuction cutoff = %8.2f Ry.", ...
-        config.CUTOFFS.coulomb_cutoff, data.reciprocal_grid_info.wfncut);
-end
+% if (config.CUTOFFS.coulomb_cutoff > data.reciprocal_grid_info.wfncut)
+%   error("&SYSTEM->coulomb_cutoff = %8.2f Ry should be no bigger than wavefuction cutoff = %8.2f Ry.", ...
+%         config.CUTOFFS.coulomb_cutoff, data.reciprocal_grid_info.wfncut);
+% end
 
 if (config.CUTOFFS.density_cutoff < 0)
   config.CUTOFFS.density_cutoff = config.CUTOFFS.density_cutoff * 2;

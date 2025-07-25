@@ -69,6 +69,31 @@ end
 
 
 % Second, calculate qindx_* in bz_samp
+qindx_S = zeros(nibz, nbz, 2);
+for ik = 1:bz_samp.nibz
+  for iqbz = 1:bz_samp.nbz
+    % ikbz_ibz = bz_samp.kbz2kibz_ind_kbz(ikbz);
+
+    % Find corresponding okbz = ikbz-iqbz and 
+    qpt = kbz_ca(iqbz,:);
+    kptbz = kibz_ca(ik,:);
+    k_q = kptbz - qpt;
+    [k_qbz, g0] = krange(k_q, TOL);
+    ind_k = find_vec_in_list(k_qbz, kbz_ca);
+    ind_g0 = find_vec_in_list(g0, maxGoset);
+    % ind_g0 = find_vec_in_list(g0, bz_samp.Go_list);
+    if ind_k == -1
+      error('k_qbz not found in kptbz_ca');
+    end
+    if ind_g0 == -1
+      error('g0 not found in Go_list');
+    end
+    qindx_S(ik, iqbz, 1) = ind_k;
+    qindx_S(ik, iqbz, 2) = ind_g0;
+    % bz_samp.qindx_X(iq, ikbz) = g0;
+  end
+end
+
 qindx_X = zeros(nibz, nbz, 2);
 for iq = 1:bz_samp.nibz
   for ikbz = 1:bz_samp.nbz
@@ -93,6 +118,7 @@ for iq = 1:bz_samp.nibz
     % bz_samp.qindx_X(iq, ikbz) = g0;
   end
 end
+bz_samp.qindx_S = qindx_S;
 bz_samp.qindx_X = qindx_X;
 
 end % EOF

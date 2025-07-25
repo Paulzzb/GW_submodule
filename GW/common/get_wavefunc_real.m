@@ -18,6 +18,18 @@ for ispin = 1:nspin
 end
 
 
+%   psir = zeros(nfftgrid, nb, nkpts, nspin);
+%   for ispin = 1:nspin
+%     for ikpt = 1:nkpts
+%       psig_tmp = psig{ikpt, ispin};
+      
+%       for iband = 1:nb
+         
+%       end
+%     end
+%   end
+%   error("Under construction");
+% else
 psir = zeros(nfftgrid, nb, nkpts, nspin);
 for ispin = 1:nspin
   for ikpt = 1:nkpts
@@ -28,6 +40,5 @@ for ispin = 1:nspin
     end
   end
 end
-
 
 end % EOF

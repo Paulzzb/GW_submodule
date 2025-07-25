@@ -18,6 +18,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 ### &CONTROL
 <a href="#isgw">isgw</a> |
 <a href="#isbse">isbse</a> |
+<a href="#enablek">enable_k_points</a> |
 <a href="#output_dir">output_dir</a> |
 <a href="#prefix">prefix</a> |
 <a href="#groundstate_dir">groundstate_dir</a> |
@@ -71,6 +72,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 |--------------------|--------|----------|---------------|--------------------------------------------------|
 | <a name="isgw"></a>`isgw`                | int    | No       | `1`           | Enable GW calculation                           |
 | <a name="isbse"></a>`isbse`              | int    | No       | `0`           | Enable BSE calculation                          |
+| <a name="enablek"></a>`enable_k_points`  | int    | No       | `0`           | Enable multi-kpoints calculation calculation                          |
 | <a name="output_dir"></a>`output_dir`    | string | No       | `'./'`        | Output directory                                |
 | <a name="prefix"></a>`prefix`            | string | No       | `'QP'`        | File name prefix                                |
 | <a name="groundstate_dir"></a>`groundstate_dir` | string | Yes | *none*       | Path to ground state data directory             |

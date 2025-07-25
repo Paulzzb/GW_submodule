@@ -23,7 +23,7 @@ qpoint_list = data.kibz;
 vcoul_cell = cell(nkibz, 1);
 
 for ik = 1:nkibz
-  gvec = gvec_list{ik};
+  gvec = gvec_list;
   qpoint = qpoint_list(ik, :);
   Gcart = gvec.components * recip_lattice;
   % Compute |q+G|^2, where q=[0 0 0] currently

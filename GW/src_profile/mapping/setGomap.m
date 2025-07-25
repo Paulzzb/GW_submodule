@@ -7,8 +7,10 @@ function mapping = setGomap(mapping, GWinfor)
   bz_samp = GWinfor.bz_samp;
   iGolist = bz_samp.iGolist;
   iGolist = unique(iGolist);
+  iGolist = 1:48;
 
-  nGo = max(iGolist);
+  % nGo = max(iGolist);
+  nGo = 48;
   % mapping.nGo = nGo;
 
   ng = gv.ng;
@@ -23,7 +25,7 @@ function mapping = setGomap(mapping, GWinfor)
     iGo = iGolist(id);
     tmp = zeros(ng, 1);
     for iG = 1:ng
-      G_Go = gv.components(iG,1:3) - gv.components(iGo,1:3);
+      G_Go = gv.components(iG,1:3) + gv.components(iGo,1:3);
       G_Go = round(G_Go, 3);
       % G_Go = back2fftzone(G_Go, gvec.fftgrid);
       ind = mod(G_Go(1), n1) + mod(G_Go(2), n2) * n1 ...

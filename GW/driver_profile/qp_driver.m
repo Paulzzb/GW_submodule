@@ -23,7 +23,14 @@ startQP = tic;
 
 % Prepare real-space wavefunction from psig
 QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
+enable_k_points = config.CONTROL.enable_k_points;
+% if (enable_k_points > 0)
+  % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.gvec_list, enable_k_points);
 GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
+% else
+  % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.gvec_list, enable_k_points);
+  % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig, enable_k_points);
+% end
 QPlog('Wavefunction in real space prepared.', 2);
 
 % Initialize energy structure

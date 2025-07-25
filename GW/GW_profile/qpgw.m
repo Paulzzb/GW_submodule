@@ -13,11 +13,18 @@ QPlog('Quasiparticle energy structure initialized.', 2);
 
 % Step 1: Exchange part
 QPlog('Calculating exchange term (Ex)...', 1);
-GWenergy.Ex = gw_x(GWinfo, config);
+if (config.CONTROL.enable_k_points > 1)
+  GWenergy.Ex = gw_x_k(GWinfo, config);
+else
+  GWenergy.Ex = gw_x(GWinfo, config);
+end
 QPlog('Exchange term completed.', 2);
 
 % Step 2: Frequency-dependent part
 switch config.FREQUENCY.frequency_dependence 
+  case -1
+    QPlog('Using Hartree-Fock approximation only.', 1);
+    QPlog('COHSEX calculation completed.', 2);
   case 0
     QPlog('Using COHSEX approximation (static).', 1);
     [GWenergy.Esex_x, GWenergy.Ecoh] = gw_cohsex(GWinfo, config);
