@@ -21,9 +21,6 @@ ha2ry = 2.0;
 ry2ev = 13.60569253;
 GWinfor = GWinfo();
 
-% Compute Coulomb interaction
-coulG = construct_vcoul(data, config);
-coulG0 = construct_coulG0(data, config);
 
 % Compute other values
 bmatrix = 2*pi*inv(sys.supercell');
@@ -39,6 +36,10 @@ gvecinput.supercell = sys.supercell;
 GWinfor.gvec = gvec(gvecinput);
 % GWinfor.idxnz = idxnz; 
  
+% Compute Coulomb interaction
+coulG = construct_vcoul(data, config, GWinfor.gvec);
+coulG0 = construct_coulG0(data, config);
+
 
 % If config.FREQUENCY.frequency_dependence == 1 --> GPP approximation
 % Prepare rho(G) using rho(R) and config.CUTOFFS.density_cutoff

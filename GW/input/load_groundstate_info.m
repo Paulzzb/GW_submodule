@@ -60,6 +60,10 @@ data.rhor = myneed.rhor;
 data.Vxc = myneed.vxc;
 data.ev = myneed.ev;
 data.psig = myneed.psig;
+% Currently, we only adopt single-k-point situation
+% cell structure (which is used for multi-kpoints) is not necessary in this
+%   version
+data.psig = data.psig{1};
 data.sys = myneed.sys;
 data.occupation = myneed.occupation;
 reciprocal_grid_info = struct();
@@ -68,6 +72,11 @@ reciprocal_grid_info.vol = myneed.vol;
 reciprocal_grid_info.idxnz = myneed.idxnz;
 reciprocal_grid_info.wfncut = myneed.wfncut;
 reciprocal_grid_info.xyz = myneed.mill;
+% Currently, we only adopt single-k-point situation
+% cell structure (which is used for multi-kpoints) is not necessary in this
+%   version
+reciprocal_grid_info.xyz = reciprocal_grid_info.xyz{1};
+reciprocal_grid_info.idxnz = reciprocal_grid_info.idxnz{1};
 fprintf("Later, check units of wfncut!\n");
 
 

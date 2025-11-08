@@ -31,43 +31,54 @@ function [ind_mu, zeta_mu] = isdf_main(type, Phir, nlist, mlist, gvec, vol, opti
   QPlog(msg, 0);
 
 
-  % Step 1: Verify input validity and check for existing result
-  QPlog(sprintf(' Verifying inputs...'), 2);
-  flag = isdf_checkInputs(fName, type, Phir, nlist, mlist, gvec, vol, optionsISDF);
+  issaveisdf = optionsISDF.is_save_isdf;
 
-  if flag
-    % Step 2 (cached): Load existing result
-    load(fName, 'ind_mu', 'zeta_mu');
-    msg = sprintf('Cached ISDF result found. Loading from %s...', fName);
-    QPlog(msg, 2);
-  else
-    % Step 2 (no cache): Start new ISDF computation
-    msg = sprintf('No valid cache found. Starting ISDF calculation...');
-    QPlog(msg, 2);
+  if issaveisdf
+    % Step 1: Verify input validity and check for existing result
+    QPlog(sprintf(' Verifying inputs...'), 2);
+    flag = isdf_checkInputs(fName, type, Phir, nlist, mlist, gvec, vol, optionsISDF);
 
-    % Step 3: Read wavefunctions in real space
+    if flag
+      % Step 2 (cached): Load existing result
+      load(fName, 'ind_mu', 'zeta_mu');
+      rank = optionsISDF.isdfoptions.rank;
+      msg = sprintf('Cached ISDF result found. Loading from %s...', fName);
+      QPlog(msg, 2);
+      msg = sprintf('ISDF completed, Type: %s, Number of helper functions: %d', outstr, rank);
+      QPlog(msg, 1);
+      return;
+    end
+  end
+  
 
-    psi = conj(Phir(:, nlist));
-    phi = Phir(:, mlist);
+  % Step 2 (no cache): Start new ISDF computation
+  msg = sprintf('No valid cache found. Starting ISDF calculation...');
+  QPlog(msg, 2);
 
-    % Step 3: Compute interpolation points
-    msg = sprintf('Generating interpolation points...');
-    QPlog(msg, 2);
-    ind_mu = isdf_indices(psi, phi, optionsISDF);
+  % Step 3: Read wavefunctions in real space
 
-    % Step 4: Construct helper functions (zeta_mu)
-    msg = sprintf('Constructing helper functions...');
-    QPlog(msg, 2);
-    zeta_mu = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
-    msg = sprintf('Helper functions constructed successfully.');
-    QPlog(msg, 2);
+  psi = conj(Phir(:, nlist));
+  phi = Phir(:, mlist);
 
-    % Step 5: Save result to file
+  % Step 3: Compute interpolation points
+  msg = sprintf('Generating interpolation points...');
+  QPlog(msg, 2);
+  ind_mu = isdf_indices(psi, phi, optionsISDF);
+
+  % Step 4: Construct helper functions (zeta_mu)
+  msg = sprintf('Constructing helper functions...');
+  QPlog(msg, 2);
+  zeta_mu = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
+  msg = sprintf('Helper functions constructed successfully.');
+  QPlog(msg, 2);
+
+  % Step 5: Save result to file
+  if issaveisdf
     msg = sprintf('Saving ISDF results to %s...', fName);
     QPlog(msg, 2);
     ISDFinputs = struct('Phir', Phir, 'nlist', nlist, 'mlist', mlist, ...
               'gvec', gvec, 'vol', vol, 'optionsISDF', optionsISDF);
-    save(fName, 'ISDFinputs', 'ind_mu', 'zeta_mu');
+    save(fName, 'ISDFinputs', 'ind_mu', 'zeta_mu', '-v7.3');
     msg = sprintf('ISDF results saved successfully.');
     QPlog(msg, 2);
   end
