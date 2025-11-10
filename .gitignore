@@ -1,8 +1,8 @@
 *.mat
 *.html
 
-!./GW/example_profile/TMP_files/groundstate.mat
-!./GW/test_profile/TMP_files/groundstate.mat
+!GW/example_profile/TMP_files/groundstate.mat
+!GW/test_profile/TMP_files/groundstate.mat
 
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
