@@ -1,9 +1,9 @@
 &CONTROL
   prefix = 'Si8',
   isgw = 1, 
-  groundstate_dir = './TMP_files',
+  groundstate_dir = './',
   groundstate_type = 'kssolv',
-  storage_dir = './TMP_FILES',
+  storage_dir = './SAVE',
 END &CONTROL
 
 &SYSTEM
