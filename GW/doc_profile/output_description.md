@@ -22,7 +22,7 @@ Allows you to reuse the same input for multiple runs or parameter studies.
 
 ---
 
-## 2. `QPenergy.mat`
+<!-- ## 2. `QPenergy.mat`
 
 **Description:**  
 The main output file containing all quasiparticle (QP) results.
@@ -40,10 +40,9 @@ An object of class [`@QPenergy`](class_reference.md), including:
 
 **Units:** All energies are in **electronvolts (eV)**.
 
----
+--- -->
 
-## 3. `QPenergy` (Or user-specified filename)
-
+## 2. `QPenergy` (Or user-specified filename)
 **Description:**  
 Human-readable summary of QP results
 
@@ -55,3 +54,9 @@ Human-readable summary of QP results
      1  -56.410809  -47.376834    0.631278    2.438596  -44.306960  163.368376 -264.086145 
                                   0.000016    0.000000    0.000016                 0.000016 
 ```
+
+## 3. `QPlog` 
+
+
+**Description:**  
+Log information for QP calculation 
