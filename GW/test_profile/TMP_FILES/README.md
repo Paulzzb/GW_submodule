@@ -1,0 +1,1 @@
+This folder contains all temperatory files generated during the execution of the test profile.

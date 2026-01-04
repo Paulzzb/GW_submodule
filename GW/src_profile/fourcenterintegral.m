@@ -87,8 +87,8 @@ if ~isisdf
       % No ISDF, use the screened Coulomb matrix
       % Calculate W
       epsilon = zeros(ng, ng);
-      for ind_nv = nv-nv_oper+1:nv
-        Mgvc = mtxel_sigma(ind_nv, GWinfom, nv+1:nsum);
+      for ind_nv = 1:nv
+        Mgvc = mtxel_sigma(ind_nv, GWinfo, nv+1:nsum);
         Mgvc = conj(Mgvc);
         
         Eden = ev(ind_nv) - ev(nv+1:nsum);
@@ -114,8 +114,7 @@ if ~isisdf
         tmp = pattern(n-nstart+1, :, ifreq);
         indm = find(tmp);
         mlisttmp = mlist(indm);
-        Mgvc = mtxel_sigma(n, GWinfo, options.Groundstate, ...
-                          mlisttmp);
+        Mgvc = mtxel_sigma(n, GWinfo, mlisttmp);
         Mgvc = conj(Mgvc);
         if ishermW
           out_list = sum(Dcoul/vol*abs(Mgvc).^2)';

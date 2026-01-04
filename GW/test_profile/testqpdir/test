@@ -1,0 +1,28 @@
+&CONTROL
+  prefix = 'NaCl',
+  isgw = 1, 
+  groundstate_dir = './TMP_FILES',
+  groundstate_type = 'kssolv',
+  storage_dir = './TMP_FILES',
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 29,
+  energy_band_index_min = 15,
+  energy_band_index_max = 18,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 2,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_cutoff = 20.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 0
+  is_save_isdf = 0
+END &ISDF
