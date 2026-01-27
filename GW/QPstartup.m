@@ -20,6 +20,7 @@ add_mpaths_only([CPATH 'src_profile/']);
 add_mpaths_only([CPATH 'GW_profile/']);
 add_mpaths_only([CPATH 'test_profile/']);
 add_mpaths_only([CPATH 'util_profile/']);
+add_mpaths_only([CPATH 'database_profile/']);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Developer Hook] Insert your custom folders below
 % add_mpaths_only([CPATH 'mymodule/']);
