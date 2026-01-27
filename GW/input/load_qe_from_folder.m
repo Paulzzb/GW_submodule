@@ -238,7 +238,7 @@ function myneed = load_qe_from_folder(qepath)
   
   % Things to recover the wavefunctions on real space.
   myneed.psig = Qcell;
-  myneed.wfncut = ecutwfc / 2;
+  myneed.wfncut = ecutwfc * 2;
   myneed.mill = mill_k';
   idxnz = cell(nkibz, 1);
   for ik = 1:nkibz

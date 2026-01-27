@@ -6,6 +6,8 @@ function ind_mu = k_means(rk, weight, options)
 %
 % Outputs:
 %    ind_mu: store indice of centroids data
+weight_tol = 1e-5;
+
 
 option=options.isdfoptions;
 n1=option.sys.n1;n2=option.sys.n2;n3=option.sys.n3;
@@ -142,4 +144,7 @@ while true
   iteration = iteration + 1;
   lastCentroids_ind_mu = newCentroids_ind_mu;
 end
+
+ind_mu = refine_indices(ind_mu, weight, points, weight_tol);
+
 end

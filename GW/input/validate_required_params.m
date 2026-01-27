@@ -15,7 +15,10 @@ end
 if ~exist(dir_path, 'dir')
   msg = sprintf('Specified directory in field %s does not exist: %s', ...
         'CONTROL.groundstate_dir', dir_path);
-  QPerror(msg);
+  QPlog(msg);
+  msg = sprintf('Create a directory %s in %s', ...
+        'CONTROL.groundstate_dir', dir_path);
+  QPlog(msg);
 end
 
 end

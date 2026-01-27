@@ -1,5 +1,7 @@
 *.mat
 *.html
+*QPenergy
+*QPlog
 
 !GW/example_profile/TMP_files/groundstate.mat
 !GW/test_profile/TMP_files/groundstate.mat

@@ -201,8 +201,14 @@ if isisdf
         + 1.0 ./ (omega + Eden + im*eta));
         epsKernel = epsKernel + Mgvc*diag(edenDRtmp)*Mgvc';
       end % for ind_nv     
-      epsKernel = inv(epsKernel)/2 - vcVvc; 
-
+      epsKernel = inv(epsKernel); 
+      % if condest(epsKernel) < 1e+12
+      %   epsKernel = inv(epsKernel); 
+      % else
+      %   epsKernel = pseudo_inv(epsKernel);
+      % end
+      epsKernel = epsKernel/2 - vcVvc;
+      
       if ishermW
         % Here epsKernel is supposed to be an Hermite matrix.
         epsKernel = tril(epsKernel, -1) + tril(epsKernel, -1)' + diag(real(diag(epsKernel)));
