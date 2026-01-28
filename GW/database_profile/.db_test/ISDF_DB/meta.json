@@ -1,41 +1,43 @@
 {
-  "version": 1,
+  "version": 2,
   "desc": {
-    "name": "ISDF database (skeleton)",
-    "created_at": "2026-01-27 23:23:23",
-    "notes": "Fill in later"
   },
-  "fields": {
-    "xga": {
-      "key": "xga",
-      "shape": [
-        1000,
-        3
-      ],
-      "isComplex": false,
-      "class": "double",
-      "file": "data/xga.bin"
-    },
-    "pmu": {
-      "key": "pmu",
-      "shape": [
-        2000,
-        64
-      ],
-      "isComplex": true,
-      "class": "double",
-      "file": "data/pmu.bin"
-    },
-    "hVh": {
-      "key": "hVh",
-      "shape": [
-        64,
-        64
-      ],
-      "isComplex": false,
-      "class": "single",
-      "file": "data/hVh.bin"
-    },
-    "G0set": {}
+  "datasets": {
+    "data1": {
+      "path": "data1",
+      "fields": {
+        "xga": {
+          "key": "xga",
+          "shape": [
+            1000,
+            3
+          ],
+          "isComplex": false,
+          "class": "double",
+          "file": "data1/xga.bin"
+        },
+        "pmu": {
+          "key": "pmu",
+          "shape": [
+            2000,
+            64
+          ],
+          "isComplex": true,
+          "class": "double",
+          "file": "data1/pmu.bin"
+        },
+        "hVh": {
+          "key": "hVh",
+          "shape": [
+            64,
+            64
+          ],
+          "isComplex": false,
+          "class": "single",
+          "file": "data1/hVh.bin"
+        },
+        "G0set": {}
+      }
+    }
   }
 }

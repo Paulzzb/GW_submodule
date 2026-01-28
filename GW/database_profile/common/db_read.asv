@@ -12,7 +12,7 @@ function A = db_read(root, ID, meta, key)
 sID = num2str(ID);
 dataID = "data"+sID;
 assert(isfield(meta.datasets.(dataID).fields, key), "Key '%s' not found in meta.", key);
-info = meta.datasets.(dataID).fields.(key);
+info = meta.datasets..(key);
 assert(isfield(info, "file"), "Key '%s' exists but has no file stored.", key);
 
 binPath = fullfile(root,char(info.file));

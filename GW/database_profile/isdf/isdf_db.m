@@ -5,11 +5,12 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-function isdf_id = isdf_db()
+function isdf_db()
 % DEMO: create a minimal ISDF database and read/write data fast
 
 root = fullfile(pwd, "ISDF_DB");
-if ~exist(root, "dir"); mkdir(root); end
+isdf_db_init(root);
+
 
 % ---- create meta skeleton (desc/xga/pmu/hVh + reserved G0set) ----
 desc = struct();

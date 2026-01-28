@@ -3,14 +3,17 @@
 % 
 % Copyright (C) 2026
 % 
-% Authors (see AUTHORS file for details): (AUTHOR LIST) 
-% 
-function meta = db_write(root, meta, key, A)
+% Authors (see AUTHORS file for details): ZZ 
+%
+% Last modified: 2026/01/28 ZZ
+function meta = db_write(root, meta, ID, key, A)
 % ================================================================
 % Fast write array A to data/<key>.bin and record dtype/shape in meta.json
 % Supports real/complex for single/double (extend if you need more).
 
-dataDir = fullfile(root, "data");
+sID = num2str(ID);
+dbfull = ["data"+ sID];
+dataDir = fullfile(root, dbfull);
 if ~exist(dataDir, "dir"); mkdir(dataDir); end
 
 info = struct();
@@ -36,8 +39,8 @@ else
   fwrite(fid, A(:), cls);
 end
 
-info.file = "data/" + key + ".bin";
-meta.fields.(key) = info;
+info.file = "data" + sID + "/" + key + ".bin";
+meta.datasets.(dbfull).fields.(key) = info;
 
 db_save(root, meta);
 
