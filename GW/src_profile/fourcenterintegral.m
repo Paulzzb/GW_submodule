@@ -35,8 +35,8 @@ patternflag = 0;
 for i = 1:2:length(varargin)
     switch lower(varargin{i})
         case 'pattern'
-            pattern = varargin{i+1};
-            patternflag = 1; % Provided pattern
+          pattern = varargin{i+1};
+          patternflag = 1; % Provided pattern
     end
 end
 
