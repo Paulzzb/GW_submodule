@@ -71,12 +71,30 @@ for i = 1:numel(matches)
     QPerror(msg);
   end
 
-  val = str2double(valStr);
-  if isnan(val)
-    if startsWith(valStr, '''') && endsWith(valStr, '''')
-    val = valStr(2:end-1);
-    else
-    val = valStr;
+  % val = str2double(valStr);
+  % if isnan(val)
+  %   if startsWith(valStr, '''') && endsWith(valStr, '''')
+  %   val = valStr(2:end-1);
+  %   else
+  %   val = valStr;
+  %   end
+  % end
+
+  % --- special: Fortran-style logical .true./.false. ---
+  vlow = lower(strtrim(valStr));
+  if strcmp(vlow, '.true.')
+    val = true;
+  elseif strcmp(vlow, '.false.')
+    val = false;
+  else
+    % --- numeric or string ---
+    val = str2double(valStr);
+    if isnan(val)
+      if startsWith(valStr, '''') && endsWith(valStr, '''')
+        val = valStr(2:end-1);
+      else
+        val = valStr;
+      end
     end
   end
 

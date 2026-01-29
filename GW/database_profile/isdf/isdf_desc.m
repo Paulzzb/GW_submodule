@@ -25,12 +25,13 @@ function out = isdf_desc(GWinfo, config)
     'desc_type3', true ...
   ); 
   % -----------------------------------------------------------------
+  desc_sys = desc();
   desc_sys.add("prefix", config.CONTROL.prefix);
   desc_sys.add("coulomb_truncation_method", config.CUTOFFS.coulomb_truncation_method);
   desc_sys.add("coulomb_truncation_parameter", config.CUTOFFS.coulomb_truncation_parameter);
   desc_sys.add("coulomb_cutoff", config.CUTOFFS.coulomb_cutoff);
-  bmax1 = config.SYSTEM.number_bands_max;
-  bmin1 = config.SYSTEM.number_bands_min;
+  bmax1 = config.SYSTEM.number_bands_in_summation;
+  bmin1 = 1;
   bmax2 = config.SYSTEM.energy_band_index_max;
   bmin = config.SYSTEM.energy_band_index_min;
   bmax = max(bmax1, bmax2);
@@ -49,6 +50,7 @@ function out = isdf_desc(GWinfo, config)
   %
   out.desc_sys = desc_sys;
   % -----------------------------------------------------------------
+  desc_param = desc();
   desc_param.add("exxmethod", config.ISDF.exxmethod);
   desc_param.add("seed", config.ISDF.seed);
   desc_param.add("init", config.ISDF.init);

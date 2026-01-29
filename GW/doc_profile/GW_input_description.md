@@ -136,7 +136,7 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | <a name="init"></a>`init`                       | string | No | `'wrs'`       | Initialization strategy             |
 | <a name="weight"></a>`weight`                   | string | No | `'add'`       | Weighting strategy                  |
 | <a name="sys"></a>`sys`                         | struct | No | `[]`          | System placeholder object           |
-| <a name="is_save_isdf"></a>`is_save_isdf`               | int | No | `0`              | Save ISDF parameters and ISDF result             |
+| <a name="is_helper"></a>`is_helper`             | int | No | `0`              | Whether to calculate the helper function       |
 ---
 
 ## 📎 Appendix

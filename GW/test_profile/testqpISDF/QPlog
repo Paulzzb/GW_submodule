@@ -57,3 +57,67 @@
 [qp-postprocess] computing final quasiparticle energies...
 [qp-postprocess] saving QP-energies results to output file QPenergy...
 [qp-postprocess] QP post-processing completed.
+[qp_driver] QP driver started
+[qp_driver] Converting wavefunction from reciprocial space to real space ...
+[QP-GW] Main GW calculation started.
+[QP-GW] Calculating exchange term (Ex)...
+[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
+[QP-GW] [Exchange] Using band range [15, 18], 16 valence bands detected.
+[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and All states, Number of helper functions: 96
+[QP-GW] [Exchange] ISDF done in 0.39 seconds.
+[QP-GW] [Exchange] Finished. Total time: 0.40 seconds.
+[QP-GW] Full-frequency method selected. Generating frequency grid...
+[QP-GW] Frequency grid generated with 8 real and 15 imaginary frequencies
+[QP-GW] Method to generate real frequencies: 0
+[QP-GW] Method to generate imaginary frequencies: 0
+[QP-GW] Performing full-frequency GW (contour deformation method)...
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and Unoccupied states, Number of helper functions: 174
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: All states and All states, Number of helper functions: 130
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and Unoccupied states, Number of helper functions: 174
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: All states and All states, Number of helper functions: 130
+[QP-GW] Total time: 3.2 seconds.
+[QP-GW] GW calculation completed.
+[qp_driver] quasiparticle calculation finished. total time: 3.22 seconds.
+[qp-postprocess] begin post-processing of QP energy...
+[qp-postprocess] post-processing QP energy shift...
+[qp-postprocess] computing final quasiparticle energies...
+[qp-postprocess] saving QP-energies results to output file QPenergy...
+[qp-postprocess] QP post-processing completed.
+[qp_driver] QP driver started
+[qp_driver] Converting wavefunction from reciprocial space to real space ...
+[QP-GW] Main GW calculation started.
+[QP-GW] Calculating exchange term (Ex)...
+[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
+[QP-GW] [Exchange] Using band range [15, 18], 16 valence bands detected.
+[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and All states, Number of helper functions: 96
+[QP-GW] [Exchange] ISDF done in 0.88 seconds.
+[QP-GW] [Exchange] Finished. Total time: 0.93 seconds.
+[QP-GW] Full-frequency method selected. Generating frequency grid...
+[QP-GW] Frequency grid generated with 8 real and 15 imaginary frequencies
+[QP-GW] Method to generate real frequencies: 0
+[QP-GW] Method to generate imaginary frequencies: 0
+[QP-GW] Performing full-frequency GW (contour deformation method)...
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and Unoccupied states, Number of helper functions: 174
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: All states and All states, Number of helper functions: 130
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: Occupied states and Unoccupied states, Number of helper functions: 174
+[ISDF] ISDF started
+[ISDF] ISDF completed, Type: All states and All states, Number of helper functions: 130
+[QP-GW] Total time: 4.2 seconds.
+[QP-GW] GW calculation completed.
+[qp_driver] quasiparticle calculation finished. total time: 4.50 seconds.
+[qp-postprocess] begin post-processing of QP energy...
+[qp-postprocess] post-processing QP energy shift...
+[qp-postprocess] computing final quasiparticle energies...
+[qp-postprocess] saving QP-energies results to output file QPenergy...
+[qp-postprocess] QP post-processing completed.

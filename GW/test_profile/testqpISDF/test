@@ -25,5 +25,5 @@ END &CUTOFFS
 &ISDF
   isisdf = 1
   isdf_ratio = 12.0
-  is_save_isdf = 0
+  is_helper = .false.
 END &ISDF

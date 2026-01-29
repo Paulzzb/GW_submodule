@@ -23,5 +23,5 @@ END &CUTOFFS
 
 
 &ISDF
-  is_save_isdf = 0
+  is_helper = .false. 
 END &ISDF

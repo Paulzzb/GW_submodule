@@ -14,8 +14,8 @@ cd test_profile/testInput
 testinput
 cd ../../
 
-cd test_profile/testisdf
-testISDF
+cd test_profile/test_isdfdriver
+test_isdfdriver
 cd ../../
 
 cd test_profile/testgw
