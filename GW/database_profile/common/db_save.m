@@ -10,11 +10,13 @@
 function db_save(root, meta)
 % Save meta.json (pretty + stable)
 % ================================================================
-metaPath = fullfile(root, "meta.json");
-txt = jsonencode(meta, "PrettyPrint", true);
-fid = fopen(metaPath, "w");
-assert(fid > 0, "Cannot open meta.json for writing.");
-cleanObj = onCleanup(@() fclose(fid));
-fwrite(fid, txt, "char");
+% metaPath = fullfile(root, "meta.json");
+% txt = jsonencode(meta, "PrettyPrint", true);
+% fid = fopen(metaPath, "w");
+% assert(fid > 0, "Cannot open meta.json for writing.");
+% cleanObj = onCleanup(@() fclose(fid));
+% fwrite(fid, txt, "char");
 % ================================================================
+metaPath = fullfile(root, "meta.mat");
+save(metaPath, "meta");
 end

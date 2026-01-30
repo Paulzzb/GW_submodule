@@ -27,10 +27,10 @@ for k = 1:Ndb
   ds = struct();
   ds.path = dname; % relative path
   ds.fields = struct();
-  ds.fields.xga = struct();    % placeholder
-  ds.fields.pmu = struct();    % placeholder
-  ds.fields.hVh = struct();    % placeholder
-  ds.fields.G0set = struct();  % placeholder (reserved)
+  % ds.fields.xga = struct();    % placeholder
+  % ds.fields.pmu = struct();    % placeholder
+  % ds.fields.hVh = struct();    % placeholder
+  % ds.fields.G0set = struct();  % placeholder (reserved)
 
   meta.datasets.(dname) = ds;
 end

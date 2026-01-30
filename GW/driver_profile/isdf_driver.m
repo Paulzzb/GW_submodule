@@ -50,6 +50,7 @@ function isdf_driver(input_dir)
     old_describer = meta.desc;
     isdf_flag_compute = isdf_desc_compare(new_describer, old_describer);
   end
+  db_save(dbroot, meta);
 
   % Implement ISDF here!!!
   QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
@@ -59,15 +60,14 @@ function isdf_driver(input_dir)
   % Clause on is_helper, to decide if helper function output is needed.
   indicater = [0, 0];
   if isdf_flag_compute(1)
-    isdf_sub("vc", indicater, dbroot, GWinfo, config) 
+    [info1, info2, info3] = isdf_sub("vc", indicater, dbroot, GWinfo, config); 
   end
   if isdf_flag_compute(2)
-    isdf_sub("vs", indicater, dbroot, GWinfo, config) 
+    [info1, info2, info3] = isdf_sub("vs", indicater, dbroot, GWinfo, config);
   end
   if isdf_flag_compute(3)
-    isdf_sub("ss", indicater, dbroot, GWinfo, config) 
+    [info1, info2, info3] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
   end
-  %
   msg = sprintf('ISDF driver done');
   QPlog(msg, 0);
   %

@@ -6,20 +6,13 @@
 % Authors (see AUTHORS file for details): ZZ 
 % 
 % Last modified: 2026/01/29 ZZ
-function [ind_mu, hVh, zeta_mu] = isdf_sub(type, indicater, dbroot, varargin)
+function [ind_mu, hVh, pga] = isdf_sub(type, indicater, dbroot, varargin)
 %====================================================================
 % This function looks like old isdf_main function
 % If indicater = 0, calculate result and save in dbroot
 %              = 1, read result from dbroot and output
 %====================================================================
-%
-if_helper = false;
-if indicater(2) > 0
-  warning('isdf_sub:ZetaOptional', ...
-    ['zeta_mu is generally not recommended to output. ', ...
-     'If you really need it, ensure cache is big enough']);
-  if_helper = true;
-end
+
 %
 switch type
   case 'vc'
@@ -45,9 +38,12 @@ if indicater(1) == 1
   %
   ind_mu  = db_read(dbroot, IID, meta, "ind_mu");
   hVh     = db_read(dbroot, IID, meta, "hVh");
-  zeta_mu = db_read(dbroot, IID, meta, "pmu");
+  pga = db_read(dbroot, IID, meta, "pga");
   return
 end
+ind_mu = 1;
+hVh = 1;
+pga = 1;
 % -------------------------------------------------------------------
 % Else, do ISDF calculation
 msg = sprintf('Starting ISDF calculation...');
@@ -60,13 +56,21 @@ for i = 1:numel(nameConstants)
 end
 %
 if ~isempty(varargin)
-    if numel(varargin) >= 1, GWinfo = varargin{1}; end
-    if numel(varargin) >= 2, config = varargin{2}; end
+  if numel(varargin) >= 1, GWinfo = varargin{1}; end
+  if numel(varargin) >= 2, config = varargin{2}; end
 end
 %
 if numel(varargin) < 2
   msg = sprintf("When implementing ISDF calculation, varargin = 6 is necessary.");
   QPerror(msg)
+end
+%
+is_helper = false;
+if config.ISDF.is_helper > 0
+  warning('isdf_sub:ZetaOptional', ...
+    ['zeta_mu is generally not recommended to output. ', ...
+     'If you really need it, ensure cache is big enough']);
+  is_helper = true;
 end
 % Extract data from GWinfo/config
 psir = GWinfo.psir;
@@ -95,6 +99,11 @@ switch IID
 end
 Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
 optionsISDF.isdfoptions.rank = Nisdf;
+tmp = "desc_type"+SID;
+meta.desc.(tmp).add("Nisdf", Nisdf);
+meta.desc.(tmp).add("nlist", [nlist(1), nlist(end)]);
+meta.desc.(tmp).add("mlist", [mlist(1), mlist(end)]);
+db_save(dbroot, meta);
 %
 % ===================================================================
 psi = conj(psir(:, nlist));
@@ -104,20 +113,21 @@ phi = psir(:, mlist);
 msg = sprintf('Generating interpolation points...');
 QPlog(msg, 2);
 ind_mu = isdf_indices(psi, phi, optionsISDF);
+meta = db_write(dbroot, meta, IID, "ind_xga", ind_mu);
 
 % Step 2: Compute helper function if necessary, then hVh
 hVh = zeros(Nisdf, Nisdf, 1);
-if if_helper
+if is_helper
   msg = sprintf('Constructing helper functions...');
   QPlog(msg);
-  zeta_mu = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
+  pga = isdf_kernelg(psi, phi, ind_mu, gvec, vol);
   msg = sprintf('Helper functions constructed successfully.');
   QPlog(msg);
-  meta = db_write(dbroot, meta, IID, "pmu", pmu);
+  meta = db_write(dbroot, meta, IID, "pga", pga);
   % Step 2.2: Compute hVh
   msg = sprintf('Constructing helper V helper...');
   QPlog(msg);
-  hVh = isdf_helper2hVh(helper, Dcoul, vol);
+  hVh = isdf_helper2hVh(pga, Dcoul, vol);
   msg = sprintf('Helper V helper constructed successfully.');
   QPlog(msg);
 else
@@ -134,10 +144,32 @@ end
 % Save into database
 msg = sprintf('Save into database...');
 QPlog(msg);
-meta = db_write(dbroot, meta, IID, "ind_xga", ind_mu);
 meta = db_write(dbroot, meta, IID, "hVh", hVh);
 msg = sprintf('Save successfully.');
 QPlog(msg);
+
+% ===================================================================
+% Verification
+msg = sprintf('ISDF type %1d validation\n', IID);
+QPlog(msg);
+
+switch IID
+  case 1
+    what = "coll";
+  case 2
+    if config.ISDF.is_helper
+      what = "rho hf coll";
+    else
+      what = "hf coll";
+    end
+  case 3
+    if config.ISDF.is_helper
+      what = "rho hf coll";
+    else
+      what = "hf coll";
+    end
+end
+isdf_validation(what, type, dbroot, GWinfo, config);
 
 % ===================================================================
 % Final output 

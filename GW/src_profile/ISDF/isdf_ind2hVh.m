@@ -119,7 +119,7 @@ for i = 1:Nblock:rk
       jrange = j:rk;
     end
     %
-    C1VC1(irange, jrange) = C1g(:, irange)' * Dcoul * C1g(:, jrange);
+    C1VC1(irange, jrange) = C1g(:, irange)' * Dcoul * C1g(:, jrange) / vol;
   end
 end
 

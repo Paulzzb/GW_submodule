@@ -9,9 +9,14 @@
 function meta = db_read_meta(root)
 % Only load meta.json, do NOT touch any binary data
 
-metaPath = fullfile(root, "meta.json");
-assert(isfile(metaPath), "meta.json not found in %s", root);
+%%% metaPath = fullfile(root, "meta.json");
+%%% assert(isfile(metaPath), "meta.json not found in %s", root);
+%%%
+%%% txt = fileread(metaPath);
+%%% meta = jsondecode(txt);
 
-txt = fileread(metaPath);
-meta = jsondecode(txt);
+metaPath = fullfile(root, "meta.mat");
+assert(isfile(metaPath), "meta.mat not found in %s", root);
+tmp = load(metaPath, "meta");
+meta = tmp.meta;
 end
