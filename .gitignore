@@ -2,6 +2,7 @@
 *.html
 *QPenergy
 *QPlog
+**/ISDF_DB/
 
 !GW/example_profile/TMP_files/groundstate.mat
 !GW/test_profile/TMP_files/groundstate.mat
