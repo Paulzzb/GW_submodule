@@ -1,5 +1,5 @@
 function QPerror(msg)
-% GWerror Display formatted error message and halt
+in_suin_summationtion% GWerror Display formatted error message and halt
 
     st = dbstack(1); % get caller info
     if isempty(st)

@@ -5,7 +5,7 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/01/28 ZZ
+% Last modified: 2026/01/30 ZZ
 %
 function out = isdf_desc(GWinfo, config)
 % Create describer for current input
@@ -57,15 +57,15 @@ function out = isdf_desc(GWinfo, config)
   desc_param.add("weight", config.ISDF.weight);
   out.desc_param = desc_param;
   % -----------------------------------------------------------------
-  descA = desc();
-  descA.add('isdf_ratio_type1', config.ISDF.isdf_ratio_type1);
-  out.descA = descA;
+  desc_type1 = desc();
+  desc_type1.add('isdf_ratio_type1', config.ISDF.isdf_ratio_type1);
+  out.desc_type1 = desc_type1;
   % -----------------------------------------------------------------
-  descB = desc();
-  descB.add('isdf_ratio_type2', config.ISDF.isdf_ratio_type2);
-  out.descB = descB;
+  desc_type2 = desc();
+  desc_type2.add('isdf_ratio_type2', config.ISDF.isdf_ratio_type2);
+  out.desc_type2 = desc_type2;
   % -----------------------------------------------------------------
-  descC = desc();
-  descC.add('isdf_ratio_type3', config.ISDF.isdf_ratio_type3);
-  out.descC = descC;
+  desc_type3 = desc();
+  desc_type3.add('isdf_ratio_type3', config.ISDF.isdf_ratio_type3);
+  out.desc_type3 = desc_type3;
 end

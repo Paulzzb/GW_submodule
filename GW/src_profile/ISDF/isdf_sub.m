@@ -14,7 +14,7 @@ function [ind_mu, hVh, zeta_mu] = isdf_sub(type, indicater, dbroot, varargin)
 %====================================================================
 %
 if_helper = false;
-if indicater(1) > 0
+if indicater(2) > 0
   warning('isdf_sub:ZetaOptional', ...
     ['zeta_mu is generally not recommended to output. ', ...
      'If you really need it, ensure cache is big enough']);
@@ -38,7 +38,7 @@ meta = db_read_meta(dbroot);
 % -------------------------------------------------------------------
 % Read from database and output if indicater = 1
 %
-if indicater(0) == 1
+if indicater(1) == 1
   %
   msg = sprintf('Loading from %s...', dbroot);
   QPlog(msg);
@@ -62,23 +62,15 @@ end
 if ~isempty(varargin)
     if numel(varargin) >= 1, GWinfo = varargin{1}; end
     if numel(varargin) >= 2, config = varargin{2}; end
-    % if numel(varargin) >= 1, Phir = varargin{1}; end
-    % if numel(varargin) >= 2, nlist = varargin{2}; end
-    % if numel(varargin) >= 3, mlist = varargin{3}; end
-    % if numel(varargin) >= 4, gvec  = varargin{4}; end
-    % if numel(varargin) >= 5, vol   = varargin{5}; end
-    % if numel(varargin) >= 6, vcoul = varargin{6}; end
-    % if numel(varargin) >= 7, optionsISDF = varargin{7}; end
 end
 %
-if numel(varargin) < 3
+if numel(varargin) < 2
   msg = sprintf("When implementing ISDF calculation, varargin = 6 is necessary.");
   QPerror(msg)
 end
 % Extract data from GWinfo/config
 psir = GWinfo.psir;
 optionsISDF = config.ISDFCauchy;
-Nisdf = optionsISDF.isdfoptions.rank;
 nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
 nsum = config.SYSTEM.number_bands_in_summation;
 nbmin = config.SYSTEM.energy_band_index_min;
@@ -93,14 +85,20 @@ Dcoul = Dcoul * ry2ev;
 switch IID
   case 1
     nlist = 1:nv; mlist = nv+1:nsum;
+    kisdf = config.ISDF.isdf_ratio_type1;
   case 2
     nlist = 1:nv; mlist = nbmin:nbmax;
+    kisdf = config.ISDF.isdf_ratio_type2;
   case 3
     nlist = 1:nsum; mlist = nbmin:nbmax;
+    kisdf = config.ISDF.isdf_ratio_type3;
 end
+Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
+optionsISDF.isdfoptions.rank = Nisdf;
+%
+% ===================================================================
 psi = conj(psir(:, nlist));
 phi = psir(:, mlist);
-% ===================================================================
 % Calculate this in isdf_main_
 % Step 1: Compute interpolation points
 msg = sprintf('Generating interpolation points...');

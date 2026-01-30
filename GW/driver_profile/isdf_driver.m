@@ -5,7 +5,7 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/01/28
+% Last modified: 2026/01/30
 %
 function isdf_driver(input_dir)
   % isdf_driver - driver for implementing ISDF\
@@ -27,25 +27,28 @@ function isdf_driver(input_dir)
   if ~config.ISDF.isisdf
     QPlog("ISDF is not implemented!\n", 0);
     QPlog("Return directly!\n", 0);
+    return
   end
   %
   % -----------------------------------------------------------------
   % Create descriptor
+  dbroot = fullfile(TMPdir, def.isdf_database);
   new_describer = isdf_desc(GWinfo, config);
   % -----------------------------------------------------------------
   % Compare the descriptor, decide which isdf type to do
-  isdf_flag_list = [false, false, false]; % for type1, 2, 3
+  isdf_flag_compute = [true, true, true]; % for type1, 2, 3
   db_dir = fullfile(TMPdir, def.isdf_database);
   if ~exist(db_dir, "dir") % No database for isdf, create one, then do the
                            % following calculation.
     QPlog("No ISDF database found!\n", 0);
     msg = sprintf("Create a new database at %s!\n", db_dir);
     QPlog(msg, 0);
+    meta = db_create(dbroot, new_describer, 1);
   else
     QPlog("ISDF database found, check descriptor!\n", 1);
     meta = db_read_meta(db_dir);
-    old_describer = meta.describer;
-    isdf_flag_list = isdf_desc_compare(new_describer, old_describer);
+    old_describer = meta.desc;
+    isdf_flag_compute = isdf_desc_compare(new_describer, old_describer);
   end
 
   % Implement ISDF here!!!
@@ -55,13 +58,13 @@ function isdf_driver(input_dir)
   
   % Clause on is_helper, to decide if helper function output is needed.
   indicater = [0, 0];
-  if isdf_flag_list(1)
+  if isdf_flag_compute(1)
     isdf_sub("vc", indicater, dbroot, GWinfo, config) 
   end
-  if isdf_flag_list(2)
+  if isdf_flag_compute(2)
     isdf_sub("vs", indicater, dbroot, GWinfo, config) 
   end
-  if isdf_flag_list(3)
+  if isdf_flag_compute(3)
     isdf_sub("ss", indicater, dbroot, GWinfo, config) 
   end
   %

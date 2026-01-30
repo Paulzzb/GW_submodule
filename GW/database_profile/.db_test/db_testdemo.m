@@ -8,8 +8,9 @@ QPstartup
 cd(CPATH);
 %----- db test --------
 
+def = filename_map();
 
-root = fullfile(pwd, "ISDF_DB");
+root = fullfile(pwd, def.isdf_database);
 if ~exist(root, "dir"); mkdir(root); end
 
 
@@ -22,7 +23,7 @@ desc_d.add("notes", "Just a test");
 % desc.created_at = char(datetime("now"));
 % desc.notes = "Fill in later";
 % desc.nv_range = 
-meta = db_create(root, desc, 1);
+meta = db_create(root, desc_d, 1);
 
 xga = rand(1000, 3, "double");          % example
 pmu = complex(rand(2000, 64), rand(2000, 64)); % example complex
