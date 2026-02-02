@@ -1,5 +1,5 @@
-cd ../testInput
-testinput
+cd ../test_input
+test_input
 cd ../test_isdfdriver
 
 cd ../TMP_FILES

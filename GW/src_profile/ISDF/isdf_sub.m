@@ -36,9 +36,14 @@ if indicater(1) == 1
   msg = sprintf('Loading from %s...', dbroot);
   QPlog(msg);
   %
-  ind_mu  = db_read(dbroot, IID, meta, "ind_mu");
+  ind_mu  = db_read(dbroot, IID, meta, "ind_xga");
   hVh     = db_read(dbroot, IID, meta, "hVh");
-  pga = db_read(dbroot, IID, meta, "pga");
+  dataID = "data"+SID;
+  if isfield(meta.datasets.(dataID).fields, "pga") 
+    pga = db_read(dbroot, IID, meta, "pga");
+  else
+    pga = -1;
+  end
   return
 end
 ind_mu = 1;

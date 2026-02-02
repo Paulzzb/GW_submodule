@@ -46,6 +46,7 @@ nv = find(GWinfor.occupation > 1 - TOL_SMALL, 1, 'last');
 vol = GWinfor.vol;
 gvec = GWinfor.gvec;
 psir = GWinfor.psir;
+occupation = GWinfor.occupation;
 
 msg = sprintf('[Exchange] Using band range [%d, %d], %d valence bands detected.\n', ...
          nbmin, nbmax, nv);
@@ -61,26 +62,39 @@ if (config.ISDF.isisdf)
   msg = sprintf('[Exchange] Using ISDF approximation for Σ_x.\n');
   QPlog(msg, 0);
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  tISDF = tic;
+  % tISDF = tic;
   
-  optISDF = config.ISDFCauchy;
+  % optISDF = config.ISDFCauchy;
   
-  % Perform ISDF
-  [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
-      nbmin:nbmax, gvec, vol, optISDF);
-  vsgzeta_mu = conj(vsgzeta_mu);
-  msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
-  QPlog(msg, 1);
+  % % Perform ISDF
+  % [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
+  %     nbmin:nbmax, gvec, vol, optISDF);
+  % vsgzeta_mu = conj(vsgzeta_mu);
+  % msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
+  % QPlog(msg, 1);
 
 
-  % Compute Σ_x
-  psirvs = psir(vsind_mu, :);
-  Phivs = psirvs(:, 1:nv); 
-  vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
-  Sigma_x  = vsDcoulvs .* conj(Phivs * Phivs'); 
+  % % Compute Σ_x
+  % psirvs = psir(vsind_mu, :);
+  % Phivs = psirvs(:, 1:nv); 
+  % vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
+  % Sigma_x  = vsDcoulvs .* conj(Phivs * Phivs'); 
 
-  Psivs = conj(psirvs(:, nbmin:nbmax)); 
-  Ex  = Psivs' * Sigma_x * Psivs / vol;
+  % Psivs = conj(psirvs(:, nbmin:nbmax)); 
+  % Ex  = Psivs' * Sigma_x * Psivs / vol;
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
+  dbroot = config.ISDF.dbroot;
+  type = 'vs'; indicater = [1];
+  [vsind_mu, hVh] = isdf_sub(type, indicater, dbroot);
+  Ex = zeros(nbmax-nbmin+1, 1);
+  for i = 1:nv
+    for j = nbmin:nbmax
+      c_rho = conj(psir(vsind_mu, i)) .* psir(vsind_mu, j);
+      Ex(j-nbmin+1) = Ex(j-nbmin+1) + occupation(i) * c_rho' * hVh * c_rho;
+    end
+  end
+  %
 
 else
 % --- Standard exchange calculation without ISDF ---

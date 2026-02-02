@@ -51,7 +51,7 @@ function out = isdf_rho_validate(type, dbroot, GWinfo)
   pgar = zeros(nr, Nisdf);
   for j = 1:Nisdf
     fftbox = put_into_fftbox(pga(:, j), gvec.idxnz, gvec.fftgrid);
-    fftbox = do_FFT(fftbox, gvec.fftgrid, 1) * (nfftgrid / vol);
+    fftbox = do_FFT(fftbox, gvec.fftgrid, -1)  ./ vol;
     pgar(:, j) = fftbox(:);
   end
   %

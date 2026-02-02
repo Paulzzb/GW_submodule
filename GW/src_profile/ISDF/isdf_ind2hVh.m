@@ -5,7 +5,7 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/01/29 ZZ
+% Last modified: 2026/02/02 ZZ
 function hVh = isdf_ind2hVh(Phi, Psi, ind_mu, Dcoul, gvec, vol)
 % Formly, we have helper = (\F*M C')*(CC')^{-1}, hVh = <h | Dcoul | h>
 % So, we calculate it as
@@ -91,7 +91,6 @@ for i = 1:step:rk
     QPlog(msg, 2);
   end
 end
-
 % -------------------------------------------------------------------
 % 2. Calculate TMP2 = TMP'*Dcoul*TMP;
 C1VC1 = zeros(rk, rk);
@@ -101,8 +100,8 @@ for i = 1:Nblock:rk
   if iter_idx == 2
     startfirstiteri = tic;
   end
-  if i+step < rk
-    irange = i:i+step-1;
+  if i+Nblock < rk
+    irange = i:i+Nblock-1;
   else
     irange = i:rk;
   end
@@ -113,8 +112,8 @@ for i = 1:Nblock:rk
       startfirstiterj = tic;
     end
 
-    if j+step < rk
-      jrange = j:j+step-1;
+    if j+Nblock < rk
+      jrange = j:j+Nblock-1;
     else
       jrange = j:rk;
     end

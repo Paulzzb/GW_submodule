@@ -52,11 +52,17 @@ function isdf_driver(input_dir)
   end
   db_save(dbroot, meta);
 
-  % Implement ISDF here!!!
   QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
   GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
   QPlog('Wavefunction in real space prepared.', 2);
+  config.ISDF.dbroot = dbroot;
+  dir = config.CONTROL.storage_dir;
+  def = filename_map();
+  fName = fullfile(dir, def.GWinput);
+  GWgroundstate = GWinfo;
+  save(fName, 'GWgroundstate', 'config');
   
+  % Implement ISDF here!!!
   % Clause on is_helper, to decide if helper function output is needed.
   indicater = [0, 0];
   if isdf_flag_compute(1)
@@ -68,6 +74,13 @@ function isdf_driver(input_dir)
   if isdf_flag_compute(3)
     [info1, info2, info3] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
   end
+
+  % Add some extra data
+
+  hVh = isdf_vcVnn(dbroot,GWinfo,config);
+  meta = db_read_meta(dbroot);
+  meta = db_write(dbroot, meta, 4, "vcVnn", hVh);
+
   msg = sprintf('ISDF driver done');
   QPlog(msg, 0);
   %
