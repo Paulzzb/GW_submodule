@@ -5,7 +5,7 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/02/02 ZZ
+% Last modified: 2026/02/04 ZZ
 function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
                       n_start_end, m_start_end, omega_list, varargin)
 
@@ -193,18 +193,19 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
   dbroot = config.ISDF.dbroot;
   %
   type = 'vc'; indicater = [1];
-  [vcind_mu, vcVvc] = isdf_sub(type, indicater, dbroot);
+  [~, vcVvc, psixgavc] = isdf_sub(type, indicater, dbroot);
   %
   type = 'vs'; indicater = [1];
-  [vsind_mu, vnVvn] = isdf_sub(type, indicater, dbroot);
+  [~, vnVvn, psixgavn] = isdf_sub(type, indicater, dbroot);
   % U = chol(vnVvn);
+  fprintf("Probably need to change line at 201::fourcenterintegral.m\n");
+
   %
   type = 'ss'; indicater = [1];
-  [ssind_mu, ~] = isdf_sub(type, indicater, dbroot);
+  [~, ~, psixgann] = isdf_sub(type, indicater, dbroot);
   meta = db_read_meta(dbroot);
   vcVnn = db_read(dbroot, 4, meta, "vcVnn"); 
   vcrank_mu = meta.desc.desc_type1.get('nisdf');
-  psir = GWinfo.psir;
 
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,7 +224,7 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
         end
         epsKernel = zeros(vcrank_mu, vcrank_mu);
         for ind_nv = 1:nv
-          Mgvc = (psir(vcind_mu, ind_nv)) .* conj(psir(vcind_mu, nv+1:nsum)); 
+          Mgvc = (psixgavc(:, ind_nv)) .* conj(psixgavc(:, nv+1:nsum)); 
           Eden = ev(ind_nv) - ev(nv+1:nsum);
           edenDRtmp = (-1.0 ./ (omega - Eden - im*eta) ...
           + 1.0 ./ (omega + Eden + im*eta));
@@ -256,7 +257,7 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
             continue;
           end
           mlisttmp = mlist(indm);
-          Mgvc = psir(ssind_mu, n) .* conj(psir(ssind_mu, mlisttmp));
+          Mgvc = psixgann(:, n) .* conj(psixgann(:, mlisttmp));
           if ishermW
             Mgvc = right_nnWnn*Mgvc; 
             out_list = - sum(dKernel.^(-1) .* abs(Mgvc).^2);
@@ -275,7 +276,7 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
         tmp = pattern(n-nstart+1, :, 1);
         indm = find(tmp);
         mlisttmp = mlist(indm);
-        Mgvn = (psir(vsind_mu, n)) .* conj(psir(vsind_mu, mlisttmp));
+        Mgvn = (psixgavn(:, n)) .* conj(psixgavn(:, mlisttmp));
         Mgvn = conj(Mgvn);
         out_list = sum(U \ abs(Mgvn).^2)';
         nm_Xomega_nm(n-nstart+1, indm) = out_list;

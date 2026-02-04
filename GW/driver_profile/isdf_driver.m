@@ -5,7 +5,7 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/01/30
+% Last modified: 2026/02/04
 %
 function isdf_driver(input_dir)
   % isdf_driver - driver for implementing ISDF\
@@ -24,6 +24,7 @@ function isdf_driver(input_dir)
   TEMP = load(fName);
   config = TEMP.config;
   TMPdir = config.CONTROL.storage_dir;
+  clear TEMP;
   % -----------------------------------------------------------------
   % Return if no isdf required
   if ~config.ISDF.isisdf
@@ -54,31 +55,32 @@ function isdf_driver(input_dir)
   end
   db_save(dbroot, meta);
 
-  if isempty(GWinfo.psir)
+  if isempty(GWinfo.psir) && config.ISDF.isisdf
     QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
     GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
     QPlog('Wavefunction in real space prepared.', 2);
+
   end
+  %
   config.ISDF.dbroot = dbroot;
   dir = config.CONTROL.storage_dir;
-  def = filename_map();
-  fName1 = fullfile(dir, def.GWinput);
+  % GWgroundstate = GWinfo;
+  % fName1 = fullfile(dir, def.GWinput);
+  % save(fName1, 'GWgroundstate', '-v7.3', '-nocompression');
   fName2 = fullfile(dir, def.config);
-  GWgroundstate = GWinfo;
-  save(fName1, 'GWgroundstate', '-v7.3', '-nocompression');
   save(fName2, 'config');
   
   % Implement ISDF here!!!
   % Clause on is_helper, to decide if helper function output is needed.
   indicater = [0, 0];
   if isdf_flag_compute(1)
-    [info1, info2, info3] = isdf_sub("vc", indicater, dbroot, GWinfo, config); 
+    [info1, info2, info3, info4] = isdf_sub("vc", indicater, dbroot, GWinfo, config); 
   end
   if isdf_flag_compute(2)
-    [info1, info2, info3] = isdf_sub("vs", indicater, dbroot, GWinfo, config);
+    [info1, info2, info3, info4] = isdf_sub("vs", indicater, dbroot, GWinfo, config);
   end
   if isdf_flag_compute(3)
-    [info1, info2, info3] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
+    [info1, info2, info3, info4] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
   end
 
   % Add some extra data

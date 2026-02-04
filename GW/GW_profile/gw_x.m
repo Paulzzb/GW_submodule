@@ -45,7 +45,6 @@ nbmax = config.SYSTEM.energy_band_index_max;
 nv = find(GWinfor.occupation > 1 - TOL_SMALL, 1, 'last');
 vol = GWinfor.vol;
 gvec = GWinfor.gvec;
-psir = GWinfor.psir;
 occupation = GWinfor.occupation;
 
 msg = sprintf('[Exchange] Using band range [%d, %d], %d valence bands detected.\n', ...
@@ -86,17 +85,16 @@ if (config.ISDF.isisdf)
   %
   dbroot = config.ISDF.dbroot;
   type = 'vs'; indicater = [1];
-  [vsind_mu, hVh] = isdf_sub(type, indicater, dbroot);
+  [~, hVh, psixga] = isdf_sub(type, indicater, dbroot);
   Ex = zeros(nbmax-nbmin+1, 1);
   for i = 1:nv
     for j = nbmin:nbmax
-      c_rho = conj(psir(vsind_mu, i)) .* psir(vsind_mu, j);
+      c_rho = conj(psixga(:, i)) .* psixga(:, j);
       Ex(j-nbmin+1) = Ex(j-nbmin+1) + occupation(i) * c_rho' * hVh * c_rho;
     end
   end
   %
   Ex = - real(Ex);
-
 else
 % --- Standard exchange calculation without ISDF ---
   msg = sprintf('[Exchange] Using standard Σ_x calculation.\n');

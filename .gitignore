@@ -2,7 +2,10 @@
 *.asv
 *.html
 *QPenergy
+QPen*
+
 *QPlog
+*log
 **/ISDF_DB/
 
 !GW/example_profile/TMP_files/groundstate.mat

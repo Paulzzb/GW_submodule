@@ -5,14 +5,17 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/01/29 ZZ
-function [ind_mu, hVh, pga] = isdf_sub(type, indicater, dbroot, varargin)
+% Last modified: 2026/02/04 ZZ
+function [ind_mu, hVh, psixga, pga] = isdf_sub(type, indicater, dbroot, varargin)
 %====================================================================
 % This function looks like old isdf_main function
 % If indicater = 0, calculate result and save in dbroot
 %              = 1, read result from dbroot and output
 %====================================================================
-
+ind_mu = 1;
+hVh = 1;
+psixga = 1;
+pga = 1;
 %
 switch type
   case 'vc'
@@ -37,7 +40,10 @@ if indicater(1) == 1
   QPlog(msg);
   %
   ind_mu  = db_read(dbroot, IID, meta, "ind_xga");
-  hVh     = db_read(dbroot, IID, meta, "hVh");
+  if IID ~= 3
+    hVh     = db_read(dbroot, IID, meta, "hVh");
+  end
+  psixga = db_read(dbroot, IID, meta, "psixga");
   dataID = "data"+SID;
   if isfield(meta.datasets.(dataID).fields, "pga") 
     pga = db_read(dbroot, IID, meta, "pga");
@@ -46,9 +52,6 @@ if indicater(1) == 1
   end
   return
 end
-ind_mu = 1;
-hVh = 1;
-pga = 1;
 % -------------------------------------------------------------------
 % Else, do ISDF calculation
 msg = sprintf('Starting ISDF calculation...');
@@ -78,7 +81,6 @@ if config.ISDF.is_helper > 0
   is_helper = true;
 end
 % Extract data from GWinfo/config
-psir = GWinfo.psir;
 optionsISDF = config.ISDFCauchy;
 nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
 nsum = config.SYSTEM.number_bands_in_summation;
@@ -109,17 +111,22 @@ meta.desc.(tmp).add("Nisdf", Nisdf);
 meta.desc.(tmp).add("nlist", [nlist(1), nlist(end)]);
 meta.desc.(tmp).add("mlist", [mlist(1), mlist(end)]);
 db_save(dbroot, meta);
-%
+
 % ===================================================================
-psi = conj(psir(:, nlist));
-phi = psir(:, mlist);
+psi = conj(GWinfo.psir(:, nlist));
+phi = GWinfo.psir(:, mlist);
 % Calculate this in isdf_main_
 % Step 1: Compute interpolation points
 msg = sprintf('Generating interpolation points...');
 QPlog(msg, 2);
 ind_mu = isdf_indices(psi, phi, optionsISDF);
 meta = db_write(dbroot, meta, IID, "ind_xga", ind_mu);
-
+%
+% Nevertheless, you need to save GWinfo.psir(ind_mu, :)
+%
+psixga = GWinfo.psir(ind_mu, :);
+meta = db_write(dbroot, meta, IID, "psixga", psixga)
+%
 % Step 2: Compute helper function if necessary, then hVh
 hVh = zeros(Nisdf, Nisdf, 1);
 if is_helper
@@ -144,7 +151,7 @@ else
   QPlog(msg);
 end
 
- 
+
 % ===================================================================
 % Save into database
 msg = sprintf('Save into database...');
