@@ -3,8 +3,9 @@ function qp_driver(input_dir)
 def = filename_map();
 fName = fullfile(input_dir, def.GWinput);
 TEMP = load(fName);
-
 GWinfo = TEMP.GWgroundstate;
+fName = fullfile(input_dir, def.config);
+TEMP = load(fName);
 config = TEMP.config;
 
 
@@ -22,9 +23,11 @@ startQP = tic;
 
 
 % Prepare real-space wavefunction from psig
-QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
-GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
-QPlog('Wavefunction in real space prepared.', 2);
+if isempty(GWinfo.psir)
+  QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
+  GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
+  QPlog('Wavefunction in real space prepared.', 2);
+end
 
 % Initialize energy structure
 GWenergy = QPenergy(GWinfo, config);

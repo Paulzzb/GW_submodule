@@ -95,6 +95,7 @@ if (config.ISDF.isisdf)
     end
   end
   %
+  Ex = - real(Ex);
 
 else
 % --- Standard exchange calculation without ISDF ---
@@ -110,9 +111,9 @@ else
   end
   msg = sprintf('[Exchange] Standard loop completed in %.2f seconds.\n', toc(tStandard));
   QPlog(msg, 1);
+  Ex = - real(diag(Ex));
 end
 
-Ex = - real(diag(Ex));
 msg = sprintf('[Exchange] Finished. Total time: %.2f seconds.\n', toc(tStart));
 QPlog(msg, 0);
 

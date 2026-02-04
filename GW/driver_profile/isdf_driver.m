@@ -20,6 +20,8 @@ function isdf_driver(input_dir)
   fName = fullfile(input_dir, def.GWinput);
   TEMP = load(fName);
   GWinfo = TEMP.GWgroundstate;
+  fName = fullfile(input_dir, def.config);
+  TEMP = load(fName);
   config = TEMP.config;
   TMPdir = config.CONTROL.storage_dir;
   % -----------------------------------------------------------------
@@ -52,15 +54,19 @@ function isdf_driver(input_dir)
   end
   db_save(dbroot, meta);
 
-  QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
-  GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
-  QPlog('Wavefunction in real space prepared.', 2);
+  if isempty(GWinfo.psir)
+    QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
+    GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
+    QPlog('Wavefunction in real space prepared.', 2);
+  end
   config.ISDF.dbroot = dbroot;
   dir = config.CONTROL.storage_dir;
   def = filename_map();
-  fName = fullfile(dir, def.GWinput);
+  fName1 = fullfile(dir, def.GWinput);
+  fName2 = fullfile(dir, def.config);
   GWgroundstate = GWinfo;
-  save(fName, 'GWgroundstate', 'config');
+  save(fName1, 'GWgroundstate', '-v7.3', '-nocompression');
+  save(fName2, 'config');
   
   % Implement ISDF here!!!
   % Clause on is_helper, to decide if helper function output is needed.
