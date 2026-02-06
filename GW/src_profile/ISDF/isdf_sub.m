@@ -40,9 +40,9 @@ if indicater(1) == 1
   QPlog(msg);
   %
   ind_mu  = db_read(dbroot, IID, meta, "ind_xga");
-  if IID ~= 3
+  % if IID ~= 3
     hVh     = db_read(dbroot, IID, meta, "hVh");
-  end
+  % end
   psixga = db_read(dbroot, IID, meta, "psixga");
   dataID = "data"+SID;
   if isfield(meta.datasets.(dataID).fields, "pga") 
@@ -119,8 +119,13 @@ phi = GWinfo.psir(:, mlist);
 % Step 1: Compute interpolation points
 msg = sprintf('Generating interpolation points...');
 QPlog(msg, 2);
+%
+starttime = tic;
 ind_mu = isdf_indices(psi, phi, optionsISDF);
 meta = db_write(dbroot, meta, IID, "ind_xga", ind_mu);
+time = toc(starttime);
+msg = sprintf('Time for computing ind_xga: %f\n', time);
+QPlog(msg, 0);
 %
 % Nevertheless, you need to save GWinfo.psir(ind_mu, :)
 %
@@ -144,11 +149,15 @@ if is_helper
   QPlog(msg);
 else
   % Step 2: Compute hVh
+  starttime = tic;
   msg = sprintf('Constructing helper V helper...');
   QPlog(msg);
   hVh = isdf_ind2hVh(psi, phi, ind_mu, Dcoul, gvec, vol);
   msg = sprintf('Helper V helper constructed successfully.');
   QPlog(msg);
+  time = toc(starttime);
+  msg = sprintf('Time for computing helper V helper: %f\n', time);
+  QPlog(msg, 0);
 end
 
 

@@ -195,8 +195,8 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
   type = 'vc'; indicater = [1];
   [~, vcVvc, psixgavc] = isdf_sub(type, indicater, dbroot);
   %
-  type = 'vs'; indicater = [1];
-  [~, vnVvn, psixgavn] = isdf_sub(type, indicater, dbroot);
+  % type = 'vs'; indicater = [1];
+  % [~, vnVvn, psixgavn] = isdf_sub(type, indicater, dbroot);
   % U = chol(vnVvn);
   fprintf("Probably need to change line at 201::fourcenterintegral.m\n");
 
@@ -272,6 +272,7 @@ function nm_Xomega_nm = fourcenterintegral(GWinfo, config, Wflag, ...
       end %for ifreq
     else
       % ISDF, bare Coulomb matrix 
+      error("This part will die!")
       for n = nstart:nend
         tmp = pattern(n-nstart+1, :, 1);
         indm = find(tmp);

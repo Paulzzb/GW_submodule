@@ -34,6 +34,7 @@ function isdf_driver(input_dir)
   end
   %
   % -----------------------------------------------------------------
+  startisdf = tic;
   % Create descriptor
   dbroot = fullfile(TMPdir, def.isdf_database);
   new_describer = isdf_desc(GWinfo, config);
@@ -72,24 +73,44 @@ function isdf_driver(input_dir)
   
   % Implement ISDF here!!!
   % Clause on is_helper, to decide if helper function output is needed.
+  isdf_flag_compute(2) = false;
   indicater = [0, 0];
+  starttimetype1 = tic;
   if isdf_flag_compute(1)
     [info1, info2, info3, info4] = isdf_sub("vc", indicater, dbroot, GWinfo, config); 
   end
+  time1 = toc(starttimetype1);
+  msg = sprintf('Time for computing vc: %f\n', time1);
+  QPlog(msg, 0);
+  starttimetype2 = tic;
   if isdf_flag_compute(2)
     [info1, info2, info3, info4] = isdf_sub("vs", indicater, dbroot, GWinfo, config);
   end
+  time2 = toc(starttimetype2);
+  msg = sprintf('Time for computing vn: %f\n', time2);
+  QPlog(msg, 0);
+  starttimetype3 = tic;
   if isdf_flag_compute(3)
     [info1, info2, info3, info4] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
   end
+  time3 = toc(starttimetype3);
+  msg = sprintf('Time for computing nn: %f\n', time3);
+  QPlog(msg, 0);
 
   % Add some extra data
 
+  starttimetype4 = tic;
   hVh = isdf_vcVnn(dbroot,GWinfo,config);
   meta = db_read_meta(dbroot);
   meta = db_write(dbroot, meta, 4, "vcVnn", hVh);
 
+  time4 = toc(starttimetype4);
+  msg = sprintf('Time for computing vcVnn: %f\n', time4);
+  QPlog(msg, 0);
   msg = sprintf('ISDF driver done');
+  QPlog(msg, 0);
+  timeISDF = toc(startisdf);
+  msg = sprintf('Time of ISDF driver: %f\n', timeISDF);
   QPlog(msg, 0);
   %
 end %function

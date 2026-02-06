@@ -23,7 +23,7 @@ startQP = tic;
 
 
 % Prepare real-space wavefunction from psig
-if isempty(GWinfo.psir)
+if isempty(GWinfo.psir) && (config.ISDF.isisdf ~= 1)
   QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
   GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
   QPlog('Wavefunction in real space prepared.', 2);

@@ -39,7 +39,9 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
   nnmrange = meta.desc.(tmp).get("mlist");
   nnmrange = nnmrange(1):nnmrange(2);
   %
-  step = 25; Nblock = 32;
+  Nblock = 16*gcp('nocreate').NumWorkers;
+  fftgrid = gvec.fftgrid;
+  idxnz = gvec.idxnz;
   
   
   rkvc=length(vcind);
@@ -66,40 +68,40 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
   %
   % -------------------------------------------------------------------
   % 1. Column slicing to calculate TMP = \F*(M C') 
-  total_iter = ceil(rkvc / step);
+  total_iter = ceil(rkvc / Nblock);
   est_total_time = -1;
   
   C1gvc = zeros(gvec.ng, rkvc);
-  for i = 1:step:rkvc
-    iter_idx = ceil(i / step);
+  for i = 1:Nblock:rkvc
+    iter_idx = ceil(i / Nblock);
   
     if iter_idx == 2
       startfirstiter = tic;
     end
   
-    if i+step < rkvc
-      irange = i:i+step-1;
+    if i+Nblock < rkvc
+      irange = i:i+Nblock-1;
     else
       irange = i:rkvc;
     end
   
     tmpr = (psir(:, vcnrange) * phivc(irange, :)') .* (psir(:, vcmrange) * psivc(irange, :)');
-    for j = 0:length(irange)-1
-      fftbox1 = reshape(tmpr(:, j+1), gvec.fftgrid);
-      fftbox1 = do_FFT(fftbox1, gvec.fftgrid, 1) * vol;
-      C1gvc(:, i+j) = get_from_fftbox(gvec.idxnz, fftbox1, gvec.fftgrid);
+    parfor j = 0:length(irange)-1
+      fftbox1 = reshape(tmpr(:, j+1), fftgrid);
+      fftbox1 = do_FFT(fftbox1, fftgrid, 1) * vol;
+      C1gvc(:, i+j) = get_from_fftbox(idxnz, fftbox1, fftgrid);
     end
   
     if iter_idx == 6 
-      time_per_step = toc(startfirstiter) / 4;
-      est_total_time = time_per_step * total_iter;
+      time_per_Nblock = toc(startfirstiter) / 4;
+      est_total_time = time_per_Nblock * total_iter;
       msg = sprintf('Estimated total time: %.1f seconds', est_total_time);
       QPlog(msg, 2);
     end
   
     % Progress bar
     if est_total_time > 0
-      elapsed_time = (iter_idx - 1) * time_per_step;
+      elapsed_time = (iter_idx - 1) * time_per_Nblock;
       msg = sprintf('Progress: %3d%% | Elapsed: %.1fs / Estimated: %.1fs', ...
           round(100 * (iter_idx-1) / total_iter), elapsed_time, est_total_time);
       QPlog(msg, 2);
@@ -111,40 +113,40 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
   %
   % -------------------------------------------------------------------
   % 1. Column slicing to calculate TMP = \F*(M C') 
-  total_iter = ceil(rknn / step);
+  total_iter = ceil(rknn / Nblock);
   est_total_time = -1;
   
   C1gnn = zeros(gvec.ng, rknn);
-  for i = 1:step:rknn
-    iter_idx = ceil(i / step);
+  for i = 1:Nblock:rknn
+    iter_idx = ceil(i / Nblock);
   
     if iter_idx == 2
       startfirstiter = tic;
     end
   
-    if i+step < rknn
-      irange = i:i+step-1;
+    if i+Nblock < rknn
+      irange = i:i+Nblock-1;
     else
       irange = i:rknn;
     end
   
     tmpr = (psir(:, nnnrange) * phinn(irange, :)') .* (psir(:, nnmrange) * psinn(irange, :)');
-    for j = 0:length(irange)-1
-      fftbox1 = reshape(tmpr(:, j+1), gvec.fftgrid);
-      fftbox1 = do_FFT(fftbox1, gvec.fftgrid, 1) * vol;
-      C1gnn(:, i+j) = get_from_fftbox(gvec.idxnz, fftbox1, gvec.fftgrid);
+    parfor j = 0:length(irange)-1
+      fftbox1 = reshape(tmpr(:, j+1), fftgrid);
+      fftbox1 = do_FFT(fftbox1, fftgrid, 1) * vol;
+      C1gnn(:, i+j) = get_from_fftbox(idxnz, fftbox1, fftgrid);
     end
   
     if iter_idx == 6 
-      time_per_step = toc(startfirstiter) / 4;
-      est_total_time = time_per_step * total_iter;
+      time_per_Nblock = toc(startfirstiter) / 4;
+      est_total_time = time_per_Nblock * total_iter;
       msg = sprintf('Estimated total time: %.1f seconds', est_total_time);
       QPlog(msg, 2);
     end
   
     % Progress bar
     if est_total_time > 0
-      elapsed_time = (iter_idx - 1) * time_per_step;
+      elapsed_time = (iter_idx - 1) * time_per_Nblock;
       msg = sprintf('Progress: %3d%% | Elapsed: %.1fs / Estimated: %.1fs', ...
           round(100 * (iter_idx-1) / total_iter), elapsed_time, est_total_time);
       QPlog(msg, 2);

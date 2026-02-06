@@ -84,7 +84,17 @@ if (config.ISDF.isisdf)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %
   dbroot = config.ISDF.dbroot;
-  type = 'vs'; indicater = [1];
+  %%% type = 'vs'; indicater = [1];
+  %%% [~, hVh, psixga] = isdf_sub(type, indicater, dbroot);
+  %%% Ex = zeros(nbmax-nbmin+1, 1);
+  %%% for i = 1:nv
+  %%%   for j = nbmin:nbmax
+  %%%     c_rho = conj(psixga(:, i)) .* psixga(:, j);
+  %%%     Ex(j-nbmin+1) = Ex(j-nbmin+1) + occupation(i) * c_rho' * hVh * c_rho;
+  %%%   end
+  %%% end
+  %%% %
+  type = 'ss'; indicater = [1];
   [~, hVh, psixga] = isdf_sub(type, indicater, dbroot);
   Ex = zeros(nbmax-nbmin+1, 1);
   for i = 1:nv
