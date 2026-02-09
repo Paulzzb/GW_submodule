@@ -39,7 +39,8 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
   nnmrange = meta.desc.(tmp).get("mlist");
   nnmrange = nnmrange(1):nnmrange(2);
   %
-  Nblock = 16*gcp('nocreate').NumWorkers;
+  Nblock = 64;
+  % Nblock = 16*gcp('nocreate').NumWorkers;
   fftgrid = gvec.fftgrid;
   idxnz = gvec.idxnz;
   
@@ -86,7 +87,8 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
     end
   
     tmpr = (psir(:, vcnrange) * phivc(irange, :)') .* (psir(:, vcmrange) * psivc(irange, :)');
-    parfor j = 0:length(irange)-1
+    for j = 0:length(irange)-1
+    % parfor j = 0:length(irange)-1
       fftbox1 = reshape(tmpr(:, j+1), fftgrid);
       fftbox1 = do_FFT(fftbox1, fftgrid, 1) * vol;
       C1gvc(:, i+j) = get_from_fftbox(idxnz, fftbox1, fftgrid);
@@ -131,7 +133,8 @@ function hVh = isdf_vcVnn(dbroot, GWinfo, config)
     end
   
     tmpr = (psir(:, nnnrange) * phinn(irange, :)') .* (psir(:, nnmrange) * psinn(irange, :)');
-    parfor j = 0:length(irange)-1
+    for j = 0:length(irange)-1
+    % parfor j = 0:length(irange)-1
       fftbox1 = reshape(tmpr(:, j+1), fftgrid);
       fftbox1 = do_FFT(fftbox1, fftgrid, 1) * vol;
       C1gnn(:, i+j) = get_from_fftbox(idxnz, fftbox1, fftgrid);

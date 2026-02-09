@@ -21,7 +21,8 @@ QPlog(msg, 2);
 [m1, n1] = size(Phi);
 [m2, n2] = size(Psi);
 ng = gvec.ng;
-Nblock = 16*gcp('nocreate').NumWorkers;
+Nblock = 64;
+% Nblock = 16*gcp('nocreate').NumWorkers;
 
 if m1 ~= m2
   msg = 'Wrong inputs: row dimensions of Phi and Psi do not match!';
@@ -69,7 +70,8 @@ for i = 1:Nblock:rk
   end
 
   tmpr = (Phi * phi(irange, :)') .* (Psi * psi(irange, :)');
-  parfor j = 0:length(irange)-1
+  for j = 0:length(irange)-1
+  % parfor j = 0:length(irange)-1
     fftbox1 = reshape(tmpr(:, j+1), fftgrid);
     fftbox1 = do_FFT(fftbox1, fftgrid, 1) * vol;
     C1g(:, i+j) = get_from_fftbox(idxnz, fftbox1, fftgrid);

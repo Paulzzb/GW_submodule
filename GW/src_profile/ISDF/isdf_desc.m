@@ -25,6 +25,12 @@ function out = isdf_desc(GWinfo, config)
     'desc_type3', true ...
   ); 
   % -----------------------------------------------------------------
+  default_Constant = constant_map();
+  nameConstants = fieldnames(default_Constant);
+  for i = 1:numel(nameConstants)
+    eval(sprintf('%s = %.16f;', nameConstants{i}, default_Constant.(nameConstants{i})));
+  end
+  % -----------------------------------------------------------------
   desc_sys = desc();
   desc_sys.add("prefix", config.CONTROL.prefix);
   desc_sys.add("coulomb_truncation_method", config.CUTOFFS.coulomb_truncation_method);
@@ -57,15 +63,47 @@ function out = isdf_desc(GWinfo, config)
   desc_param.add("weight", config.ISDF.weight);
   out.desc_param = desc_param;
   % -----------------------------------------------------------------
+  nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
+  nsum = config.SYSTEM.number_bands_in_summation;
+  nbmin = config.SYSTEM.energy_band_index_min;
+  nbmax = config.SYSTEM.energy_band_index_max;
+  % -----------------------------------------------------------------
   desc_type1 = desc();
+  %
+  nlist = 1:nv; mlist = nv+1:nsum;
+  kisdf = config.ISDF.isdf_ratio_type1;
+  Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
+  %
   desc_type1.add('isdf_ratio_type1', config.ISDF.isdf_ratio_type1);
+  desc_type1.add("Nisdf", Nisdf);
+  desc_type1.add("nlist", [nlist(1), nlist(end)]);
+  desc_type1.add("mlist", [mlist(1), mlist(end)]);
+  %
   out.desc_type1 = desc_type1;
   % -----------------------------------------------------------------
   desc_type2 = desc();
+  %
+  nlist = 1:nv; mlist = nv+1:nsum;
+  kisdf = config.ISDF.isdf_ratio_type1;
+  Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
+  % 
   desc_type2.add('isdf_ratio_type2', config.ISDF.isdf_ratio_type2);
+  desc_type2.add("Nisdf", Nisdf);
+  desc_type2.add("nlist", [nlist(1), nlist(end)]);
+  desc_type2.add("mlist", [mlist(1), mlist(end)]);
+  %
   out.desc_type2 = desc_type2;
   % -----------------------------------------------------------------
   desc_type3 = desc();
+  %
+  nlist = 1:nsum; mlist = nbmin:nbmax;
+  kisdf = config.ISDF.isdf_ratio_type3;
+  Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
+  %
   desc_type3.add('isdf_ratio_type3', config.ISDF.isdf_ratio_type3);
+  desc_type3.add("Nisdf", Nisdf);
+  desc_type3.add("nlist", [nlist(1), nlist(end)]);
+  desc_type3.add("mlist", [mlist(1), mlist(end)]);
+  %
   out.desc_type3 = desc_type3;
 end

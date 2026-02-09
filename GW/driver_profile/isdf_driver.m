@@ -40,7 +40,7 @@ function isdf_driver(input_dir)
   new_describer = isdf_desc(GWinfo, config);
   % -----------------------------------------------------------------
   % Compare the descriptor, decide which isdf type to do
-  isdf_flag_compute = [true, true, true]; % for type1, 2, 3
+  isdf_flag_compute = [true, true, true, true]; % for type1, 2, 3
   db_dir = fullfile(TMPdir, def.isdf_database);
   if ~exist(db_dir, "dir") % No database for isdf, create one, then do the
                            % following calculation.
@@ -99,16 +99,19 @@ function isdf_driver(input_dir)
 
   % Add some extra data
 
-  starttimetype4 = tic;
-  hVh = isdf_vcVnn(dbroot,GWinfo,config);
-  meta = db_read_meta(dbroot);
-  meta = db_write(dbroot, meta, 4, "vcVnn", hVh);
+  if isdf_flag_compute(4)
+    starttimetype4 = tic;
+    hVh = isdf_vcVnn(dbroot,GWinfo,config);
+    meta = db_read_meta(dbroot);
+    meta = db_write(dbroot, meta, 4, "vcVnn", hVh);
+    time4 = toc(starttimetype4);
+    msg = sprintf('Time for computing vcVnn: %f\n', time4);
+    QPlog(msg, 0);
+    msg = sprintf('ISDF driver done');
+    QPlog(msg, 0);
+  end
 
-  time4 = toc(starttimetype4);
-  msg = sprintf('Time for computing vcVnn: %f\n', time4);
-  QPlog(msg, 0);
-  msg = sprintf('ISDF driver done');
-  QPlog(msg, 0);
+  
   timeISDF = toc(startisdf);
   msg = sprintf('Time of ISDF driver: %f\n', timeISDF);
   QPlog(msg, 0);

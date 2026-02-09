@@ -107,7 +107,8 @@ while true
 
   center_new = newCentroids_ind_mu; 
   % calulate centroids
-  parfor mk=1:rk
+  % parfor mk=1:rk
+  for mk=1:rk
     %grids belong to the same cluster
     cluster=find(index_min==mk);
     center = newCentroids_ind_mu(mk);
