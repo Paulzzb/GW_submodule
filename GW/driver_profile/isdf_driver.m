@@ -14,6 +14,7 @@ function isdf_driver(input_dir)
   cleanup = QPlog_push('ISDF_driver');
   
   def = filename_map();
+
   % -----------------------------------------------------------------
   % Load GWinfo and config
   % 
@@ -25,6 +26,10 @@ function isdf_driver(input_dir)
   config = TEMP.config;
   TMPdir = config.CONTROL.storage_dir;
   clear TEMP;
+  % -----------------------------------------------------------------
+  if ~isempty(config.CONTROL.log_file)
+    QPlog_logfile(config.CONTROL.log_file);
+  end
   % -----------------------------------------------------------------
   % Return if no isdf required
   if ~config.ISDF.isisdf
@@ -54,6 +59,7 @@ function isdf_driver(input_dir)
     old_describer = meta.desc;
     isdf_flag_compute = isdf_desc_compare(new_describer, old_describer);
   end
+  meta.desc = new_describer;
   db_save(dbroot, meta);
 
   if isempty(GWinfo.psir) && config.ISDF.isisdf

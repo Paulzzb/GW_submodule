@@ -73,13 +73,13 @@ function flaglist = isdf_desc_compare(isdf_desc1, isdf_desc2)
   %
   flag4 = true;
   if ~isequal(vcmlist1, vcmlist2)
-    flag1 = false;
+    flag4 = false;
   elseif ~isequal(nnmlist1, nnmlist2)
-    flag1 = false;
+    flag4 = false;
   elseif (Nvc1 ~= Nvc2)
-    flag1 = false;
+    flag4 = false;
   elseif (Nnn1 ~= Nnn2)
-    flag1 = false;
+    flag4 = false;
   end
 
   flaglist = [~flag1, ~flag2, ~flag3, ~flag4];

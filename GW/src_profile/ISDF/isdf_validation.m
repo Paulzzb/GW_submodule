@@ -24,7 +24,7 @@ function info = isdf_validation(what, type, dbroot, GWinfo, config)
     rho_error = isdf_rho_validate(type, dbroot, GWinfo);
   end
   if contains(what, 'hf')
-    hf_error = isdf_hf_validate(type, dbroot, GWinfo);
+    hf_error = isdf_hf_validate(type, dbroot, GWinfo, config);
   end
   if contains(what, 'coll')
     coll_error = isdf_coll_validate();

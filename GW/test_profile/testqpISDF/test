@@ -9,12 +9,15 @@ END &CONTROL
 
 &SYSTEM
   number_bands_in_summation = 29,
-  energy_band_index_min = 15,
-  energy_band_index_max = 18,
+  energy_band_index_min = 14,
+  energy_band_index_max = 19,
 END &SYSTEM
 
 &FREQUENCY
-  frequency_dependence = 2,
+  frequency_dependence = 0,
+  frequency_low_cutoff = 15,
+  delta_frequency = 0.25,
+  number_imaginary_freqs = 20
 END &FREQUENCY
 
 &CUTOFFS
@@ -23,7 +26,8 @@ END &FREQUENCY
 END &CUTOFFS
 
 &ISDF
-  isisdf = 1
-  isdf_ratio = 12.0
+  isisdf = 0
+  isdf_ratio_type1 = 10.0
+  isdf_ratio = 20.0
   is_helper = .false.
 END &ISDF

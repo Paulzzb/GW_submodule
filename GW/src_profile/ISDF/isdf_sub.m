@@ -5,7 +5,8 @@
 % 
 % Authors (see AUTHORS file for details): ZZ 
 % 
-% Last modified: 2026/02/04 ZZ
+% Last modified: 2026/02/13 ZZ
+%
 function [ind_mu, hVh, psixga, pga] = isdf_sub(type, indicater, dbroot, varargin)
 %====================================================================
 % This function looks like old isdf_main function
@@ -130,7 +131,7 @@ QPlog(msg, 0);
 % Nevertheless, you need to save GWinfo.psir(ind_mu, :)
 %
 psixga = GWinfo.psir(ind_mu, :);
-meta = db_write(dbroot, meta, IID, "psixga", psixga)
+meta = db_write(dbroot, meta, IID, "psixga", psixga);
 %
 % Step 2: Compute helper function if necessary, then hVh
 hVh = zeros(Nisdf, Nisdf, 1);

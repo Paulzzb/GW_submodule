@@ -10,14 +10,22 @@ cd test_profile/test_groundstate
 test_groundstate
 cd ../../
 
-cd test_profile/testInput
-testinput
+cd test_profile/test_input
+test_input
 cd ../../
 
 cd test_profile/test_isdfdriver
 test_isdfdriver
 cd ../../
 
-cd test_profile/testgw
+cd test_profile/test_gw
 testgw
+cd ../../
+
+cd test_profile/testqpdir
+demo
+cd ../../
+
+cd test_profile/testqpISDF
+demo
 cd ../../
