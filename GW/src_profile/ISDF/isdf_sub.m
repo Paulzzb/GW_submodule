@@ -107,7 +107,7 @@ switch IID
 end
 Nisdf = ceil(kisdf*sqrt(length(nlist)*length(mlist)));
 optionsISDF.isdfoptions.rank = Nisdf;
-tmp = "desc_type"+SID;
+% tmp = "desc_type"+SID;
 % meta.desc.(tmp).add("Nisdf", Nisdf);
 % meta.desc.(tmp).add("nlist", [nlist(1), nlist(end)]);
 % meta.desc.(tmp).add("mlist", [mlist(1), mlist(end)]);
