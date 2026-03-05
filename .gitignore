@@ -1,15 +1,15 @@
-./GW/*
-./TMP/*
-./GW/test_profile/TMP_FILES/*
-!./GW/*/
-!./GW/doc_profile/*
-./GW/doc_profile/latex
+*.mat
+*.asv
+*.html
+*QPenergy
+QPen*
 
-!./GW/*.m
+*QPlog
+*log
+**/ISDF_DB/
 
-
-!./GW/*.md
-!./GW/*.html
+!GW/example_profile/TMP_files/groundstate.mat
+!GW/test_profile/TMP_files/groundstate.mat
 
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path

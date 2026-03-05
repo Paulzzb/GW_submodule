@@ -1,3 +1,8 @@
+# Todo
+
+还有一些工作要做, 但是暂时没空.
+ - 完成 coll 测试函数，然后修改判断条件; 现在的 HF 测试是好的，但是 rho 应该是不合适的测试函数.
+
 # QP-GW: Quasiparticle GW Calculation Framework
 
 QP-GW is a modular and extensible MATLAB-based framework for conducting G\(_0\)W\(_0\) quasiparticle calculations.  

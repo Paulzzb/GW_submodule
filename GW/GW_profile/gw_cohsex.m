@@ -1,3 +1,11 @@
+% 
+% License-Identifier: GPL
+% 
+% Copyright (C) 2026
+% 
+% Authors (see AUTHORS file for details): ZZ 
+% 
+% Last modified: 2026/02/13 ZZ
 function [Esx_x, Ecoh] = gw_cohsex(GWinfo, config)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This file is used to calculate GW quasiparticle energies under COHSEX approximation.
@@ -56,7 +64,9 @@ if (nsum <= nv)
 end
 vol = GWinfo.vol;
 gvec = GWinfo.gvec;
-psir = GWinfo.psir;
+if (config.ISDF.isisdf == 0)
+  psir = GWinfo.psir;
+end
 
 msg = sprintf('[COHSEX] Using band range [%d, %d], %d valence bands detected.\n', ...
          nbmin, nbmax, nv);
@@ -67,30 +77,39 @@ QPlog(msg);
 
 % Start calculation
 if (config.ISDF.isisdf)
-  
-  optISDF = config.ISDFCauchy;
+  % Read from ISDFDB
+  dbroot = config.ISDF.dbroot;
+  type = 'vc'; indicater = [1];
+  [~, vcVvc, psixgavc] = isdf_sub(type, indicater, dbroot);
+  type = 'ss'; indicater = [1];
+  [~, ~, psixgass] = isdf_sub(type, indicater, dbroot);
+  meta = db_read_meta(dbroot);
+  vcVnn = db_read(dbroot, 4, meta, "vcVnn"); 
+  vcrank_mu = meta.desc.desc_type1.get('nisdf');
+  %
+  % optISDF = config.ISDFCauchy;
 
-  [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
-      nbmin:nbmax, gvec, vol, optISDF);
-  vsgzeta_mu = conj(vsgzeta_mu);
+  % [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
+  %     nbmin:nbmax, gvec, vol, optISDF);
+  % vsgzeta_mu = conj(vsgzeta_mu);
 
-  [vcind_mu, vcgzeta_mu] = isdf_main('vc', psir, 1:nv, ...
-      nv+1:nsum, gvec, vol, optISDF);
-  vcgzeta_mu = conj(vcgzeta_mu);
+  % [vcind_mu, vcgzeta_mu] = isdf_main('vc', psir, 1:nv, ...
+  %     nv+1:nsum, gvec, vol, optISDF);
+  % vcgzeta_mu = conj(vcgzeta_mu);
 
-  [ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, 1:nsum, ...
-      nbmin:nbmax, gvec, vol, optISDF);
-  ssgzeta_mu = conj(ssgzeta_mu);
+  % [ssind_mu, ssgzeta_mu] = isdf_main('ss', psir, 1:nsum, ...
+  %     nbmin:nbmax, gvec, vol, optISDF);
+  % ssgzeta_mu = conj(ssgzeta_mu);
 
 
 
-  vcrank_mu = length(vcind_mu);
-  vsrank_mu = length(vsind_mu);
-  ssrank_mu = length(ssind_mu);
+  % vcrank_mu = length(vcind_mu);
+  % vsrank_mu = length(vsind_mu);
+  % ssrank_mu = length(ssind_mu);
 
-  psirvc = psir(vcind_mu, :);
-  psirvs = psir(vsind_mu, :);
-  psirss = psir(ssind_mu, :);
+  % psixgavc = psir(vcind_mu, :);
+  % psixgass = psir(vsind_mu, :);
+  % psixgass = psir(ssind_mu, :);
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Manipulate operators
@@ -99,8 +118,8 @@ if (config.ISDF.isisdf)
   startinveps = tic; 
 
   if config.ISDFCauchy.isCauchy
-    Phi = psirvc(:, 1:nv); 
-    Psi = psirvc(:, nv+1:nsum); 
+    Phi = psixgavc(:, 1:nv); 
+    Psi = psixgavc(:, nv+1:nsum); 
     evOcc = ev(1:nv);
     evUnocc = ev(nv+1:nsum);
     
@@ -113,45 +132,50 @@ if (config.ISDF.isisdf)
     COmegaCresult = zeros(vcrank_mu, vcrank_mu);
     scal = 4.0;
     for ind_nv = 1:nv
-      Mgvc = conj(psirvc(:, ind_nv)) .* psirvc(:, nv+1:nsum);
+      Mgvc = conj(psixgavc(:, ind_nv)) .* psixgavc(:, nv+1:nsum);
       Mgvc = conj(Mgvc);
       eden = 1 ./ (ev(ind_nv) - ev(nv+1:nsum));
       COmegaCresult = COmegaCresult + scal * Mgvc * diag(eden) * Mgvc';
     end
   end
-  COmegaCresult = COmegaCresult / vol;
-  epsg_main = inv(COmegaCresult) - vcgzeta_mu' * Dcoul * vcgzeta_mu; 
+  COmegaCresult = COmegaCresult;
+  epsg_main = inv(COmegaCresult) - vcVvc; 
   timeforinveps = toc(startinveps);
   fprintf('Time for inveps = %.4f.\n', timeforinveps);
+  clear COmegaCresult Mgvc;
 
   
   startSigma = tic; 
   % Calculate operator \Sigma_{COH}, \Sigma_{SEX_X}, and \Sigma_{X} formally.
-  Phivs = psirvs(:, 1:nv); 
-  Phiss = psirss(:, 1:nsum); 
-  epsvc = vcgzeta_mu / epsg_main;
-  epsvcDcoulvs = epsvc' * Dcoul * vsgzeta_mu;
-  epsvcDcoulss = epsvc' * Dcoul * ssgzeta_mu;
-  vcDcoulvs = vcgzeta_mu' * Dcoul * vsgzeta_mu;
-  vcDcoulss = vcgzeta_mu' * Dcoul * ssgzeta_mu;
-  W1_mu = vcDcoulvs' * (epsvcDcoulvs);
-  W1_mu_1 = vcDcoulss' * (epsvcDcoulss);
-  Sigma_sex_x = W1_mu .* (Phivs * Phivs'); 
+  Phivs = psixgass(:, 1:nv); 
+  Phiss = psixgass(:, 1:nsum); 
+  
+  % epsvc = vcgzeta_mu / epsg_main;
+  % epsvcDcoulvs = epsvc' * Dcoul * vsgzeta_mu;
+  % epsvcDcoulss = epsvc' * Dcoul * ssgzeta_mu;
+  epsvcDcoulss = epsg_main \ vcVnn;
+  
+  % vcDcoulvs = vcgzeta_mu' * Dcoul * vsgzeta_mu;
+  % vcDcoulss = vcgzeta_mu' * Dcoul * ssgzeta_mu;
+  % W1_mu = vcDcoulvs' * (epsvcDcoulvs);
+  W1_mu_1 = vcVnn' * (epsvcDcoulss);
+  Sigma_sex_x = W1_mu_1 .* (Phivs * Phivs'); 
   Sigma_coh   = W1_mu_1 .* (Phiss * Phiss');
   clear W1_mu vcDcoulvs vcDcoulss epsvcDcoulvs epsvcDcoulss;
   timeForSigma = toc(startSigma);
   fprintf('Sigma operator time = %f.\n', timeForSigma);
+  clear W1_mu_1 Phivs Phiss 
 
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Calculate self-energies
 
   timeForSelfE = tic;
-  Psivs = conj(psirvs(:, nbmin:nbmax)); 
-  Psiss = conj(psirss(:, nbmin:nbmax)); 
+  Psivs = conj(psixgass(:, nbmin:nbmax)); 
+  Psiss = conj(psixgass(:, nbmin:nbmax)); 
   
-  Esx_x = - Psivs' * Sigma_sex_x * Psivs / vol;
-  Ecoh   = 0.5 * Psiss' * Sigma_coh   * Psiss / vol;
+  Esx_x = - Psivs' * Sigma_sex_x * Psivs;
+  Ecoh   = 0.5 * Psiss' * Sigma_coh   * Psiss;
 
   clear Psivs Psiss;
   timeforSelfE = toc(timeForSelfE);

@@ -1,5 +1,4 @@
-% function vcoul = construct_vcoul(mill, supercell, amin, truncation)
-function vcoul = construct_vcoul(data, config)
+function vcoul = construct_vcoul(data, config, gvec)
 % construct_vcoul - construct the electrostatic potential from the charge density
 % config.CUTOFFS.coulomb_truncation_method = 
 %   = 0,  no truncation (3D)
@@ -11,7 +10,6 @@ function vcoul = construct_vcoul(data, config)
 % 
 trunc_method = config.CUTOFFS.coulomb_truncation_method;
 trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
-cutoff = config.CUTOFFS.coulomb_cutoff;
 eightpi = 8*pi;
 fourpi = 4*pi;
 tol_zero = 1e-10;
@@ -25,21 +23,9 @@ wfncut = data.reciprocal_grid_info.wfncut;
 supercell = data.sys.supercell;
 recip_lattice = 2*pi*inv(supercell'); % rows are b1, b2, b3
 Gcart = double(xyz) * recip_lattice;
+Gcart = double(xyz) * recip_lattice;
 % Compute |q+G|^2, where q=[0 0 0] currently
 qG2 = sum(Gcart.^2, 2);                 
- 
-% Select desired reciprocal vectors under coulomb_cutoff if coulomb_cutoff < wfncut
-if (cutoff < wfncut)
-  Ggrid_coul= [];
-  % Filter where G² <= cutoff
-  new_idx = find(qG2 <= cutoff);
-  Ggrid_coul.xyz = xyz(new_idx,:);
-  Ggrid_coul.idxnz = idxnz(new_idx,:);
-  Gcart = Gcart(new_idx,:);
-  qG2 = qG2(new_idx,:);
-else
-  Ggrid_coul = data.reciprocal_grid_info; 
-end
 
 % Calculate the coulomb potential
 % ngcomb = length(Ggrid_coul.idxnz);

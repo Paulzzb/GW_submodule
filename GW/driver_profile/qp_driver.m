@@ -3,8 +3,9 @@ function qp_driver(input_dir)
 def = filename_map();
 fName = fullfile(input_dir, def.GWinput);
 TEMP = load(fName);
-
 GWinfo = TEMP.GWgroundstate;
+fName = fullfile(input_dir, def.config);
+TEMP = load(fName);
 config = TEMP.config;
 
 
@@ -22,16 +23,18 @@ startQP = tic;
 
 
 % Prepare real-space wavefunction from psig
-QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
 enable_k_points = config.CONTROL.enable_k_points;
+if isempty(GWinfo.psir) && (config.ISDF.isisdf ~= 1)
+  QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
 % if (enable_k_points > 0)
   % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.gvec_list, enable_k_points);
-GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
+  GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
 % else
   % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.gvec_list, enable_k_points);
   % GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig, enable_k_points);
 % end
-QPlog('Wavefunction in real space prepared.', 2);
+  QPlog('Wavefunction in real space prepared.', 2);
+end
 
 % Initialize energy structure
 GWenergy = QPenergy(GWinfo, config);
@@ -62,7 +65,7 @@ msg = sprintf('quasiparticle calculation finished. total time: %.2f seconds.', t
 QPlog(msg, 0);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Post-processing
-qp_postprocess(GWenergy)
+QP_postprocess(GWenergy)
 % % step 3: energy shift to account for degeneracy, etc.
 % QPlog('post-processing QP energy shift...', 1);
 % GWenergy = shiftenergy(GWenergy);

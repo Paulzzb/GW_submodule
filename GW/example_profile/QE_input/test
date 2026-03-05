@@ -1,0 +1,22 @@
+&CONTROL
+  prefix = 'Si2',
+  isgw = 1, 
+  groundstate_dir = './',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 8,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 2,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_cutoff = 2.0
+END &CUTOFFS
+

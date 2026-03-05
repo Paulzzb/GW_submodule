@@ -6,6 +6,8 @@ function ind_mu = k_means(rk, weight, options)
 %
 % Outputs:
 %    ind_mu: store indice of centroids data
+weight_tol = 1e-5;
+
 
 option=options.isdfoptions;
 n1=option.sys.n1;n2=option.sys.n2;n3=option.sys.n3;
@@ -102,15 +104,15 @@ while true
   end
   [~, index_min] = min(dist, [], 2);
   shifted_points=points;
-   
+
+  center_new = newCentroids_ind_mu; 
   % calulate centroids
+  % parfor mk=1:rk
   for mk=1:rk
     %grids belong to the same cluster
     cluster=find(index_min==mk);
+    center = newCentroids_ind_mu(mk);
     if isempty(cluster)
-      if newCentroids_ind_mu(mk) == 0
-        newCentroids_ind_mu(mk) = 1;
-      end
       continue;
     end
     total_pointsMutilweight = sum(shifted_points(cluster, :).*weight(cluster),1);
@@ -120,8 +122,21 @@ while true
     % find the nearest point as estimated centroids
     distPoint2Centroid = sum((Centroids-shifted_points(cluster,:)).^2, 2);
     [~, I] = min(distPoint2Centroid);
-    newCentroids_ind_mu(mk,1) = cluster(I);
+    center_new(mk,1) = cluster(I);
   end
+  for mk = 1:rk
+    center = newCentroids_ind_mu(mk);
+    if isempty(cluster)
+      if center == 0
+        t = 1;
+      else
+        t = center;
+      end
+      center_new(mk) = t;
+    end
+  end
+  newCentroids_ind_mu = center_new;
+  
   
   %The calculation will be stopped if one of  two conditions is satisfied
   %reach the number of scheduled max_iteration or  the centroids change within convergence criteria
@@ -142,4 +157,7 @@ while true
   iteration = iteration + 1;
   lastCentroids_ind_mu = newCentroids_ind_mu;
 end
+
+ind_mu = refine_indices(ind_mu, weight, points, weight_tol);
+
 end

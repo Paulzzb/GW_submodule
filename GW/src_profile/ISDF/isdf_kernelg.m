@@ -97,7 +97,10 @@ for i = 1:step:rk
     QPlog(msg, 2);
   end
 end
-
-zetag = C1g / C2;
+if condest(C2) < 1e+12
+  zetag = C1g / C2;
+else
+  zetag = C1g * pseudoinv(C2);
+end
 
 return;

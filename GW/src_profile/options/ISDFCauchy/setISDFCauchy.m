@@ -6,6 +6,7 @@ opt = def;
 
 % Read data from config and data
 opt.isISDF = config.ISDF.isisdf;
+opt.is_helper = config.ISDF.is_helper;
 opt.exxmethod = config.ISDF.exxmethod;
 opt.vcrank_ratio = config.ISDF.isdf_ratio_type1;
 opt.vsrank_ratio = config.ISDF.isdf_ratio_type2;

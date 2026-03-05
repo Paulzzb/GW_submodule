@@ -45,7 +45,7 @@ nbmax = config.SYSTEM.energy_band_index_max;
 nv = find(GWinfor.occupation > 1 - TOL_SMALL, 1, 'last');
 vol = GWinfor.vol;
 gvec = GWinfor.gvec;
-psir = GWinfor.psir;
+occupation = GWinfor.occupation;
 
 msg = sprintf('[Exchange] Using band range [%d, %d], %d valence bands detected.\n', ...
          nbmin, nbmax, nv);
@@ -61,27 +61,50 @@ if (config.ISDF.isisdf)
   msg = sprintf('[Exchange] Using ISDF approximation for Σ_x.\n');
   QPlog(msg, 0);
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  tISDF = tic;
+  % tISDF = tic;
   
-  optISDF = config.ISDFCauchy;
+  % optISDF = config.ISDFCauchy;
   
-  % Perform ISDF
-  [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
-      nbmin:nbmax, gvec, vol, optISDF);
-  vsgzeta_mu = conj(vsgzeta_mu);
-  msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
-  QPlog(msg, 1);
+  % % Perform ISDF
+  % [vsind_mu, vsgzeta_mu] = isdf_main('vs', psir, 1:nv, ...
+  %     nbmin:nbmax, gvec, vol, optISDF);
+  % vsgzeta_mu = conj(vsgzeta_mu);
+  % msg = sprintf('[Exchange] ISDF done in %.2f seconds.\n', toc(tISDF));
+  % QPlog(msg, 1);
 
 
-  % Compute Σ_x
-  psirvs = psir(vsind_mu, :);
-  Phivs = psirvs(:, 1:nv); 
-  vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
-  Sigma_x  = vsDcoulvs .* conj(Phivs * Phivs'); 
+  % % Compute Σ_x
+  % psirvs = psir(vsind_mu, :);
+  % Phivs = psirvs(:, 1:nv); 
+  % vsDcoulvs = vsgzeta_mu' * Dcoul * vsgzeta_mu;
+  % Sigma_x  = vsDcoulvs .* conj(Phivs * Phivs'); 
 
-  Psivs = conj(psirvs(:, nbmin:nbmax)); 
-  Ex  = Psivs' * Sigma_x * Psivs / vol;
-
+  % Psivs = conj(psirvs(:, nbmin:nbmax)); 
+  % Ex  = Psivs' * Sigma_x * Psivs / vol;
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %
+  dbroot = config.ISDF.dbroot;
+  %%% type = 'vs'; indicater = [1];
+  %%% [~, hVh, psixga] = isdf_sub(type, indicater, dbroot);
+  %%% Ex = zeros(nbmax-nbmin+1, 1);
+  %%% for i = 1:nv
+  %%%   for j = nbmin:nbmax
+  %%%     c_rho = conj(psixga(:, i)) .* psixga(:, j);
+  %%%     Ex(j-nbmin+1) = Ex(j-nbmin+1) + occupation(i) * c_rho' * hVh * c_rho;
+  %%%   end
+  %%% end
+  %%% %
+  type = 'ss'; indicater = [1];
+  [~, hVh, psixga] = isdf_sub(type, indicater, dbroot);
+  Ex = zeros(nbmax-nbmin+1, 1);
+  for i = 1:nv
+    for j = nbmin:nbmax
+      c_rho = conj(psixga(:, i)) .* psixga(:, j);
+      Ex(j-nbmin+1) = Ex(j-nbmin+1) + occupation(i) * c_rho' * hVh * c_rho;
+    end
+  end
+  %
+  Ex = - real(Ex);
 else
 % --- Standard exchange calculation without ISDF ---
   msg = sprintf('[Exchange] Using standard Σ_x calculation.\n');
@@ -96,9 +119,9 @@ else
   end
   msg = sprintf('[Exchange] Standard loop completed in %.2f seconds.\n', toc(tStandard));
   QPlog(msg, 1);
+  Ex = - real(diag(Ex));
 end
 
-Ex = - real(diag(Ex));
 msg = sprintf('[Exchange] Finished. Total time: %.2f seconds.\n', toc(tStart));
 QPlog(msg, 0);
 

@@ -20,6 +20,8 @@ function [ind_mu] = isdf_indices(Phi, Psi, options)
 % Outputs:
 %   ind_mu: indices of interpolation points
 
+weight_tol = 1e-5;
+
 [m1, n1] = size(Phi);
 [m2, n2] = size(Psi);
 
@@ -105,8 +107,10 @@ switch lower(options.exxmethod)
         % ind_mu = k_means_hpc(rk, weight_square, options);
         % toc
         % Construct the interpolation basis.
+
     otherwise
         error('Unknown sample method %s.',opt.samp);
+end
 end
 
 function weight = HF_weight(Z,mol,rk)
@@ -129,5 +133,5 @@ for i=1:size(Z,1)
     weight(i)=G(i,:)*ZT(i,:)';
 end
 return
-return
 
+end %function

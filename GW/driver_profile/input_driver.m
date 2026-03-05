@@ -33,13 +33,16 @@ function input_driver(inputfile)
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
   dir = config.CONTROL.storage_dir;
   def = filename_map();
-  fName = fullfile(dir, def.GWinput);
+  fName1 = fullfile(dir, def.GWinput);
+  fName2 = fullfile(dir, def.config);
   if ~exist(dir, 'dir')
     mkdir(dir);
   end
   
   config.ISDFCauchy = GWoptions.ISDFCauchy;
-  save(fName, 'GWgroundstate', 'GWoptions', 'config');
+  save(fName1, 'GWgroundstate', '-v7.3', '-nocompression');
+  save(fName2, 'GWoptions', 'config');
+  %
 
   % Step 7: display input and groundstate information
   display_input_summary(GWgroundstate, GWoptions, config)

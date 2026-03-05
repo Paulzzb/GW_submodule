@@ -17,6 +17,7 @@ fprintf('Current set nkibz, nspin, and nspinor always 1\n');
 
 sys = initsys(mol);
 rhor = H.rho;
+% vxc = getVhxc(mol, rhor);
 [~, vxc] = getVhxc(mol, rhor);
 ev = info.Eigvals;
 occupation = X0.occ;
@@ -32,6 +33,7 @@ psir = F' * X0.psi;
 Vxc = zeros(nb, 1);
 for it=1:nb
   Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol) / nr;
+  % Vxc(it) = sumel(vxc(:) .* ((abs(psir(:,it))).^2)) * (sys.vol)^2 / nr;
 end
 
 % Prepare reciprocal grid information

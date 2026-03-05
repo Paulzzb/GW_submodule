@@ -14,7 +14,8 @@ QP_root/
 ├── src_profile/        # 核心类与数值方法
 ├── GW_profile/         # GW计算辅助子模块
 ├── util_profile/       # 输出与日志函数
-├── test_profile/       # 测试脚本与用例
+├── test_profile/       # 测试脚本
+├── example_profile/    # 使用例子
 ├── QPstartup.m         # 启动脚本（设置路径）
 ```
 
@@ -22,31 +23,77 @@ QP_root/
 
 ## 2. 快速开始
 
+
 ### Step 1：环境初始化
 
-在 MATLAB 中执行：
+在 MATLAB 中进入 `GW` 文件夹内，并执行
 
 ```matlab
-QPstartup;  % 自动配置路径（仅添加 .m 文件）
+QPstartup;
 ```
 
 ### Step 2：准备输入文件
 
-假设你已使用 `kssolv` 进行基态计算 (若未完成，可执行`QP_root/test_profile/test_groundstate`文件夹下的`testground.m`) , 可添加如下内容保存数据：
+#### A. KSSOLV
 
+- **请务必使用根目录下的 `./kssolv` 进行 scf 计算!!!!!!**
+
+A.1 使用 `KSSOLV` (请使用根目录下 `./kssolv` 地址中的版本) 进行基态计算
 ```matlab
+% set mol
+% set options_scf
 [mol,H,X0,info] = scf(mol, options_scf);
-save_groundstate_to_GWformat(mol, H, X0, info, './');
 ```
 
-编写 `input` 文件如下：
+A.2 使用根目录中函数`save_groundstate_to_GWformat`保存数据至目录`my_dir`：
+
+```matlab
+save_groundstate_to_GWformat(mol, H, X0, info, 'my_dir');
+```
+
+A.3 在当前文件夹下，编写 `input` 文件
 
 ```text
 &CONTROL
-  groundstate_dir = './',
+  groundstate_dir = 'my_dir',
   groundstate_type = 'kssolv',
 END &CONTROL
 ```
+
+#### B. Quantum ESPRESSO
+
+- 用户使用的 **Quantum ESPRESSO (QE)** 版本应支持 **HDF5 输出**。
+
+2.1. 使用 `pw.x` 进行两步计算：
+   - 第一步：`calculation = 'scf'`；
+   - 第二步：`calculation = 'bands'`。
+   
+   其中，输入文件中 **k 点** 的设置应如下所示：
+
+```text
+K_POINTS crystal
+1
+0.0 0.0 0.0 1.0
+``````
+
+2.2 使用 `pw2bgw.x` 导出所需的 `vxc.dat` 文件。
+
+2.3 将以下文件（其中前三个由 `pw.x` 生成，默认位于 `$PREFIX.SAVE` 文件夹内，最后一个由 `pw2bgw.x` 生成）
+```text
+charge-density.hdf5  data-file-schema.xml  wfc1.hdf5  vxc.dat 
+```
+复制或链接至目标目录 (例如 `./qeinput/`)。
+
+
+2.4 在当前目录编写 `input` 文件如下：
+
+```text
+&CONTROL
+  groundstate_dir = './qeinput',
+  groundstate_type = 'qe',
+END &CONTROL
+```
+
 
 ### Step 3：运行主程序
 
@@ -55,7 +102,12 @@ input_driver('./input');  % 读取输入配置
 qp_driver('./');          % 执行QP计算
 ```
 
+### Step 4：检查结果
+
+用户可以在 `QPlog` 中查看计算日志，并在 `QPenergy` 中查看计算的能带结果。
+
 ---
+
 
 ## 3. 扩展框架功能（开发新模块）
 
