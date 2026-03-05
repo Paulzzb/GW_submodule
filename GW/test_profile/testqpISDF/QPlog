@@ -1,11 +1,10 @@
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
+[ISDF_driver] ISDF database found, check descriptor!\n
 [ISDF_driver] Converting wavefunction from reciprocial space to real space ...
 [ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.473866
+[ISDF_driver] Time for computing ind_xga: 0.328966
 [ISDF_driver] Constructing helper V helper...
 [ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.273682
+[ISDF_driver] Time for computing helper V helper: 0.181774
 [ISDF_driver] Save into database...
 [ISDF_driver] Save successfully.
 [ISDF_driver] ISDF type 1 validation
@@ -13,370 +12,63 @@
 [ISDF_validation] COLL difference (abs, ev) = -1.000e+00
 [ISDF_validation] COLL difference (rel) = -1.000e+00
 [ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.823626
-[ISDF_driver] Time for computing vn: 0.000041
+[ISDF_driver] Time for computing vc: 0.584011
+[ISDF_driver] Time for computing vn: 0.000068
 [ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.715511
+[ISDF_driver] Time for computing ind_xga: 0.537462
 [ISDF_driver] Constructing helper V helper...
 [ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.690779
+[ISDF_driver] Time for computing helper V helper: 0.534806
 [ISDF_driver] Save into database...
 [ISDF_driver] Save successfully.
 [ISDF_driver] ISDF type 3 validation
 [ISDF_validation] Validating ISDF for HF calculations
 [ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 1.590e+01
-[ISDF_validation] Hartree--Fock energy band max difference (rel) = Inf
+[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 6.877e-04
+[ISDF_validation] Hartree--Fock energy band max difference (rel) = 4.341e-05
 [ISDF_validation] COLL difference (abs, ev) = -1.000e+00
 [ISDF_validation] COLL difference (rel) = -1.000e+00
 [ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing nn: 2.029348
-[ISDF_driver] Time for computing vcVnn: 0.784314
+[ISDF_driver] Time for computing nn: 1.339955
+[ISDF_driver] Time for computing vcVnn: 0.593602
 [ISDF_driver] ISDF driver done
-[ISDF_driver] Time of ISDF driver: 3.732423
+[ISDF_driver] Time of ISDF driver: 2.608078
 [qp_driver] QP driver started
 [QP-GW] Main GW calculation started.
 [QP-GW] Calculating exchange term (Ex)...
 [QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.08 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.1 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.15 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] ISDF database found, check descriptor!\n
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000093
-[ISDF_driver] Time for computing vn: 0.000041
-[ISDF_driver] Time for computing nn: 0.000031
-[ISDF_driver] Time of ISDF driver: 0.155669
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.09 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.1 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.16 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.288100
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.203284
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 1 validation
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.552201
-[ISDF_driver] Time for computing vn: 0.000051
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.734243
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.587703
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 3 validation
-[ISDF_validation] Validating ISDF for HF calculations
-[ISDF_driver] ISDF database found, check descriptor!\n
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000008
-[ISDF_driver] Time for computing vn: 0.000003
-[ISDF_driver] Time for computing nn: 0.000003
-[ISDF_driver] Time of ISDF driver: 0.163079
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.10 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.407504
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.186730
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 1 validation
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.662608
-[ISDF_driver] Time for computing vn: 0.000004
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.774327
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.631966
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 3 validation
-[ISDF_validation] Validating ISDF for HF calculations
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.285185
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.152523
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 1 validation
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.499460
-[ISDF_driver] Time for computing vn: 0.000004
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.698223
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.590419
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 3 validation
-[ISDF_validation] Validating ISDF for HF calculations
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.478317
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.186381
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 1 validation
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.738491
-[ISDF_driver] Time for computing vn: 0.000003
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.692604
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.591651
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 3 validation
-[ISDF_validation] Validating ISDF for HF calculations
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 5.432e-02
-[ISDF_validation] Hartree--Fock energy band max difference (rel) = 3.429e-03
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing nn: 14.499316
-[ISDF_driver] Time for computing vcVnn: 1.110199
-[ISDF_driver] ISDF driver done
-[ISDF_driver] Time of ISDF driver: 16.536689
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.08 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.2 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.18 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] ISDF database found, check descriptor!\n
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000030
-[ISDF_driver] Time for computing vn: 0.000010
-[ISDF_driver] Time for computing nn: 0.000003
-[ISDF_driver] Time of ISDF driver: 0.135082
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.08 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.2 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.17 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] ISDF database found, check descriptor!\n
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000010
-[ISDF_driver] Time for computing vn: 0.000003
-[ISDF_driver] Time for computing nn: 0.000003
-[ISDF_driver] Time of ISDF driver: 0.087247
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.05 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.1 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.10 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] No ISDF database found!\n
-[ISDF_driver] Create a new database at .\TMP_FILES\ISDF_DB!
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.238930
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.133228
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 1 validation
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing vc: 0.422917
-[ISDF_driver] Time for computing vn: 0.000002
-[ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] Time for computing ind_xga: 0.519995
-[ISDF_driver] Constructing helper V helper...
-[ISDF_driver] Helper V helper constructed successfully.
-[ISDF_driver] Time for computing helper V helper: 0.504143
-[ISDF_driver] Save into database...
-[ISDF_driver] Save successfully.
-[ISDF_driver] ISDF type 3 validation
-[ISDF_validation] Validating ISDF for HF calculations
-[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
-[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 5.521e-04
-[ISDF_validation] Hartree--Fock energy band max difference (rel) = 3.485e-05
-[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
-[ISDF_validation] COLL difference (rel) = -1.000e+00
-[ISDF_driver] ISDF sub routine finished.
-[ISDF_driver] Time for computing nn: 6.757457
-[ISDF_driver] Time for computing vcVnn: 0.614573
-[ISDF_driver] ISDF driver done
-[ISDF_driver] Time of ISDF driver: 7.877342
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] [Exchange] Finished. Total time: 0.05 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
-[QP-GW] Total time: 0.1 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 0.09 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] ISDF is not implemented!\n
-[ISDF_driver] Return directly!\n
-[qp_driver] QP driver started
-[qp_driver] Converting wavefunction from reciprocial space to real space ...
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using standard Σ_x calculation.
-[QP-GW] [Exchange] Standard loop completed in 0.13 seconds.
-[QP-GW] [Exchange] Finished. Total time: 0.13 seconds.
-[QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
-[QP-GW] Total time: 5.4 seconds.
-[QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 5.44 seconds.
-[qp-postprocess] begin post-processing of QP energy...
-[qp-postprocess] post-processing QP energy shift...
-[qp-postprocess] computing final quasiparticle energies...
-[qp-postprocess] saving QP-energies results to output file QPenergy...
-[qp-postprocess] QP post-processing completed.
-[ISDF_driver] ISDF database found, check descriptor!\n
-[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000008
-[ISDF_driver] Time for computing vn: 0.000003
-[ISDF_driver] Time for computing nn: 0.000002
-[ISDF_driver] Time of ISDF driver: 0.093219
-[qp_driver] QP driver started
-[QP-GW] Main GW calculation started.
-[QP-GW] Calculating exchange term (Ex)...
-[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [4, 19], 16 valence bands detected.
+[QP-GW] [Exchange] Using band range [1, 20], 16 valence bands detected.
 [QP-GW] [Exchange] Using ISDF approximation for Σ_x.
 [QP-GW] Loading from .\TMP_FILES\ISDF_DB...
 [QP-GW] [Exchange] Finished. Total time: 0.07 seconds.
 [QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [4, 19], 16 valence bands detected.
+[QP-GW] [COHSEX] Using band range [1, 20], 16 valence bands detected.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Total time: 0.1 seconds.
+[QP-GW] GW calculation completed.
+[qp_driver] quasiparticle calculation finished. total time: 0.14 seconds.
+[qp-postprocess] begin post-processing of QP energy...
+[qp-postprocess] post-processing QP energy shift...
+[qp-postprocess] computing final quasiparticle energies...
+[qp-postprocess] saving QP-energies results to output file QPenergy...
+[qp-postprocess] QP post-processing completed.
+[ISDF_driver] ISDF database found, check descriptor!\n
+[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
+[ISDF_driver] Time for computing vc: 0.000055
+[ISDF_driver] Time for computing vn: 0.000024
+[ISDF_driver] Time for computing nn: 0.000023
+[ISDF_driver] Time of ISDF driver: 0.071965
+[qp_driver] QP driver started
+[QP-GW] Main GW calculation started.
+[QP-GW] Calculating exchange term (Ex)...
+[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
+[QP-GW] [Exchange] Using band range [1, 20], 16 valence bands detected.
+[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] [Exchange] Finished. Total time: 0.08 seconds.
+[QP-GW] Using COHSEX approximation (static).
+[QP-GW] [COHSEX] Using band range [1, 20], 16 valence bands detected.
 [QP-GW] Loading from .\TMP_FILES\ISDF_DB...
 [QP-GW] Loading from .\TMP_FILES\ISDF_DB...
 [QP-GW] Total time: 0.1 seconds.
@@ -388,26 +80,99 @@
 [qp-postprocess] saving QP-energies results to output file QPenergy...
 [qp-postprocess] QP post-processing completed.
 [ISDF_driver] ISDF database found, check descriptor!\n
+[ISDF_driver] ISDF database found, check descriptor!\n
 [ISDF_driver] Converting wavefunction from reciprocial space to real space ...
-[ISDF_driver] Time for computing vc: 0.000011
-[ISDF_driver] Time for computing vn: 0.000003
+[ISDF_driver] Time for computing vc: 0.000083
+[ISDF_driver] Time for computing vn: 0.000041
 [ISDF_driver] Starting ISDF calculation...
-[ISDF_driver] ISDF is not implemented!\n
-[ISDF_driver] Return directly!\n
+[ISDF_driver] Time for computing ind_xga: 0.674744
+[ISDF_driver] Constructing helper V helper...
+[ISDF_driver] Helper V helper constructed successfully.
+[ISDF_driver] Time for computing helper V helper: 0.496107
+[ISDF_driver] Save into database...
+[ISDF_driver] Save successfully.
+[ISDF_driver] ISDF type 3 validation
+[ISDF_validation] Validating ISDF for HF calculations
+[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
+[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 8.553e-04
+[ISDF_validation] Hartree--Fock energy band max difference (rel) = 5.399e-05
+[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
+[ISDF_validation] COLL difference (rel) = -1.000e+00
+[ISDF_driver] ISDF sub routine finished.
+[ISDF_driver] Time for computing nn: 1.413952
+[ISDF_driver] Time for computing vcVnn: 0.571954
+[ISDF_driver] ISDF driver done
+[ISDF_driver] Time of ISDF driver: 35.235578
 [qp_driver] QP driver started
-[qp_driver] Converting wavefunction from reciprocial space to real space ...
 [QP-GW] Main GW calculation started.
 [QP-GW] Calculating exchange term (Ex)...
 [QP-GW] [Exchange] Start computing Σ_x (exchange part)...
-[QP-GW] [Exchange] Using band range [14, 19], 16 valence bands detected.
-[QP-GW] [Exchange] Using standard Σ_x calculation.
-[QP-GW] [Exchange] Standard loop completed in 0.06 seconds.
+[QP-GW] [Exchange] Using band range [1, 18], 16 valence bands detected.
+[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
 [QP-GW] [Exchange] Finished. Total time: 0.07 seconds.
 [QP-GW] Using COHSEX approximation (static).
-[QP-GW] [COHSEX] Using band range [14, 19], 16 valence bands detected.
-[QP-GW] Total time: 5.2 seconds.
+[QP-GW] [COHSEX] Using band range [1, 18], 16 valence bands detected.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Total time: 0.1 seconds.
 [QP-GW] GW calculation completed.
-[qp_driver] quasiparticle calculation finished. total time: 5.18 seconds.
+[qp_driver] quasiparticle calculation finished. total time: 0.12 seconds.
+[qp-postprocess] begin post-processing of QP energy...
+[qp-postprocess] post-processing QP energy shift...
+[qp-postprocess] computing final quasiparticle energies...
+[qp-postprocess] saving QP-energies results to output file QPenergy...
+[qp-postprocess] QP post-processing completed.
+[ISDF_driver] ISDF database found, check descriptor!\n
+[ISDF_driver] Converting wavefunction from reciprocial space to real space ...
+[ISDF_driver] Starting ISDF calculation...
+[ISDF_driver] Time for computing ind_xga: 0.241180
+[ISDF_driver] Constructing helper V helper...
+[ISDF_driver] Helper V helper constructed successfully.
+[ISDF_driver] Time for computing helper V helper: 0.143010
+[ISDF_driver] Save into database...
+[ISDF_driver] Save successfully.
+[ISDF_driver] ISDF type 1 validation
+[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
+[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
+[ISDF_validation] COLL difference (rel) = -1.000e+00
+[ISDF_driver] ISDF sub routine finished.
+[ISDF_driver] Time for computing vc: 0.437476
+[ISDF_driver] Time for computing vn: 0.000042
+[ISDF_driver] Starting ISDF calculation...
+[ISDF_driver] Time for computing ind_xga: 0.625230
+[ISDF_driver] Constructing helper V helper...
+[ISDF_driver] Helper V helper constructed successfully.
+[ISDF_driver] Time for computing helper V helper: 0.509791
+[ISDF_driver] Save into database...
+[ISDF_driver] Save successfully.
+[ISDF_driver] ISDF type 3 validation
+[ISDF_validation] Validating ISDF for HF calculations
+[ISDF_validation] Validating ISDF for <ij|v|kl> calculations
+[ISDF_validation] Hartree--Fock energy band max difference (abs, ev) = 8.553e-04
+[ISDF_validation] Hartree--Fock energy band max difference (rel) = 5.399e-05
+[ISDF_validation] COLL difference (abs, ev) = -1.000e+00
+[ISDF_validation] COLL difference (rel) = -1.000e+00
+[ISDF_driver] ISDF sub routine finished.
+[ISDF_driver] Time for computing nn: 1.370620
+[ISDF_driver] Time for computing vcVnn: 0.589626
+[ISDF_driver] ISDF driver done
+[ISDF_driver] Time of ISDF driver: 8.669612
+[qp_driver] QP driver started
+[QP-GW] Main GW calculation started.
+[QP-GW] Calculating exchange term (Ex)...
+[QP-GW] [Exchange] Start computing Σ_x (exchange part)...
+[QP-GW] [Exchange] Using band range [1, 18], 16 valence bands detected.
+[QP-GW] [Exchange] Using ISDF approximation for Σ_x.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] [Exchange] Finished. Total time: 0.07 seconds.
+[QP-GW] Using COHSEX approximation (static).
+[QP-GW] [COHSEX] Using band range [1, 18], 16 valence bands detected.
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Loading from .\TMP_FILES\ISDF_DB...
+[QP-GW] Total time: 0.1 seconds.
+[QP-GW] GW calculation completed.
+[qp_driver] quasiparticle calculation finished. total time: 0.12 seconds.
 [qp-postprocess] begin post-processing of QP energy...
 [qp-postprocess] post-processing QP energy shift...
 [qp-postprocess] computing final quasiparticle energies...

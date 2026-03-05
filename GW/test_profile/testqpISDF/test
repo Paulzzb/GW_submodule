@@ -9,8 +9,8 @@ END &CONTROL
 
 &SYSTEM
   number_bands_in_summation = 29,
-  energy_band_index_min = 14,
-  energy_band_index_max = 19,
+  energy_band_index_min = 1,
+  energy_band_index_max = 18,
 END &SYSTEM
 
 &FREQUENCY
@@ -26,7 +26,7 @@ END &FREQUENCY
 END &CUTOFFS
 
 &ISDF
-  isisdf = 0
+  isisdf = 1
   isdf_ratio_type1 = 10.0
   isdf_ratio = 20.0
   is_helper = .false.

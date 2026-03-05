@@ -9,7 +9,7 @@ END &CONTROL
 
 &SYSTEM
   number_bands_in_summation = 29,
-  energy_band_index_min = 4,
+  energy_band_index_min = 11,
   energy_band_index_max = 19,
 END &SYSTEM
 
