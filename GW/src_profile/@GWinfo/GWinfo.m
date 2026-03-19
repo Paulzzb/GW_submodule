@@ -29,6 +29,7 @@ classdef GWinfo
     nspinor
 
     mapping
+    tmp_devel
   end
 
   properties (SetAccess = protected)

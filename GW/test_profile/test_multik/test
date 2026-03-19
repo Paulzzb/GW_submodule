@@ -1,0 +1,30 @@
+&CONTROL
+  prefix = 'Si',
+  isgw = 1, 
+  groundstate_dir = 'GaN.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true. 
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 40,
+  energy_band_index_min = 1,
+  energy_band_index_max = 15,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = -1,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 0,
+  coulomb_cutoff = 15.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 0
+  is_helper = .false.
+END &ISDF

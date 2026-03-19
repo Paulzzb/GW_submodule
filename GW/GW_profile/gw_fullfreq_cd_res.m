@@ -46,10 +46,10 @@ n_ener = length(bandtocal);
 n_oper = config.SYSTEM.number_bands_in_summation;
 nsum = config.SYSTEM.number_bands_in_summation;
 nv = find(GWinfo.occupation > 1 - TOL_SMALL, 1, 'last');
-if (nv >= nsum)
-  msg = sprintf('Number of valence bands = %d >= Number of bands in summation = %d', nv, nsum);
-  QPerror(msg)
-end
+% if (nv >= nsum)
+%   msg = sprintf('Number of valence bands = %d >= Number of bands in summation = %d', nv, nsum);
+%   QPerror(msg)
+% end
 
 
 bandtocal_occ = bandtocal(find(bandtocal <= nv));

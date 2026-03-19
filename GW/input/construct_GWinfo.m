@@ -59,7 +59,7 @@ end
 % GWinfor.idxnz = idxnz; 
  
 % Compute Coulomb interaction
-coulG_list = construct_vcoul_k(data, config, GWinfor.gvec);
+coulG_list = construct_vcoul_k(data, config, GWinfor.gvec_list);
 coulG0 = construct_coulG0(data, config);
 
 % set coulG to fit single-kpoints code
@@ -92,16 +92,29 @@ GWinfor.ev = data.ev * ha2ry;
 GWinfor.psig = psig;
 GWinfor.Ggrid4psig = data.reciprocal_grid_info;
 GWinfor.occupation = data.occupation;
-bvec = 2*pi*inv(sys.supercell);
+
+a1 = sys.supercell(1, :)';
+a2 = sys.supercell(2, :)';
+a3 = sys.supercell(3, :)';
+Omega = dot(a1,cross(a2,a3));
+
+b1 = 2*pi*cross(a2,a3)/Omega;
+b2 = 2*pi*cross(a3,a1)/Omega;
+b3 = 2*pi*cross(a1,a2)/Omega;
+B = [b1'; b2'; b3'];
+recip_lattice = B;
+
+% bvec = 2*pi*inv(sys.supercell);
+bvec = recip_lattice;
 GWinfor.bvec = bvec;
-GWinfor.bdot = GWinfor.bvec * GWinfor.bvec.';
+% GWinfor.bdot = GWinfor.bvec * GWinfor.bvec.';
 
 % Symmetric information if needed
 
 if config.CONTROL.enable_k_points
   syms = data.syms;
   % Get symmetry information
-  GWinfor.symminfo = symminfo(syms.ntran, syms.ntranq, syms.mtrx, syms.nrot, syms.indsub, syms.kgzero);
+  GWinfor.symminfo = symminfo(syms.nsym, syms.ntranq, syms.mtrx, syms.nrot, syms.indsub, syms.kgzero);
   % Use irreducible k-points to generate full-kpoints set
   [GWinfor.bz_samp] = bz_sampling(data.nkibz, data.kibz, bvec, data.kweight);
   GWinfor.bz_samp = fullbz(GWinfor.bz_samp, GWinfor.symminfo, GWinfor.gvec);

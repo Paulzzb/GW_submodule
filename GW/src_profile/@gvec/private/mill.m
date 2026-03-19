@@ -24,8 +24,8 @@ idlist = 1:length(gkxind);
 
 
 gkind = [gkxind, gkyind, gkzind];
-rcplat = 2*pi*inv(supercell);
-gkvec = gkind*rcplat';
+rcplat = 2*pi*inv(supercell');
+gkvec = gkind*rcplat;
 qgkvec = gkvec + qpoint;
 qgkabs = sum(qgkvec.^2, 2);
 idxnz = find(qgkabs <= ecut);

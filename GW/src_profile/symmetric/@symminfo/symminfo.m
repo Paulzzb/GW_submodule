@@ -2,7 +2,7 @@ classdef symminfo
   % symminfo: Encapsulates symmetry operations for BZ sampling
   
   properties
-    ntran   (1,1) {mustBeInteger} = 0    % # symmetry ops preserving q
+    nsym   (1,1) {mustBeInteger} = 0    % # symmetry ops preserving q
     ntranq  (1,1) {mustBeInteger} = 0    % unused (reserved)
     mtrx    cell                         % {nrot x 1} rotation matrices
     nrot    (1,1) {mustBeInteger} = 0    % total # symmetry operations
@@ -16,9 +16,9 @@ classdef symminfo
   end
 
   methods
-    function obj = symminfo(ntran, ntranq, mtrx, nrot, indsub, kgzero)
+    function obj = symminfo(nsym, ntranq, mtrx, nrot, indsub, kgzero)
       if nargin > 0
-        obj.ntran  = ntran;
+        obj.nsym  = nsym;
         obj.ntranq = ntranq;
         obj.mtrx   = mtrx;
         obj.nrot   = nrot;
@@ -29,7 +29,7 @@ classdef symminfo
 
     function show(obj)
       fprintf('Symmetry info: %d total rotations, %d invariant under q\n', ...
-              obj.nrot, obj.ntran);
+              obj.nrot, obj.nsym);
     end
 
     function R = get_rotation(obj, i)

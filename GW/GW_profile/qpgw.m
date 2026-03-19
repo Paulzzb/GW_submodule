@@ -24,7 +24,7 @@ QPlog('Exchange term completed.', 2);
 switch config.FREQUENCY.frequency_dependence 
   case -1
     QPlog('Using Hartree-Fock approximation only.', 1);
-    QPlog('COHSEX calculation completed.', 2);
+    QPlog('HF calculation completed.', 2);
   case 0
     QPlog('Using COHSEX approximation (static).', 1);
     [GWenergy.Esex_x, GWenergy.Ecoh] = gw_cohsex(GWinfo, config);

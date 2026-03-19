@@ -36,15 +36,18 @@ function mapping = setRgridmap(mapping, GWinfor)
   for id = 1:length(indrot)
     irot = indrot(id);
     mtrx = syms.mtrx{irot};
+    inv_mtrx = round(inv(mtrx));
     tmpind = zeros(n123, 1);
     count = 0;
     for i3 = 1:n3
       for i2 = 1:n2
         for i1 = 1:n1
-          iv = [i1, i2, i3] * mtrx;
+          % iv = [i1, i2, i3] * inv_mtrx;
+          iv = inv_mtrx * [i1;i2;i3];
           count = count+1;
-          i5 = 1 + mod(iv(1), n1) + mod(iv(2), n2)*n1 + mod(iv(3), n3)*n1*n2;
-          tmpind(i5) = count;
+          i5 = round(1 + mod(iv(1), n1) + mod(iv(2), n2)*n1 + mod(iv(3), n3)*n1*n2);
+          tmpind(count) = i5;
+          % tmpind(count) = i5;
         end % for i3
       end % for i2
     end % for i1

@@ -68,7 +68,14 @@ function myneed = load_qe_from_folder(qepath)
     qgrid=data.getElementsByTagName('qpoint_grid').item(0).getAttributes;
     nqs=str2num([qgrid.item(0).getTextContent,qgrid.item(1).getTextContent,qgrid.item(2).getTextContent]);
   end
-  nkibz=str2double(data.getElementsByTagName('nk').item(0).getTextContent);
+  nodes = data.getElementsByTagName('nk');
+
+  if nodes.getLength > 0
+    nkibz = str2double(nodes.item(0).getTextContent);
+  else
+    nodes = data.getElementsByTagName('nks');
+    nkibz = str2double(nodes.item(0).getTextContent);
+  end
   %kibzobj=data.getElementsByTagName('starting_k_points').item(0).getElementsByTagName('k_point');
   kibzobj=data.getElementsByTagName('k_point');
   
@@ -283,6 +290,7 @@ function myneed = load_qe_from_folder(qepath)
   % Things contains symmetric matrix information
   % kpoints information
   %%
+
   nsym=str2double(data.getElementsByTagName('nsym').item(0).getTextContent);
   nrot=str2double(data.getElementsByTagName('nrot').item(0).getTextContent);
   rotation=data.getElementsByTagName('rotation');
@@ -291,7 +299,18 @@ function myneed = load_qe_from_folder(qepath)
       mtrx{i,1}=str2num(rotation.item(i-1).getTextContent);
   end
   
-  syms.ntran = nsym;
+  data_in=xmlread(xmlname);
+  input_node=data_in.getElementsByTagName('input').item(0);
+  sym_flags = input_node.getElementsByTagName('symmetry_flags').item(0);
+  no_t_inv = sym_flags.getElementsByTagName('no_t_rev').item(0).getTextContent;
+  if strcmp(no_t_inv,'false')
+    syms.is_t_rev = int32( 1 );
+  elseif strcmp(no_t_inv,'true')
+    syms.is_t_rev = int32( 0 );
+  else
+    error('no_t_rev is neither true nor false');
+  end
+  syms.nsym = nsym;
   syms.ntranq = 0;
   syms.mtrx = mtrx;
   syms.nrot = nrot;
