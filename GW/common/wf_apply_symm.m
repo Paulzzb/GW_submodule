@@ -25,8 +25,10 @@ function wf = wf_apply_symm(GWinfo, isc)
   end
 
   if (nspinor == 1)
-    indrot = GWinfo.mapping.fft_r_rot{is};
-    wf = GWinfo.psir(indrot, ib, ik_is, ik_isp);
+    % indrot = GWinfo.mapping.fft_r_rot{is};
+    is_inv = GWinfo.tmp_devel.inv_rot_index(is);
+    indinv_rot = GWinfo.tmp_devel.R_rot(:, is_inv);
+    wf = GWinfo.psir(indinv_rot, ib, ik_is, ik_isp);
   end
   
 end % EOF

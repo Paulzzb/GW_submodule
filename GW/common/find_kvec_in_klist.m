@@ -1,17 +1,19 @@
-function [ind_k] = find_vec_in_list(kpt, kpt_set, TOL)
+function [ind_k] = find_kvec_in_klist(kpt, kpt_set, TOL)
   % Return the index of kpt in kpt_set
   %       -1 if not found
   % Default TOL = 1e-9
   if nargin < 3
-    TOL = 1e-9;
+    TOL = 1e-5;
   end
-
+  
   ind_k = -1;
   nbz = length(kpt_set(:)) / 3;
 
+  
   for ii=1:nbz
-    tmpf=abs(kpt-kpt_set(ii,:));
-    if sum(abs(tmpf)) <= TOL 
+    kpt_diff = kpt - kpt_set(ii,:);
+    v = kpt_diff - round(kpt_diff);
+    if norm(v) <= TOL 
       ind_k = ii;
       return;
     end
