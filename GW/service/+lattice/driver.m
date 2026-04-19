@@ -14,13 +14,31 @@ function driver(data, config)
   % Initial setup for d_lat and r_lat
   lattice.manager('r_lat', 'free');
   lattice.manager('d_lat', 'free');
-  d_lat_m = lattice.d_lattice_m();
-  r_lat_m = lattice.r_lattice_m();
+  d_lat_m = lattice.base.d_lattice_m();
+  r_lat_m = lattice.base.r_lattice_m();
   d_lat_m.a1a2a3 = data.sys.supercell';
   d_lat_m.DL_vol = det(d_lat_m.a1a2a3);
-  b1b2b3 = 2*pi*inv(r_lat_m.a1a2a3');
+  b1b2b3 = 2*pi*inv(d_lat_m.a1a2a3');
   r_lat_m.b1b2b3 = b1b2b3;
   r_lat_m.RL_vol = (2*pi)^3 / d_lat_m.DL_vol;
+
+  xyz = [];
+  if isfield(data, 'xyz') && ~isempty(data.xyz)
+    xyz = data.xyz;
+  elseif isfield(data, 'sys') && isfield(data.sys, 'xyzlist') && ~isempty(data.sys.xyzlist)
+    xyz = data.sys.xyzlist;
+  end
+  if ~isempty(xyz)
+    xyz = single(xyz);
+    nat = size(xyz, 1);
+    d_lat_m.atom_pos = reshape(xyz, nat, 1, 3);
+    if isfield(data, 'atom_symbol') && numel(data.atom_symbol) == nat
+      d_lat_m.atom_symbol = data.atom_symbol(:);
+    else
+      d_lat_m.atom_symbol = repmat({''}, nat, 1);
+    end
+  end
+
   lattice.manager('r_lat', 'save2mod', r_lat_m);
   lattice.manager('d_lat', 'save2mod', d_lat_m);
 
@@ -29,30 +47,31 @@ function driver(data, config)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Lets construct G-grid
   % 
-  ecut = config.CUTOFF.coulomb_cutoff;
+  ecut = config.CUTOFFS.coulomb_cutoff;
   lattice.RL_shell_construct(ecut); 
   % 
   % Construct G_rot
   % 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Construct kpt first
-  kibz_RLU = data.kibz;
-  nibz = size(kibz_RLU, 1);
-  kweight = data.kweight;
+  kibz_Cart = data.kibz;
+  nibz = size(kibz_Cart, 1);
+  kweights = data.kweight;
 
-  k = bz_samp(nibz, nsym);
+  k = lattice.base.bz_samp_m(nibz, nsym);
 
-  k.kweight = kweight;
-  k.kpt_RLU = kibz_RLU; 
-  k.kpt_Cart = k.kpt_RLU * b1b2b3';
+  k.weights = kweights;
+  k.kpt_Cart = single(kibz_Cart);
+  k.kpt_RLU = k.kpt_Cart / b1b2b3';
 
   % Set all properties in k with respect to 'full bz'
-  k = KPT_expand(k);
+  k = lattice.KPT_expand(k);
   q = k;
   %
   % Construct qindx*
   % 
-  KPT_qindx(k, q);
+  lattice.KPT_qindx(k, q);
+  FFT.FFT_G_table();
   %
   lattice.manager('k', 'save2mod', k);
   lattice.manager('q', 'save2mod', q);

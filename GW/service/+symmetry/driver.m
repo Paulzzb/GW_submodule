@@ -6,13 +6,13 @@
 %
 % Last modified: 2026/03/18 ZZ
 
-function symm_m = driver(data)
+function driver(data, config)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % extract from data
-  a1a2a3 = data.sys.supercell';
+  a1a2a3 = single( data.sys.supercell' );
   inv_a1a2a3 = inv(a1a2a3);
   b1b2b3 = 2*pi * inv_a1a2a3';
-  fftgrid = [data.sys.n1, data.sys.n2, data.sys.n3];
+  fftgrid = int32( [data.sys.n1, data.sys.n2, data.sys.n3] );
   %
   syms_in = data.syms;
   is_t_rev = syms_in.is_t_rev;
@@ -20,44 +20,49 @@ function symm_m = driver(data)
   nsym = syms_in.nsym;
   mtrx_RLU_G = syms_in.mtrx;
   % init
-  symm_m = symmetric.symm_m(nsym, nrot, is_t_rev);
-  nsym = symm_m.nsym;
+  symm_data = symmetry.base.symm_m(nsym, nrot, is_t_rev);
+  nsym = symm_data.nsym;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Read rotation matrix : RLU on G grid
-  for i = 1:int32( single(nsym)/ (1+is_t_rev) )
-    symm_m.rot_mtrx_RLU_G(:, :, i) = mtrx_RLU_G{i};
-    % single( symm_m.rot_mtrx_RLU_G(:, :, i) );
+  for i = 1: nsym / (1+is_t_rev)
+    symm_data.rot_mtrx_RLU_G(:, :, i) = mtrx_RLU_G{i};
+    % single( symm_data.rot_mtrx_RLU_G(:, :, i) );
   end
   if (is_t_rev == 1)
-    for i = 1:(nsym/2)
-      symm_m.rot_mtrx_RLU_G(:, :, i+nsym/2) = - symm_m.rot_mtrx_RLU_G(:, :, i);
+    for i = 1:( nsym/(1+is_t_rev) )
+      symm_data.rot_mtrx_RLU_G(:, :, i+nsym/2) = - symm_data.rot_mtrx_RLU_G(:, :, i);
     end
   end
 
   % Construct rotation in Card .and. RLU on Rgrid
+  % a1a2a3_scal = a1a2a3 ./ single(fftgrid);
+  R_scal = diag(1./single(fftgrid));
+  % inv_a1a2a3_scal = inv(a1a2a3_scal);
   for irot = 1:nsym
-    mtrx_RLU = symm_m.rot_mtrx_RLU_G{irot};
+    mtrx_RLU = single( symm_data.rot_mtrx_RLU_G(:, :, irot) );
     % Since we assume all vector are row vector, operators are on r.h.s
     mtrx_Cart = a1a2a3 * mtrx_RLU * inv_a1a2a3;
     mtrx_Cart = single ( mtrx_Cart );
-    symm_m.rot_mtrx_Cart(:, :, irot) = mtrx_Cart;
-    symm_m.rot_mtrx_RLU_R{irot} = (a1a2a3./fftgrid)' * mtrx_Cart * inv(a1a2a3./fftgrid)'; 
+    symm_data.rot_mtrx_Cart(:, :, irot) = mtrx_Cart;
+    symm_data.rot_mtrx_RLU_R(:, :, irot) = ...
+      R_scal * (a1a2a3)' * mtrx_Cart * inv_a1a2a3' * diag(single(fftgrid));
+    % symm_data.rot_mtrx_RLU_R(:, :, irot) =  mtrx_RLU; 
   end
 
   % Construct inverse rotation index
   inv_rot_index = int32( zeros(nsym, 1)-1 );
   for irot = 1:nsym
-    inv_rot_Cart_irot = inv(symm_m.rot_mtrx_Cart(:, :, irot));
+    inv_rot_Cart_irot = inv(symm_data.rot_mtrx_Cart(:, :, irot));
     for jrot = 1:nsym
-      rot_Cart_jrot = symm_m.rot_mtrx_Cart(:, :, jrot);
+      rot_Cart_jrot = symm_data.rot_mtrx_Cart(:, :, jrot);
       if norm(inv_rot_Cart_irot - rot_Cart_jrot) < 1e-5
         inv_rot_index(irot) = jrot;
       end
     end
   end
-  symm_m.inv_rot_index = inv_rot_index;
+  symm_data.inv_rot_index = inv_rot_index;
 
   % put into persistent variable
-  symmetry.save2mod(symm_m);
+  symmetry.save2mod(symm_data);
 end

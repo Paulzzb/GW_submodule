@@ -6,7 +6,7 @@
 %
 % Last modified: 2026/03/18 ZZ
 
-function driver(data)
+function driver(data, config)
   % extract from data
   fftgrid = [data.sys.n1, data.sys.n2, data.sys.n3];
   nr = prod(fftgrid);
@@ -18,18 +18,11 @@ function driver(data)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % init
   nsym = double(symm_m_obj.nsym);
-  fft_m = FFT.FFT_m(fftgrid, nsym);
+  fft_m = FFT.base.FFT_m(fftgrid, nsym);
   
-  % Construct Rgrid_RLU: all FFT grid points in RLU
-  Rgrid_RLU = single( zeros(fftgrid(1)*fftgrid(2)*fftgrid(3), 3) );
-  for i = 0:fftgrid(1)-1
-    for j = 0:fftgrid(2)-1
-      for k = 0:fftgrid(3)-1
-        idx = k*fftgrid(1)*fftgrid(2) + j*fftgrid(1) + i + 1;
-        Rgrid_RLU(idx, :) = single([i, j, k]);
-      end
-    end
-  end
+  % Construct Rgrid_RLU: all FFT grid points in RLU (vectorized)
+  [I, J, K] = ndgrid(0:fftgrid(1)-1, 0:fftgrid(2)-1, 0:fftgrid(3)-1);
+  Rgrid_RLU = single([I(:), J(:), K(:)]);
   fft_m.Rgrid_RLU = Rgrid_RLU;
   
   % Get rotation matrix in RLU space on R grid (FFT grid)
@@ -44,10 +37,12 @@ function driver(data)
     % Select appropriate rotation matrix
     if is <= int32(nsym_tot / (1 + is_t_rev))
       % Standard rotation: positive sign
+      % mtrx_RLU_R = symm_m_obj.rot_mtrx_RLU_G(:, :, is);
       mtrx_RLU_R = symm_m_obj.rot_mtrx_RLU_R(:, :, is);
       sign_factor = 1;
     elseif is <= int32(nsym_tot)
       % Time-reversed operation: negative sign
+      % mtrx_RLU_R = symm_m_obj.rot_mtrx_RLU_G(:, :, is);
       mtrx_RLU_R = symm_m_obj.rot_mtrx_RLU_R(:, :, is);
       sign_factor = -1;
     else
@@ -57,19 +52,28 @@ function driver(data)
       sign_factor = 1;
     end
     M2 = single( sign_factor * mtrx_RLU_R );
+    % for i1=1:3
+    %   for i2=1:3
+    %     M2(i1,i2) = M2(i1,i2) * fftgrid(i1) / fftgrid(i2);
+    %   end
+    % end
+    % M2 = diag(1./fftgrid) * M2 * diag(fftgrid);
 
-    for ir = 1:nr
-      M2_r_RLU = round( single( Rgrid_RLU(ir, :) ) * M2 );
-      % Apply periodic boundary conditions with modulo (both operands are 1x3 row vectors)
-      iv_mod = int32(mod(M2_r_RLU + fftgrid, fftgrid));
-      i4 = 1 + iv_mod(1) + iv_mod(2)*fftgrid(1) + iv_mod(3)*fftgrid(1)*fftgrid(2);
-      if is == int32(nsym_tot + 1)
-        % Spatial inversion: ir -> i4
-        fft_m.R_rot_inv(ir) = int32(i4);
-      else
-        % Standard symmetry: ir -> i4
-        fft_m.R_rot(ir, is) = int32(i4);
-      end
+    % Vectorized computation for all grid points
+    M2_r_RLU = (Rgrid_RLU * M2);  % nr x 3
+    if norm(M2_r_RLU - round(M2_r_RLU)) > 1e-3
+      error('Non-integer mapping found in rotation. Check the rotation matrices and FFT grid.');
+    end
+    M2_r_RLU = (round(M2_r_RLU));
+    iv_mod = int32(mod(M2_r_RLU + fftgrid, fftgrid));  % nr x 3
+    i4 = 1 + iv_mod(:,1) + iv_mod(:,2)*fftgrid(1) + iv_mod(:,3)*fftgrid(1)*fftgrid(2);  % nr x 1
+    
+    if is == int32(nsym_tot + 1)
+      % Spatial inversion: ir -> i4
+      fft_m.R_rot_inv = int32(i4);
+    else
+      % Standard symmetry: ir -> i4
+      fft_m.R_rot(:, is) = int32(i4);
     end
   end 
 

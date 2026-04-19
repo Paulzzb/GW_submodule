@@ -18,38 +18,48 @@ function RL_shell_construct(ecut)
   fft_m = FFT.manager('get');
   %
   fftgrid = fft_m.fftgrid;
+  fftgrid_s = single(fftgrid);
   b1b2b3 = r_lat_m.b1b2b3;
   %
   n1 = fftgrid(1);
   n2 = fftgrid(2);
   n3 = fftgrid(3); 
 
-  [gkxind, gkyind, gkzind] = ...
-    ndgrid((0:n1-1)-((0:n1-1) >= n1/2)*n1, ...
-      (0:n2-1)-((0:n2-1) >= n2/2)*n2, ...
-      (0:n3-1)-((0:n3-1) >= n3/2)*n3);
-  gkxind = gkxind(:);
-  gkyind = gkyind(:);
-  gkzind = gkzind(:);
+  n1_s = single(n1);
+  n2_s = single(n2);
+  n3_s = single(n3);
+  [gkxind, gkyind, gkzind] = ndgrid( ...
+  (0:n1_s-1) - ( (0:n1_s-1) >= n1_s/2 )*n1_s, ...
+  (0:n2_s-1) - ( (0:n2_s-1) >= n2_s/2 )*n2_s, ...
+  (0:n3_s-1) - ( (0:n3_s-1) >= n3_s/2 )*n3_s);
+  gkxind = int32( gkxind(:) );
+  gkyind = int32( gkyind(:) );
+  gkzind = int32( gkzind(:) );
   
   % Calculate |G|^2 for all G-vectors in the full FFT grid,
   % and select those within the cutoff 
   gkind = [gkxind, gkyind, gkzind];
-  gkvec = gkind*b1b2b3';
+  gkvec = single(gkind) * b1b2b3';
   gkabs2 = sum(gkvec.^2, 2);
+  % Sort according to |G|.^2
+  [gkabs2, sort_ind] = sort(gkabs2);
+  gkind = gkind(sort_ind, :);
+  gkxind = gkxind(sort_ind);
+  gkyind = gkyind(sort_ind);
+  gkzind = gkzind(sort_ind);
+
+  % ecut =   59.7353365;
   idxnz = int32( find(gkabs2 <= ecut) );
   r_lat_m.ng = length(idxnz);
   gkxind = gkxind(idxnz);
   gkyind = gkyind(idxnz);
   gkzind = gkzind(idxnz);
-
-  % Sort according to |G|.^2
   gkabs2 = gkabs2(idxnz);
-  [~, sort_ind] = sort(gkabs2);
-  r_lat_m.Ggrid_RLU = [gkxind(sort_ind), gkyind(sort_ind), gkzind(sort_ind)];
-  r_lat_m.Ggrid_Cart = single(r_lat_m.Ggrid_RLU * b1b2b3');
-  r_lat_m.idxnz = idxnz(sort_ind);
-  gkabs2 = gkabs2(sort_ind);
+
+  % gkabs2 = gkabs2(sort_ind);
+  r_lat_m.Ggrid_RLU = [gkxind, gkyind, gkzind];
+  r_lat_m.Ggrid_Cart = single(r_lat_m.Ggrid_RLU) * b1b2b3';
+  % r_lat_m.idxnz = idxnz(sort_ind);
 
   % Construct shell structure
   first_index_in_each_shell = zeros(r_lat_m.ng, 1);
@@ -77,7 +87,7 @@ function RL_shell_construct(ecut)
   r_lat_m.G_rot = int32( zeros(r_lat_m.ng, symm_m.nsym) );
   for irot = 1:symm_m.nsym 
     mtrx_RLU = symm_m.rot_mtrx_RLU_G(:, :, irot);
-    rot_Ggrid_RLU = r_lat_m.Ggrid_RLU(:, :) * mtrx_RLU;
+    rot_Ggrid_RLU = int32( single( r_lat_m.Ggrid_RLU(:, :) ) * mtrx_RLU );
     for ishell = 1:r_lat_m.n_g_shell
       ig_start = r_lat_m.first_index_in_each_shell(ishell);
       ig_len = r_lat_m.num_index_in_each_shell(ishell);
@@ -85,8 +95,8 @@ function RL_shell_construct(ecut)
       ig_range = ig_start:ig_end;
       for ig1 = ig_range
         for ig2 = ig_range
-          gdiff = round(rot_Ggrid_RLU(ig1, :) - r_lat_m.Ggrid_RLU(ig2, :)); 
-          if norm( mod(gdiff + fftgrid, fftgrid) ) < r_lat_m.tol
+          gdiff = rot_Ggrid_RLU(ig1, :) - r_lat_m.Ggrid_RLU(ig2, :); 
+          if all( mod(gdiff + fftgrid, fftgrid) == 0 ) 
             r_lat_m.G_rot(ig1, irot) = ig2;
             break
           end

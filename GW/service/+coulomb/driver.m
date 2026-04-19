@@ -22,7 +22,7 @@ function driver(data, config)
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Initial setup for coulomb
-  coulomb_m = coulomb.coulomb_m(ng, nqibz);
+  coulomb_m = coulomb.base.coulomb_m(ng, nqibz);
   %
   coulomb_m.trunc_method = config.CUTOFFS.coulomb_truncation_method;
   coulomb_m.trunc_param = config.CUTOFFS.coulomb_truncation_parameter;
@@ -31,7 +31,7 @@ function driver(data, config)
   Ggrid_Cart = r_lat.Ggrid_Cart;
   %
   for iqibz = 1:nqibz
-    qpt = q.qpt_Cart(iqibz, :);
+    qpt = q.kpt_Cart(iqibz, :);
     qgp_Cart = Ggrid_Cart + qpt;
     qgpabs = sqrt( sum(qgp_Cart.^2, 2) );
     coulomb_m.bare_qpg(:, iqibz) = qgpabs;

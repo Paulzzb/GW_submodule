@@ -13,7 +13,6 @@ function vcoul()
 
   eightpi = 8*pi;
   fourpi = 4*pi;
-  tol_zero = 1e-7;
   Godby_const = 7.44;
   spherical_const = 7.7956;
 
@@ -30,7 +29,7 @@ function vcoul()
   coulomb_m.vcoul0 = reg_q_m2;
 
   for iqibz = 1:q.nibz
-    q_weight = q.weights(iqibz);
+    % q_weight = q.weights(iqibz);
     bare_qpg = coulomb_m.bare_qpg(:, iqibz);
     switch trunc_method
       case 0

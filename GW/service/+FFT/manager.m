@@ -23,7 +23,7 @@ function out = manager(cmd, varargin)
 
     case 'save2mod'
       data = varargin{1};
-      if ~(isa(data, 'FFT.FFT_m') || isa(data, 'FFT_m'))
+      if ~( isa(data, 'FFT.base.FFT_m') )
         error('FFT::save2mod requires input as a FFT_m object');
       end
       out = 0;

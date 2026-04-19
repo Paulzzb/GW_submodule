@@ -44,11 +44,7 @@ function out = manager(type, cmd, varargin)
       out = lattice_ptr;
       return
 
-    case 'save2mod'
-      if ~(isa(varargin{1}, class_name) || isa(varargin{1}, ['lattice.' class_name]))
-        error('lattice::save2mod(%s) requires input as a %s object', type, class_name);
-      end
-      
+    case 'save2mod'     
       % Save to the appropriate persistent variable
       switch lower(type)
         case 'r_lat'

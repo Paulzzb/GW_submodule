@@ -20,7 +20,7 @@ function k = KPT_ibz2bz(k)
   for ikbz = 1:k.nbz
     ikibz = k.bz2ibz(ikbz);
     isym = k.bz2rot(ikbz);
-    rot_Cart = single( symm_m.rot_mtrx_Cart{isym} );
+    rot_Cart = single( symm_m.rot_mtrx_Cart(:, :, isym) );
     kibz_Cart = single( k.kpt_Cart(ikibz, :) );
     k.kptbz_Cart(ikbz, :) = kibz_Cart * rot_Cart;
   end

@@ -7,7 +7,7 @@
 % Last modified: 2026/03/18 ZZ
 
 function out = manager(cmd, varargin)
-  persistent coulomb_m  
+  persistent coul_m  
 
   if nargin==0
     cmd = 'get';
@@ -15,22 +15,22 @@ function out = manager(cmd, varargin)
 
   switch lower(cmd)
     case 'get'
-      if isempty(coulomb_m)
+      if isempty(coul_m)
         error('coulomb_m not initialized.');
       end
-      out = coulomb_m;
+      out = coul_m;
       return
 
     case 'save2mod'
       input = varargin{1};
-      if ~isa(input, 'coulomb_m')
+      if ~( isa( input, 'coulomb.base.coulomb_m' ) )
         error('coulomb::save2mod required input as a coulomb_m object');
       end
-      coulomb_m = input;
+      coul_m = input;
       out = 0;
 
     case 'free'
-      coulomb_m = [];
+      coul_m = [];
 
     otherwise
       error('Unknown command')

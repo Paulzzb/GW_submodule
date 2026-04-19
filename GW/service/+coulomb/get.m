@@ -9,4 +9,4 @@
 function out = get()
   cmd = 'get';
   out = coulomb.manager(cmd);
-en
+end
