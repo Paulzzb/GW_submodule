@@ -1,7 +1,7 @@
 &CONTROL
   prefix = 'Si',
   isgw = 1, 
-  groundstate_dir = 'GaN.save',
+  groundstate_dir = 'Si.save',
   groundstate_type = 'qe',
   storage_dir = './SAVE',
   enable_k_points = .true. 

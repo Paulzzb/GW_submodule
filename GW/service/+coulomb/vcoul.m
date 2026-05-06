@@ -50,7 +50,7 @@ function vcoul()
     case 0
       coulomb_m.vcoul0 = reg_q_m2;
     case 2
-      coulomb_m.vcoul0 = fourpi * trunc_factor.^2;
+      coulomb_m.vcoul0 = q_weight * fourpi * trunc_param.^2;
     otherwise
       error('Unsupported truncation method');
   end

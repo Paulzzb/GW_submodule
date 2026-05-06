@@ -77,6 +77,12 @@ data.nspinor = myneed.nspinor;
 symm = myneed.syms;
 data.syms = symm;
 
+if isfield(myneed, 'xyz')
+  data.xyz = myneed.xyz;
+end
+if isfield(myneed, 'atom_symbol')
+  data.atom_symbol = myneed.atom_symbol;
+end
 
 end
 

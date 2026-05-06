@@ -1,10 +1,10 @@
 function report = run_coarse_selection_test()
-% Sandbox test for isdf.gen_indices_coarse.
+% Sandbox test for isdf.coeff.gen_indices_coarse.
 
   fprintf('\n=== isdftest: coarse grid selection ===\n');
 
 
-  [Nmu, ind_mu] = isdf.gen_indices_coarse();
+  [Nmu, ind_mu] = isdf.coeff.gen_indices_coarse();
 
   report = struct();
   report.ok = true;

@@ -9,13 +9,13 @@
 function gen_indices_coarse_test()
 % GEN_INDICES_COARSE_TEST  ISDF coarse-grid pipeline (driver).
 %
-% Steps: isdf.gen_coeff_coarse ('fft_grid', 'wf') -> isdf_build_tildeVq ->
+% Steps: isdf.coeff.gen_coeff_coarse ('fft_grid', 'wf') -> isdf_build_tildeVq ->
 %        isdf_coarse_validate_energies.
 %
 % Caching of wf_on_coarse / tildeVq is not implemented here (reserved for DB layer).
   fft_data = FFT.get();
   fftgrid_i = int32(fft_data.fftgrid(:).');
-  [fftgrid_c, Nmu, R_coarse_RLU, R_rot_coarse] = isdf.gen_coarse_Rgrid();
+  [fftgrid_c, Nmu, R_coarse_RLU, R_rot_coarse] = isdf.coeff.gen_coarse_Rgrid();
 
   
   N_dense = prod(double(fftgrid_i));
@@ -29,7 +29,7 @@ function gen_indices_coarse_test()
   fprintf('Coarse / dense fraction %.6g\n', N_coarse / N_dense);
   fprintf('=============================================\n\n');
 
-  wf_on_coarse = isdf.gen_coeff_coarse('wf', fftgrid_c, Nmu, R_coarse_RLU);
+  wf_on_coarse = isdf.coeff.gen_coeff_coarse('wf', fftgrid_c, Nmu, R_coarse_RLU);
 
   tildeVq = isdf_build_tildeVq(wf_on_coarse, R_coarse_RLU, R_rot_coarse, fftgrid_i, fftgrid_c, fft_sz, Nmu);
 

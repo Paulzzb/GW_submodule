@@ -52,12 +52,12 @@ function tildeVq = isdf_build_tildeVq(wf_on_coarse, R_coarse_RLU, R_rot_coarse, 
       wf_c_1tmp = wf_on_coarse(:, :, ikibz, 1);
       wf_c_2tmp = wf_on_coarse(:, :, ikpibz, 1);
       if ikrot ~= 1
-        wf_c_1 = isdf.isdf_apply_symm_on_coarse(wf_c_1tmp, ikrot, symm_data, R_rot_coarse);
+        wf_c_1 = isdf.coeff.isdf_apply_symm_on_coarse(wf_c_1tmp, ikrot, symm_data, R_rot_coarse);
       else
         wf_c_1 = wf_c_1tmp;
       end
       if ikprot ~= 1
-        wf_c_2 = isdf.isdf_apply_symm_on_coarse(wf_c_2tmp, ikprot, symm_data, R_rot_coarse);
+        wf_c_2 = isdf.coeff.isdf_apply_symm_on_coarse(wf_c_2tmp, ikprot, symm_data, R_rot_coarse);
       else
         wf_c_2 = wf_c_2tmp;
       end

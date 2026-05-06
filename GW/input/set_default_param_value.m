@@ -86,10 +86,33 @@ if (config.ISDF.isisdf > 0)
   if (config.ISDF.isdf_ratio_type3 < 0)
     config.ISDF.isdf_ratio_type3 = config.ISDF.isdf_ratio;
   end
+  if (config.ISDF.adaptive_threshold_type1 < 0)
+    config.ISDF.adaptive_threshold_type1 = 2e-4;
+  end
+  if (config.ISDF.adaptive_threshold_type2 < 0)
+    config.ISDF.adaptive_threshold_type2 = 2e-4;
+  end
+  if (config.ISDF.adaptive_num_add_type1 < 0)
+    config.ISDF.adaptive_num_add_type1 = 16;
+  end
+  if (config.ISDF.adaptive_num_add_type2 < 0)
+    config.ISDF.adaptive_num_add_type2 = 16;
+  end
+  if (config.ISDF.adaptive_candidate_ratio_type1 < 0)
+    config.ISDF.adaptive_candidate_ratio_type1 = 2.0;
+  end
+  if (config.ISDF.adaptive_candidate_ratio_type2 < 0)
+    config.ISDF.adaptive_candidate_ratio_type2 = 2.0;
+  end
+  if (config.ISDF.adaptive_max_add_frac_type1 < 0)
+    config.ISDF.adaptive_max_add_frac_type1 = 1.0;
+  end
+  if (config.ISDF.adaptive_max_add_frac_type2 < 0)
+    config.ISDF.adaptive_max_add_frac_type2 = 1.0;
+  end
   if isempty(config.ISDF.sys)
     config.ISDF.sys = data.sys;
   end
 end
-
 
 end

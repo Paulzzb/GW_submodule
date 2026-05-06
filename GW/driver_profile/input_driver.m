@@ -25,6 +25,7 @@ function input_driver(inputfile)
   config = set_default_param_value(config, data);
 
 
+  save()
   % Step 4: Construct GWinfo (Basically, the groundstate data) and GWOptions seperately
   GWgroundstate = construct_GWinfo(data, config);
   GWoptions = construct_GWOptions(data, config);
@@ -33,6 +34,8 @@ function input_driver(inputfile)
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 
   dir = config.CONTROL.storage_dir;
   def = filename_map();
+  fNamedata = fullfile(dir, def.data);
+
   fName1 = fullfile(dir, def.GWinput);
   fName2 = fullfile(dir, def.config);
   if ~exist(dir, 'dir')
@@ -40,10 +43,13 @@ function input_driver(inputfile)
   end
   
   config.ISDFCauchy = GWoptions.ISDFCauchy;
+  save(fNamedata, 'data', '-v7.3', '-nocompression');
   save(fName1, 'GWgroundstate', '-v7.3', '-nocompression');
   save(fName2, 'GWoptions', 'config');
   %
-
+  % Step 8: ( testing )
+  % use structure in service/ to construct 
+  service_driver(data, config);
   % Step 7: display input and groundstate information
   display_input_summary(GWgroundstate, GWoptions, config)
 

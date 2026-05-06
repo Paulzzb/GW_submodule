@@ -74,6 +74,7 @@ function out = manager(cmd, varargin)
           obj = isdf.base.isdf_m();
           obj.desc = desc_str;
           obj.id = int32(i);
+          obj.allocated = true;
           obj.assigned = false;
           pool{i} = obj;
           current_id = int32(i);

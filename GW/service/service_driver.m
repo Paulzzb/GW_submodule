@@ -8,13 +8,15 @@
 
 function service_driver(data, config)
   % A temporary driver to call service modules for testing and demonstration.
-  
+
+  isdf.debug.init_from_config(config);
+
   system.driver(data, config);
   symmetry.driver(data, config);
   FFT.driver(data, config);
   lattice.driver(data, config);
   coulomb.driver(data, config);
-  pair_symmetry.driver(data, config);
+  % pair_symmetry.driver(data, config);
   wave_functions.driver(data, config);
   if config.ISDF.isisdf
     isdf.driver(data, config);

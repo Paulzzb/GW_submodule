@@ -4,7 +4,7 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/03/24
+% Last modified: 2026/04/19
 
 function report = service_reset_persistent()
   % Clear persistent caches across service modules.
@@ -16,10 +16,13 @@ function report = service_reset_persistent()
     % @() coulomb.free(), 'coulomb.free';
     % @() wave_functions.manager('free'), 'wave_functions.free';
     @() wave_functions.WF_apply_symm('reset'), 'wave_functions.WF_apply_symm(''reset'')';
-    @() isdf.isdf_apply_symm_on_coarse('reset'), 'isdf.isdf_apply_symm_on_coarse(''reset'')';
-    @() isdf_get_coeff('reset'), 'isdf_get_coeff(''reset'')';
-    @() isdf_schur_update('clear'), 'isdf_schur_update(''clear'')';
-    @() adaptive_weight('clear'), 'adaptive_weight(''clear'')';
+    @() isdf.coeff.isdf_apply_symm_on_coarse('reset'), 'isdf.coeff.isdf_apply_symm_on_coarse(''reset'')';
+    @() isdf.coeff.isdf_get_coeff('reset'), 'isdf.coeff.isdf_get_coeff(''reset'')';
+    @() isdf.adaptive.isdf_schur_update('clear'), 'isdf.adaptive.isdf_schur_update(''clear'')';
+    @() isdf.adaptive.adaptive_weight('clear'), 'isdf.adaptive.adaptive_weight(''clear'')';
+    @() isdf.get_u_xalpha('reset'), 'isdf.get_u_xalpha(''reset'')';
+    @() isdf.get_rho_xalpha('reset'), 'isdf.get_rho_xalpha(''reset'')';
+    @() isdf.debug.clear(), 'isdf.debug.clear';
     @() timing.free(), 'timing.free';
   };
 

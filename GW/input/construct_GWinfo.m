@@ -117,7 +117,7 @@ if config.CONTROL.enable_k_points
   GWinfor.symminfo = symminfo(syms.nsym, syms.ntranq, syms.mtrx, syms.nrot, syms.indsub, syms.kgzero);
   % Use irreducible k-points to generate full-kpoints set
   [GWinfor.bz_samp] = bz_sampling(data.nkibz, data.kibz, bvec, data.kweight);
-  GWinfor.bz_samp = fullbz(GWinfor.bz_samp, GWinfor.symminfo, GWinfor.gvec);
+  % GWinfor.bz_samp = fullbz(GWinfor.bz_samp, GWinfor.symminfo, GWinfor.gvec);
   % Mapping G-Go with fft_grid
   GWinfor.mapping = setmapping(GWinfor);
   % GWinfor.gvec = setGomap(GWinfor.gvec, GWinfor.bz_samp.nGo);

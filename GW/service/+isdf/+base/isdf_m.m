@@ -33,6 +33,8 @@ classdef isdf_m
     R_rot_extra(:, :) {mustBeInteger} = int32(zeros(0, 0))
     N_coarse(1, 1) {mustBeInteger} = int32(0)
     N_extra(1, 1) {mustBeInteger} = int32(0) % N_extra + N_coarse = nisdf
+    tmp
+    bundle_struct
   end
 
   methods

@@ -70,7 +70,7 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_coarse_validate_energies(tildeVq, 
       for ib = 1:nb
         wf_1_c = wf_on_coarse(:, ib, ikibz, ispin);
         if ikrot ~= 1
-          wf_1_c = isdf.isdf_apply_symm_on_coarse(wf_1_c, ikrot, symm_data, R_rot_coarse);
+          wf_1_c = isdf.coeff.isdf_apply_symm_on_coarse(wf_1_c, ikrot, symm_data, R_rot_coarse);
         end
         wf_1_c = conj(wf_1_c);
         for iqbz = 1:nbz
@@ -97,7 +97,7 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_coarse_validate_energies(tildeVq, 
             end
             wf_2_c = wf_on_coarse(:, ob, ikpibz, ispin);
             if ikprot ~= 1
-              wf_2_c = isdf.isdf_apply_symm_on_coarse(wf_2_c, ikprot, symm_data, R_rot_coarse);
+              wf_2_c = isdf.coeff.isdf_apply_symm_on_coarse(wf_2_c, ikprot, symm_data, R_rot_coarse);
             end
             c_rho = wf_1_c .* wf_2_c;
 

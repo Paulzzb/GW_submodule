@@ -1,0 +1,32 @@
+&CONTROL
+  prefix = 'Si',
+  isgw = 1, 
+  groundstate_dir = 'Si.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true. 
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 71,
+  energy_band_index_min = 1,
+  energy_band_index_max = 15,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = -1,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 0,
+  coulomb_cutoff = 17.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  isdf_ratio = 7.0
+  exxmethod = 'coarse'
+  is_helper = .false.
+END &ISDF

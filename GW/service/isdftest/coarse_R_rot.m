@@ -7,7 +7,7 @@
 % Last modified: 2026/04/08
 
 function R_rot_coarse = coarse_R_rot(fftgrid_c)
-% Thin wrapper: isdf.isdf_coarse_R_rot.
+% Thin wrapper: isdf.coeff.isdf_coarse_R_rot.
 
-  R_rot_coarse = isdf.isdf_coarse_R_rot(fftgrid_c);
+  R_rot_coarse = isdf.coeff.isdf_coarse_R_rot(fftgrid_c);
 end

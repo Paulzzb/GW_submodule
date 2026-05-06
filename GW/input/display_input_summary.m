@@ -1,4 +1,4 @@
-function display_input_summary(GWgroundstate, GWoptions, config)
+function display_input_summary(~, ~, config)
 
 disp("========== GW Input Summary ==========")
 fprintf(" Groundstate Type     : %s\n", config.CONTROL.groundstate_type);
@@ -14,6 +14,14 @@ fprintf(" ISDF Ratio           : %.2f\n", config.ISDF.isdf_ratio);
 fprintf(" ISDF Type1 Ratio     : %.2f\n", config.ISDF.isdf_ratio_type1);
 fprintf(" ISDF Type2 Ratio     : %.2f\n", config.ISDF.isdf_ratio_type2);
 fprintf(" ISDF Type3 Ratio     : %.2f\n", config.ISDF.isdf_ratio_type3);
+fprintf(" Adaptive Thres T1/T2 : %.2e / %.2e\n", ...
+  config.ISDF.adaptive_threshold_type1, config.ISDF.adaptive_threshold_type2);
+fprintf(" Adaptive NumAdd T1/T2: %d / %d\n", ...
+  int32(config.ISDF.adaptive_num_add_type1), int32(config.ISDF.adaptive_num_add_type2));
+fprintf(" Adaptive CandR T1/T2 : %.2f / %.2f\n", ...
+  config.ISDF.adaptive_candidate_ratio_type1, config.ISDF.adaptive_candidate_ratio_type2);
+fprintf(" Adaptive MaxFrac T1/T2: %.2f / %.2f\n", ...
+  config.ISDF.adaptive_max_add_frac_type1, config.ISDF.adaptive_max_add_frac_type2);
 
 disp("----------- CUTOFFS Settings -----------")
 fprintf(" COULOMB TRUNCATION   : %3d\n", config.CUTOFFS.coulomb_truncation_method);

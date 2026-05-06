@@ -91,13 +91,28 @@ function myneed = load_qe_from_folder(qepath)
   structure=data.getElementsByTagName('atomic_positions').item(0).getElementsByTagName('atom');
   xyzlist=[];
   atomlist=[];
+  atom_symbol = cell(structure.getLength, 1);
   for i=0:structure.getLength-1
     xyzlist=[xyzlist;str2num(structure.item(i).getTextContent)];
+    atom_symbol{i+1} = char(structure.item(i).getAttribute('name'));
     % atomlist=[atomlist, Atom(structure.item(i).getAttribute('name').toCharArray')];
   end
   
   ev = zeros(nbnd,nkibz,nspin);
 
+  ev_data=data.getElementsByTagName('band_structure').item(0).getElementsByTagName('eigenvalues');
+  
+  if nspin==2
+      for ik=1:nkibz
+          ev(:,ik,:)=reshape(str2double(split(strtrim(string(ev_data.item(ik-1).getTextContent)))),nbnd,[],2);
+      end
+  else
+      for ik=1:nkibz
+          ev(:,ik)=str2double(split(strtrim(string(ev_data.item(ik-1).getTextContent))));
+      end
+  end
+
+  
   efermi = str2double(data.getElementsByTagName('fermi_energy').item(0).getTextContent);
   
   ng=h5readatt(chargename,'/','ngm_g');
@@ -218,6 +233,7 @@ function myneed = load_qe_from_folder(qepath)
   myneed.bvec = 2*pi*inv(supercell)';
   myneed.bdot = myneed.bvec * myneed.bvec.';
   myneed.xyz = xyzlist;
+  myneed.atom_symbol = atom_symbol;
 
   myneed.ne = nelec;
   myneed.nspin = nspin;
@@ -263,14 +279,22 @@ function myneed = load_qe_from_folder(qepath)
   
   myneed.rhor = rho; 
   myneed.rhog3d = rhog3d; 
-  myneed.ev = ev*2;
   vxc_ = zeros(nbnd,nkibz,nspin);
+  nbnd_vxc = floor(size(vxc.value, 1) / nspin);
+  nbnd_vxc_use = min(nbnd, nbnd_vxc);
+  if nbnd_vxc_use < nbnd
+    warning('load_qe_from_folder:vxcBands', ...
+      ['vxc.dat provides %d bands (per spin), but XML nbnd=%d. ', ...
+       'Only first %d bands are filled from vxc.dat; remaining bands set to 0.'], ...
+      nbnd_vxc, nbnd, nbnd_vxc_use);
+  end
   for ikibz = 1:nkibz
     if (nspin == 1)
-      vxc_(:, ikibz) = vxc.value(1:nspin:end, ikibz);
+      vxc_(1:nbnd_vxc_use, ikibz) = vxc.value(1:nbnd_vxc_use, ikibz);
     else
       for ispin = 1:nspin
-        vxc_(:, ikibz, ispin) = vxc.value(ispin:nspin:end, ikibz);
+        vxc_spin = vxc.value(ispin:nspin:end, ikibz);
+        vxc_(1:nbnd_vxc_use, ikibz, ispin) = vxc_spin(1:nbnd_vxc_use);
       end
     end
   end
@@ -279,12 +303,15 @@ function myneed = load_qe_from_folder(qepath)
   occ_ = zeros(nbnd,nkibz,nspin);
   occ_data=data.getElementsByTagName('band_structure').item(0).getElementsByTagName('occupations');
   for ik = 1:nkibz
-      occ = str2double(split(strtrim(string(occ_data.item(ik-1).getTextContent))));
-      occ = reshape(occ, [], nspin);
-      occ_(:, ik, :) = occ;
+    occ = str2double(split(strtrim(string(occ_data.item(ik-1).getTextContent))));
+    occ = reshape(occ, [], nspin);
+    occ_(:, ik, :) = occ;
   end
   myneed.occupation = occ_;
   myneed.efermi = efermi;
+  
+
+  myneed.ev = ev*2;
   
 
   % Things contains symmetric matrix information
