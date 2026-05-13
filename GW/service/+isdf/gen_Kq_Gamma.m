@@ -1,4 +1,4 @@
-function Kq_ISDF = gen_Kq(id_vc, iqibz, omega)
+function Kq_ISDF = gen_Kq_Gamma(id_vc, iqibz, omega)
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);

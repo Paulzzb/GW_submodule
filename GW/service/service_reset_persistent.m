@@ -23,6 +23,7 @@ function report = service_reset_persistent()
     @() isdf.get_u_xalpha('reset'), 'isdf.get_u_xalpha(''reset'')';
     @() isdf.get_rho_xalpha('reset'), 'isdf.get_rho_xalpha(''reset'')';
     @() isdf.debug.clear(), 'isdf.debug.clear';
+    @() parallel.free(), 'parallel.free';
     @() timing.free(), 'timing.free';
   };
 

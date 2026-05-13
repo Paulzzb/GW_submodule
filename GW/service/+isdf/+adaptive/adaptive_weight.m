@@ -5,24 +5,36 @@ function varargout = adaptive_weight(mode, varargin)
 %   adaptive_weight('init', id)
 %   adaptive_weight('update', Nlist [, Nadd])
 %   w = adaptive_weight('get')
+%   adaptive_weight('set_batch_size', n)
 %   adaptive_weight('clear')
 
-  persistent Nw w nbrange1 nbrange2 Phi Psi
+  persistent Nw w nbrange1 nbrange2 Phi Psi batch_size
 
   if nargin < 1
     error('adaptive_weight:mode', 'First argument ''mode'' is required.');
   end
 
   switch lower(mode)
+    case 'set_batch_size'
+      if nargin < 2 || isempty(varargin{1})
+        error('adaptive_weight:set_batch_size', '''set_batch_size'' requires a positive integer.');
+      end
+      bs = double(varargin{1});
+      if ~(isfinite(bs) && bs >= 1)
+        error('adaptive_weight:set_batch_size', 'batch_size must be a positive integer.');
+      end
+      batch_size = max(1, round(bs));
+
     case 'init_update'
       % varargin{1}: Nlist; optional varargin{2}: Nadd
       [Nisdf, ~, invL_CCH, ~, Psi_on_grid, Phi_on_grid] ...
               = isdf.adaptive.isdf_schur_update('get');
-      invL_CCH = single(invL_CCH);
-      Psi_on_grid = single(Psi_on_grid);
-      Phi_on_grid = single(Phi_on_grid);
+      Nisdfmax = size(Psi_on_grid, 1);
+      isdf.adaptive.MrC1H('ensure', Nw, Nisdfmax);
 
-      batch_size = 128;
+      if isempty(batch_size)
+        batch_size = 256;
+      end
       n_batches = ceil(double(Nw) / double(batch_size));
       for ib = 1:n_batches
         i1 = (ib - 1) * batch_size + 1;
@@ -30,8 +42,23 @@ function varargout = adaptive_weight(mode, varargin)
         batch_idx = i1:i2;
         batch_idx_col = batch_idx(:);
 
-        MrC1H = isdf.prod(Psi(batch_idx, :), Psi_on_grid(1:Nisdf, :), ...
-                          Phi(batch_idx, :), Phi_on_grid(1:Nisdf, :));
+        cols_have = isdf.adaptive.MrC1H('cached_cols', batch_idx_col);
+        need_mask = (cols_have < Nisdf);
+        if any(need_mask)
+          starts = unique(cols_have(need_mask));
+          for is = 1:length(starts)
+            cstart0 = starts(is);
+            row_mask = (cols_have == cstart0);
+            rows_now = batch_idx(row_mask);
+            cstart = cstart0 + 1;
+            MrC1H_new = isdf.prod(Psi(rows_now, :), Psi_on_grid(cstart:Nisdf, :), ...
+                                  Phi(rows_now, :), Phi_on_grid(cstart:Nisdf, :));
+            isdf.adaptive.MrC1H('set_range', rows_now, cstart, MrC1H_new);
+            isdf.adaptive.MrC1H('set_cached_cols', rows_now, Nisdf);
+            cols_have(row_mask) = Nisdf;
+          end
+        end
+        MrC1H = isdf.adaptive.MrC1H('get', batch_idx, 1, Nisdf);
         invL1MrC1H = invL_CCH(1:Nisdf, 1:Nisdf) * MrC1H';
         w(batch_idx_col) = w(batch_idx_col) - sum(abs(invL1MrC1H).^2, 1).';
       end
@@ -40,10 +67,8 @@ function varargout = adaptive_weight(mode, varargin)
       % varargin{1}: Nlist; optional varargin{2}: Nadd
       [Nisdf, Nadd, invL_CCH, L_CCH, Psi_on_grid, Phi_on_grid] ...
               = isdf.adaptive.isdf_schur_update('get');
-      invL_CCH = single(invL_CCH);
-      L_CCH = single(L_CCH);
-      Psi_on_grid = single(Psi_on_grid);
-      Phi_on_grid = single(Phi_on_grid);
+      Nisdfmax = size(Psi_on_grid, 1);
+      isdf.adaptive.MrC1H('ensure', Nw, Nisdfmax);
 
       if nargin < 2
         Nlist = 1:Nw;
@@ -62,7 +87,9 @@ function varargout = adaptive_weight(mode, varargin)
         warning('use init_update instead');
       end
       %
-      batch_size = 128;
+      if isempty(batch_size)
+        batch_size = 256;
+      end
       n_list = length(Nlist);
       n_batches = ceil(double(n_list) / double(batch_size));
       for ib = 1:n_batches
@@ -74,15 +101,35 @@ function varargout = adaptive_weight(mode, varargin)
         if Nold == 0
           MrC1H = isdf.prod(Psi(batch_idx, :), Psi_on_grid(1:Nisdf, :), ...
                             Phi(batch_idx, :), Phi_on_grid(1:Nisdf, :));
+          isdf.adaptive.MrC1H('set_range', batch_idx, 1, MrC1H);
+          isdf.adaptive.MrC1H('set_cached_cols', batch_idx_col, Nisdf);
           invL1MrC1H = L_CCH(1:Nisdf, 1:Nisdf) \ MrC1H';
           w(batch_idx_col) = w(batch_idx_col) - sum(abs(invL1MrC1H).^2, 1).';
         else
+          cols_have = isdf.adaptive.MrC1H('cached_cols', batch_idx_col);
+          need_mask = (cols_have < Nold);
+          if any(need_mask)
+            starts = unique(cols_have(need_mask));
+            for is = 1:length(starts)
+              cstart0 = starts(is);
+              row_mask = (cols_have == cstart0);
+              rows_now = batch_idx(row_mask);
+              cstart = cstart0 + 1;
+              MrC1H_old = isdf.prod(Psi(rows_now, :), Psi_on_grid(cstart:Nold, :), ...
+                                    Phi(rows_now, :), Phi_on_grid(cstart:Nold, :));
+              isdf.adaptive.MrC1H('set_range', rows_now, cstart, MrC1H_old);
+              isdf.adaptive.MrC1H('set_cached_cols', rows_now, Nold);
+              cols_have(row_mask) = Nold;
+            end
+          end
+
           MrC2H = isdf.prod(Psi(batch_idx, :), Psi_on_grid(Nold+1:Nisdf, :), ...
                             Phi(batch_idx, :), Phi_on_grid(Nold+1:Nisdf, :));
+          isdf.adaptive.MrC1H('set_range', batch_idx, Nold + 1, MrC2H);
+          isdf.adaptive.MrC1H('set_cached_cols', batch_idx_col, Nisdf);
           % invL2MrC2H = L_CCH(Nold+1:Nisdf, Nold+1:Nisdf) \ MrC2H;
 
-          MrC1H = isdf.prod(Psi(batch_idx, :), Psi_on_grid(1:Nold, :), ...
-                            Phi(batch_idx, :), Phi_on_grid(1:Nold, :));
+          MrC1H = isdf.adaptive.MrC1H('get', batch_idx, 1, Nold);
           % invL1MrC1H = L_CCH(1:Nold, 1:Nold) \ MrC1H;
 
           % L21_invL1MrC1H = L_CCH(Nold+1:Nisdf, 1:Nold) * invL1MrC1H;
@@ -135,11 +182,20 @@ function varargout = adaptive_weight(mode, varargin)
       end
       id = varargin{1};
       wf_data = wave_functions.get();
+      isdf_data = isdf.get(id);
+      if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
+        error('adaptive_weight:init:nrange', ...
+          ['Missing cached nrange in ISDF id=%d. ' ...
+           'Build it first via isdf.set_nrange(id, config.SYSTEM).'], ...
+          int32(id));
+      end
       Nw = double(wf_data.nc);
       w = zeros(Nw, 1, 'single');
-      [nbrange1, nbrange2] = isdf.isdf_get_nrange(id);
+      nbrange1 = double(isdf_data.nrange1);
+      nbrange2 = double(isdf_data.nrange2);
       Psi = single(wf_data.c(:, nbrange1, 1, 1));
       Phi = single(wf_data.c(:, nbrange2, 1, 1));
+      isdf.adaptive.MrC1H('clear');
       % Calculate diag(MMH), fill them into w
       for ic = 1:Nw
         Psi_r = Psi(ic, :);
@@ -157,7 +213,8 @@ function varargout = adaptive_weight(mode, varargin)
       varargout{1} = w(Nlist);
 
     case 'clear'
-      clear Nw w nbrange1 nbrange2 Phi Psi
+      isdf.adaptive.MrC1H('clear');
+      clear Nw w nbrange1 nbrange2 Phi Psi batch_size
 
     otherwise
       error('adaptive_weight:mode', 'Unknown mode ''%s''.', mode);

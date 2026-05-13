@@ -1,4 +1,4 @@
-function tildeWq = gen_tildeWq(id_vc, iqibz, Kq, id_outer)
+function tildeWq = gen_tildeWq(id_vc, iqibz, Kq, id_outer, flagherm)
 % Kq is calculated by gen_Kq.m, which is using vc data
 % Now, formally,
 %     tildeW_q = <outer|Vq|in> * Kq^{-1} * <in|Vq|outer> + <outer|Vq|outer>,
@@ -10,6 +10,10 @@ function tildeWq = gen_tildeWq(id_vc, iqibz, Kq, id_outer)
 
 if nargin < 4
   error('gen_tildeWq: Missing input: id_vc, iqibz, Kq, id_outer');
+end
+
+if nargin < 5
+  flagherm = false;
 end
 
 vc_data = isdf.get(id_vc);
@@ -34,9 +38,14 @@ helperqG_outer = outer_data.helperqG(:, :, iqibz);
 vc_Vq_outer = helperqG_vc' * diag(vcoul_q) * helperqG_outer;
 %
 % t = vc_Vq_outer' * inv(Kq) * vc_Vq_outer;
-L_Kq = chol(Kq, "lower");
-vc_Vq_outer = L_Kq \ vc_Vq_outer;
-tildeWq = vc_Vq_outer'*vc_Vq_outer;
+
+if flagherm
+  L_Kq = chol(Kq, "lower");
+  vc_Vq_outer = L_Kq \ vc_Vq_outer;
+  tildeWq = vc_Vq_outer'*vc_Vq_outer;
+else
+  tildeWq = vc_Vq_outer' * (Kq \ vc_Vq_outer);
+end
 
 % if norm(t - tildeWq, 'fro') / norm(t, 'fro') > 1e-6
 %   warning('gen_tildeWq: inconsistent t and tildeWq, rel=%.6e', norm(t - tildeWq, 'fro') / norm(t, 'fro'));

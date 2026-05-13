@@ -26,14 +26,27 @@ function driver(data, config)
     end
   end
   nknb = nk * nb;
+  use_parfor = parallel.enabled();
   for ispin = 1:nspin
-    for ikib = 1:nknb
-      ik = floor((ikib - 1) / nb) + 1;
-      ib = mod(ikib - 1, nb) + 1;
-      fftbox = put_into_fftbox(data.psig{ik, ispin}(:, ib), data.reciprocal_grid_info.idxnz{ik}, fftgrid);
-      fftbox = nc ./ DL_vol * do_FFT(fftbox, fftgrid, 1);
-      wf_data.c(:, ib, ik, ispin) = fftbox(:);
+    c_spin_2d = complex(zeros(nc, nknb, 'single'));
+    if use_parfor
+      parfor ikib = 1:nknb
+        ik = floor((ikib - 1) / nb) + 1;
+        ib = mod(ikib - 1, nb) + 1;
+        fftbox = put_into_fftbox(data.psig{ik, ispin}(:, ib), data.reciprocal_grid_info.idxnz{ik}, fftgrid);
+        fftbox = nc ./ DL_vol * do_FFT(fftbox, fftgrid, 1);
+        c_spin_2d(:, ikib) = single(fftbox(:));
+      end
+    else
+      for ikib = 1:nknb
+        ik = floor((ikib - 1) / nb) + 1;
+        ib = mod(ikib - 1, nb) + 1;
+        fftbox = put_into_fftbox(data.psig{ik, ispin}(:, ib), data.reciprocal_grid_info.idxnz{ik}, fftgrid);
+        fftbox = nc ./ DL_vol * do_FFT(fftbox, fftgrid, 1);
+        c_spin_2d(:, ikib) = single(fftbox(:));
+      end
     end
+    wf_data.c(:, :, :, ispin) = reshape(c_spin_2d, [nc, nb, nk]);
   end
 
   wave_functions.save2mod(wf_data);

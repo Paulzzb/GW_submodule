@@ -6,7 +6,7 @@
 % Authors (see AUTHORS file for details): ZZ
 %
 % Last modified: 2026/04/27 ZZ
-function [Esx_x, Ecoh] = gw_cohsex_multi_k(config)
+function [Esx_x, Ecoh] = gw_cohsex_Gamma(config)
 %GW_COHSEX_MULTI_K  Static COHSEX self-energy diagonal (ISDF or dense G-space).
 %
 %   [Esx_x, Ecoh] = gw_cohsex_multi_k(GWinfo, config)
@@ -104,8 +104,8 @@ function [Esx_x, Ecoh] = gw_cohsex_multi_k(config)
         if iqibz ~= iqibz_old
           % tildeW_q = isdf.gen_tildeWq(id_vc, iqibz);
           Kq_ISDF = isdf.gen_Kq(id_vc, iqibz);
-          tildeWq_vn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_vn, true); % for SEX
-          tildeWq_nn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_nn, true); % for COH
+          tildeWq_vn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_vn); % for SEX
+          tildeWq_nn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_nn); % for COH
           % verify
           ng = size(vc_data.helperqG, 1);
           if size(vn_data.helperqG, 1) ~= ng || size(nn_data.helperqG, 1) ~= ng

@@ -90,8 +90,6 @@ for ik = 1:nkibz
           ngrho_left = SCATTER_Bamp(param);
 
           Ex_t = sum(vcoul_q .* abs(ngrho_left).^2);
-          disp(param)
-          fprintf('nb = %3d, out = %.3e\n', ob, Ex_t / 8 / pi)
           Ex(ib_out, ik, ispin) = Ex(ib_out, ik, ispin) + Ex_t;
         end
       end

@@ -9,7 +9,17 @@ QPen*
 **/ISDF_DB/
 
 !GW/example_profile/TMP_files/groundstate.mat
-!GW/test_profile/TMP_files/groundstate.mat
+
+# test_profile: ignore generated checkpoints and report-like text outputs
+GW/test_profile/**/*.mat
+GW/test_profile/**/adaptiveisdf_id*.txt
+GW/test_profile/**/isdf_validate_HF*.txt
+GW/test_profile/**/HF_ratio*.txt
+GW/test_profile/**/adapt_ratio*.txt
+GW/test_profile/**/coarse_FFT_direct.txt
+GW/test_profile/**/*report*.txt
+GW/test_profile/**/*报告*.txt
+GW/test_profile/**/*log*.txt
 
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path

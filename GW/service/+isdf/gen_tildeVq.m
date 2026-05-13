@@ -22,7 +22,13 @@ function tildeVq = gen_tildeVq(id)
   fft_data = FFT.get();
   fft_sz = fft_data.fftgrid;
   isdf_data = isdf.get(id);
-  [nrange1, nrange2] = isdf.isdf_get_nrange(id);
+  if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
+    error('gen_tildeVq:nrange', ...
+      'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', ...
+      int32(id));
+  end
+  nrange1 = double(isdf_data.nrange1);
+  nrange2 = double(isdf_data.nrange2);
   nb1 = length(nrange1); nb2 = length(nrange2);
 
 
@@ -45,6 +51,8 @@ function tildeVq = gen_tildeVq(id)
   helperqR = zeros(nc, Nmu);
   helperqG = zeros(ng, Nmu);
   isdf_data.helperqG = zeros(ng, Nmu, nibz);
+  use_parfor = parallel.enabled();
+  g_table_col = fft_data.G_table(:, 1);
 
   % Fine FFT box: same symmetry index map as isdf_coarse_R_rot (nr_fine x nsym), built lazily in non-coarse branch.
   R_rot_extra = int32([]);
@@ -56,6 +64,7 @@ function tildeVq = gen_tildeVq(id)
     end
 
     MCHq = zeros(nc, Nmu);
+    FFTMCHq = zeros(ng, Nmu);
     CCHq = zeros(Nmu, Nmu);
     for ikbz = 1:nbz
       ikibz = k_data.bz2ibz(ikbz, 1);
@@ -184,10 +193,9 @@ function tildeVq = gen_tildeVq(id)
       % fprintf('[ISDF] Frobenius norm |CCHqdiff|_F: %.6e\n', norm(CCHqdiff, 'fro')/norm(CCHq_tmp, 'fro'));
     end % ikbz
 
-    helperqR = MCHq / CCHq;
-    [Q, ~] = qr(helperqR, 'econ');
-    fro_norm_diff = norm(Q' * Q - eye(size(Q, 2)), 'fro');
-    fprintf('[ISDF] Orthogonality ||Q''Q - I||_F (iqibz=%d): %.3e\n', iqibz, fro_norm_diff);
+    % [Q, ~] = qr(helperqR, 'econ');
+    % fro_norm_diff = norm(Q' * Q - eye(size(Q, 2)), 'fro');
+    % fprintf('[ISDF] Orthogonality ||Q''Q - I||_F (iqibz=%d): %.3e\n', iqibz, fro_norm_diff);
     % Diagnostic loop only: must not overwrite MCHq/CCHq used for helperqR.
 
     %%% for ikbz = 1:nbz
@@ -257,11 +265,35 @@ function tildeVq = gen_tildeVq(id)
     % fprintf('[ISDF] Frobenius norm |MCHq|_F: %.6e\n', norm(MCHq, 'fro'));
     % fprintf('[ISDF] Frobenius norm |CCHq|_F: %.6e\n', norm(CCHq, 'fro'));
 
-    for imu = 1:Nmu
-      fftbox = reshape(helperqR(:, imu), fft_sz);
-      fftbox = do_FFT(fftbox, fft_sz, 1) * DL_vol;
-      helperqG(:, imu) = fftbox(fft_data.G_table(:, 1));
+    % helperqR = MCHq / CCHq;
+    if use_parfor
+      parfor imu = 1:Nmu
+        fftbox = reshape(helperqR(:, imu), fft_sz);
+        fftbox = do_FFT(fftbox, fft_sz, 1) * DL_vol;
+        helperqG(:, imu) = fftbox(g_table_col);
+      end
+    else
+      for imu = 1:Nmu
+        fftbox = reshape(helperqR(:, imu), fft_sz);
+        fftbox = do_FFT(fftbox, fft_sz, 1) * DL_vol;
+        helperqG(:, imu) = fftbox(g_table_col);
+      end
     end
+    % FFTMCHq = FFT(MCHq)
+    if use_parfor
+      parfor imu = 1:Nmu
+        fftbox = reshape(MCHq(:, imu), fft_sz);
+        fftbox = do_FFT(fftbox, fft_sz, 1) * DL_vol;
+        FFTMCHq(:, imu) = fftbox(g_table_col);
+      end
+    else
+      for imu = 1:Nmu
+        fftbox = reshape(MCHq(:, imu), fft_sz);
+        fftbox = do_FFT(fftbox, fft_sz, 1) * DL_vol;
+        FFTMCHq(:, imu) = fftbox(g_table_col);
+      end
+    end
+    helperqG = FFTMCHq / CCHq;
     isdf_data.helperqG(:, :, iqibz) = helperqG;
     tildeVq(:, :, iqibz) = helperqG' * diag(vcoul_q) * helperqG;
     tildeVq(:, :, iqibz) = tildeVq(:, :, iqibz) / 2 + tildeVq(:, :, iqibz)' / 2;

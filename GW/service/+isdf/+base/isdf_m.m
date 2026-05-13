@@ -19,7 +19,11 @@ classdef isdf_m
 
     interp_scheme(1, 1) string = "" % describes the interpolation scheme to use
     nisdf(1, 1) {mustBeInteger} = int32(0)
+    nrange1(1, :) {mustBeInteger} = int32(zeros(1, 0))
+    nrange2(1, :) {mustBeInteger} = int32(zeros(1, 0))
     R_sampling_RLU(:, :) single = single(zeros(0, 3))
+    Nnrange1(1, 1) {mustBeInteger} = int32(0)
+    Nnrange2(1, 1) {mustBeInteger} = int32(0)
     % Stored as double arrays; values may be complex (avoid classdef 'complex' = zeros(...) on older MATLAB).
     coeff_seper(:, :, :, :) = zeros(0, 0, 0, 0) % nisdf * nb * nkibz * nspin
     tildeVq(:, :, :, :) = zeros(0, 0, 0, 0) % nisdf * nisdf * nkibz * nspin

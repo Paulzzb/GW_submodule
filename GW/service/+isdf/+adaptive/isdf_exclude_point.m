@@ -12,7 +12,13 @@ function isdf_exclude_point(id)
   abs_tol = single(nr) / sqrt(DL_vol) * rel_tol;
 
   isdf_data = isdf.get(id);
-  [nrange1, nrange2] = isdf.isdf_get_nrange(id);
+  if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
+    error('isdf_exclude_point:nrange', ...
+      'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', ...
+      int32(id));
+  end
+  nrange1 = double(isdf_data.nrange1);
+  nrange2 = double(isdf_data.nrange2);
   Psixga = isdf_data.coeff_seper(:, nrange1, 1, 1);
   Phixga = isdf_data.coeff_seper(:, nrange2, 1, 1);
 

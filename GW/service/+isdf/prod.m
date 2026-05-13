@@ -9,6 +9,7 @@ function out = prod(Psi, psi, Phi, phi)
   if size(Psi,1) ~= size(Phi,1)
       error('Psi and Phi must have the same number of rows.');
   end
+
   % for i = 1:n1
   %   tmp1 = Psi(i, :) .* psi;
   %   tmp2 = Phi(i, :) .* phi;

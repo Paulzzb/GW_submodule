@@ -16,6 +16,7 @@ classdef system_m
     nspin(1, 1) {mustBeInteger} = int32(0)
 
     Eo(:, :, :) double = zeros(0, 0, 0)
+    Vxc(:, :, :) double = zeros(0, 0, 0)
     Eqp(:, :, :) double = zeros(0, 0, 0)
     qptype (1, 1) string = "HF"
     f(:, :, :) double = zeros(0, 0, 0)
@@ -43,6 +44,7 @@ classdef system_m
       obj.nk = int32(nk);
       obj.nspin = int32(nspin);
       obj.Eo = zeros(nb, nk, nspin);
+      obj.Vxc = zeros(nb, nk, nspin);
       obj.Eqp = zeros(nb, nk, nspin);
       obj.qptype = "HF";
       obj.f = zeros(nb, nk, nspin);

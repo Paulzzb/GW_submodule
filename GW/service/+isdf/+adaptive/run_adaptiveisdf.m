@@ -61,40 +61,25 @@ function run_adaptiveisdf(type, output_dir)
 
   isdf.debug.init_from_config(config);
 
-  system_data = system.get();
-  wf_data = wave_functions.get();
-  k_data = lattice.manager('k', 'get');
-  nb = wf_data.nb;
-  nkibz = k_data.nibz;
   cfg = config.ISDF;
-
-  nocc_max = 0;
-  nspin = system_data.nspin;
-  for ispin = 1:nspin
-    for ikibz = 1:nkibz
-      f_ib = system_data.f(:, ikibz, ispin);
-      idx_last = find(f_ib(:) > 1e-5, 1, 'last');
-      if ~isempty(idx_last)
-        nocc_max = max(nocc_max, idx_last);
-      end
-    end
-  end
 
   isdf.free();
 
   if strcmp(type, 'vn')
     desc_token = 'vn';
     id_slot = isdf.isdf_add('vn');
+    isdf.set_nrange(id_slot, config.SYSTEM);
     slot_data = isdf.get(id_slot);
-    nmu_target = cfg.isdf_ratio_type2 * sqrt(double(nocc_max) * double(nb));
+    nmu_target = cfg.isdf_ratio_type2 * sqrt(double(length(slot_data.nrange1)) * double(length(slot_data.nrange2)));
     slot_data.nisdf = int32(max(1, ceil(nmu_target)));
     slot_data.assigned = true;
     isdf.save2mod(slot_data, id_slot);
   else
     desc_token = 'nn';
     id_slot = isdf.isdf_add('nn');
+    isdf.set_nrange(id_slot, config.SYSTEM);
     slot_data = isdf.get(id_slot);
-    nmu_target = cfg.isdf_ratio_type3 * double(nb);
+    nmu_target = cfg.isdf_ratio_type3 * sqrt(double(length(slot_data.nrange1)) * double(length(slot_data.nrange2)));
     slot_data.nisdf = int32(max(1, ceil(nmu_target)));
     slot_data.assigned = true;
     isdf.save2mod(slot_data, id_slot);

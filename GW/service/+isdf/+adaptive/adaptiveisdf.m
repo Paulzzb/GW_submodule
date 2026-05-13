@@ -29,13 +29,20 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   threshold = params.threshold;
   num_add = params.num_add;
   ratio = params.candidate_ratio;
+  isdf.adaptive.adaptive_weight('set_batch_size', params.weight_batch_size);
   if strcmp(char(string(isdf_data.desc)), 'nn')
     Naddmax = Nisdf;
   else
     Naddmax = int32(max(1, ceil(double(Nisdf) * params.max_add_frac)));
   end
   
-  [nrange1, nrange2] = isdf.isdf_get_nrange(id);
+  if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
+    error('adaptiveisdf:nrange', ...
+      'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', ...
+      int32(id));
+  end
+  nrange1 = double(isdf_data.nrange1);
+  nrange2 = double(isdf_data.nrange2);
   R_sampling_indices = isdf_data.bundle_struct.sampling2bundle;
   Psixga = isdf_data.bundle_struct.WF_bundle(R_sampling_indices, nrange1, 1, 1);
   Phixga = isdf_data.bundle_struct.WF_bundle(R_sampling_indices, nrange2, 1, 1);
@@ -107,7 +114,7 @@ function idnew = adaptiveisdf(id, cfg_isdf)
       % 2.2 update the Gram matrix
       Psi_on_new_grid = squeeze(wf_data.c(selected_indices(iadd), nrange1, 1, 1));
       Phi_on_new_grid = squeeze(wf_data.c(selected_indices(iadd), nrange2, 1, 1));
-      isdf.adaptive.isdf_schur_update('update', 1, Psi_on_new_grid, Phi_on_new_grid);
+      isdf.adaptive.isdf_schur_update('update', 1, Psi_on_new_grid, Phi_on_new_grid, selected_indices(iadd));
       % 2.3 update the weight
       isdf.adaptive.adaptive_weight('update', candidate_indices(1:Nremain), 1);
       Nremain = Nremain - 1;
@@ -297,23 +304,27 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   %
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  CCH = isdf.prod(Psi_on_grid(1:Nisdf_new, :), Psi_on_grid(1:Nisdf_new, :), ...
-                  Phi_on_grid(1:Nisdf_new, :), Phi_on_grid(1:Nisdf_new, :));
-  L_CCH_dir = chol(CCH(1:Nisdf_new, 1:Nisdf_new), "lower");
-  output = norm(L_CCH_dir - L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro') / norm(L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro');
-  fprintf('Difference between direct Cholesky and adaptive Cholesky: %f\n', output);
+  % CCH = isdf.prod(Psi_on_grid(1:Nisdf_new, :), Psi_on_grid(1:Nisdf_new, :), ...
+  %                 Phi_on_grid(1:Nisdf_new, :), Phi_on_grid(1:Nisdf_new, :));
+  % L_CCH_dir = chol(CCH(1:Nisdf_new, 1:Nisdf_new), "lower");
+  % output = norm(L_CCH_dir - L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro') / norm(L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro');
+  % fprintf('Difference between direct Cholesky and adaptive Cholesky: %f\n', output);
 
-  output = norm(...
-           invL_CCH(1:Nisdf_new, 1:Nisdf_new) * L_CCH(1:Nisdf_new, 1:Nisdf_new)...
-            - eye(Nisdf_new), 'fro') / norm(eye(Nisdf_new), 'fro');
-  fprintf('Difference between invL_CCH * L_CCH and eye: %f\n', output);
+  % output = norm(...
+  %          invL_CCH(1:Nisdf_new, 1:Nisdf_new) * L_CCH(1:Nisdf_new, 1:Nisdf_new)...
+  %           - eye(Nisdf_new), 'fro') / norm(eye(Nisdf_new), 'fro');
+  % fprintf('Difference between invL_CCH * L_CCH and eye: %f\n', output);
 
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  idnew = isdf.isdf_add('adaptive');
+  idnew = isdf.isdf_add(isdf_data.desc);
   % Build a new ISDF object at idnew, keep original id unchanged.
   isdf_data_new = isdf.get(idnew);
-  % isdf_data_new = isdf_data;
+  isdf_data_new.nrange1 = isdf_data.nrange1;
+  isdf_data_new.nrange2 = isdf_data.nrange2;
+  isdf_data_new.Nnrange1 = isdf_data.Nnrange1;
+  isdf_data_new.Nnrange2 = isdf_data.Nnrange2;
+  isdf_data_new = isdf_data;
   isdf_data_new.id = idnew;
   % isdf_data_new.desc = sprintf('adaptiveisdf from id=%d', int32(id));
   isdf_data_new.desc = isdf_data.desc;
@@ -561,6 +572,7 @@ function params = adaptiveisdf_resolve_params(desc, cfg_isdf)
   params.num_add = int32(16);
   params.candidate_ratio = 2.0;
   params.max_add_frac = 1.0;
+  params.weight_batch_size = 256;
   params.source = "legacy";
 
   if isempty(cfg_isdf) || ~isstruct(cfg_isdf)
@@ -584,6 +596,8 @@ function params = adaptiveisdf_resolve_params(desc, cfg_isdf)
   params.num_add = int32(num_add_d);
   params.candidate_ratio = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_candidate_ratio_' suffix], params.candidate_ratio);
   params.max_add_frac = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_max_add_frac_' suffix], params.max_add_frac);
+  params.weight_batch_size = adaptiveisdf_get_cfg_integer(cfg_isdf, 'adaptive_weight_batch_size', params.weight_batch_size);
+  params.weight_batch_size = adaptiveisdf_get_cfg_integer(cfg_isdf, 'adaptive_batch_size', params.weight_batch_size);
   params.source = "config";
 end
 

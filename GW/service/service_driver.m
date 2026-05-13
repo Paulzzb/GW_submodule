@@ -10,6 +10,7 @@ function service_driver(data, config)
   % A temporary driver to call service modules for testing and demonstration.
 
   isdf.debug.init_from_config(config);
+  parallel.driver(data, config);
 
   system.driver(data, config);
   symmetry.driver(data, config);

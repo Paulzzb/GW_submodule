@@ -5,7 +5,19 @@ function E = qp_cohsex(config)
   t0 = tic;
 
   Ex = gw_x_k_packages(config);
-  [Esx_x, Ecoh] = gw_cohsex_multi_k(config);
+  
+  switch config.FREQUENCY.frequency_dependence
+    case -1
+      [Esx_x, Ecoh] = gw_cohsex_multi_k(config);
+    case 2
+      if ~isfield(config, 'freqinfo')
+        config = generate_frequency([], config);
+      end
+      Esx_x = gw_fullfreq_cd_res_Gamma(config);
+      Ecoh = gw_fullfreq_cd_int_Gamma(config);
+    otherwise
+      error('qp_cohsex:InvalidFrequencyDependence', 'Invalid frequency dependence.');
+  end
   nik = size(Ex, 2);
   Eqp = zeros(size(Ex));
   for ik = 1:nik
@@ -24,4 +36,13 @@ function E = qp_cohsex(config)
   E.Ex = Ex;
   E.Esx_x = Esx_x;
   E.Ecoh = Ecoh;
+  E.Eqp0 = [];
+  E.fout = '';
+
+  try
+    E.fout = qp_cohsex_fout(E, config);
+    QPlog(sprintf('[COHSEX] Saved qp_cohsex table to: %s', E.fout), 0);
+  catch ME
+    QPlog(sprintf('[COHSEX] Failed to write qp_cohsex output file: %s', ME.message), 0);
+  end
 end

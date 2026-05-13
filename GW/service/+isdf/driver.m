@@ -29,9 +29,11 @@ function driver(~, config)
   isdf.free();
   if do_vc
     id_vc = isdf.isdf_add("vc");
-    [nrange1, nrange2] = isdf.isdf_get_nrange(id_vc);
+    isdf.set_nrange(id_vc, config.SYSTEM);
     vc_data = isdf.get(id_vc);
-    nmu_target = cfg.isdf_ratio_type1 * sqrt(length(nrange1) * length(nrange2));
+    Nnrange1 = double(vc_data.Nnrange1);
+    Nnrange2 = double(vc_data.Nnrange2);
+    nmu_target = cfg.isdf_ratio_type1 * sqrt(Nnrange1 * Nnrange2);
     vc_data.nisdf = int32(max(1, ceil(nmu_target)));
     isdf.save2mod(vc_data, id_vc);
     %
@@ -48,9 +50,11 @@ function driver(~, config)
 
   if do_vn
     id_vn = isdf.isdf_add("vn");
-    [nrange1, nrange2] = isdf.isdf_get_nrange(id_vn);
+    isdf.set_nrange(id_vn, config.SYSTEM);
     vn_data = isdf.get(id_vn);
-    nmu_target = cfg.isdf_ratio_type2 * sqrt(length(nrange1) * length(nrange2));
+    Nnrange1 = double(vn_data.Nnrange1);
+    Nnrange2 = double(vn_data.Nnrange2);
+    nmu_target = cfg.isdf_ratio_type2 * sqrt(Nnrange1 * Nnrange2);
     vn_data.nisdf = int32(max(1, ceil(nmu_target)));
     isdf.save2mod(vn_data, id_vn);
     %
@@ -67,9 +71,11 @@ function driver(~, config)
 
   if do_nn
     id_nn = isdf.isdf_add("nn");
+    isdf.set_nrange(id_nn, config.SYSTEM);
     nn_data = isdf.get(id_nn);
-    [nrange1, nrange2] = isdf.isdf_get_nrange(id_nn);
-    nmu_target = cfg.isdf_ratio_type3 * sqrt(length(nrange1) * length(nrange2));
+    Nnrange1 = double(nn_data.Nnrange1);
+    Nnrange2 = double(nn_data.Nnrange2);
+    nmu_target = cfg.isdf_ratio_type3 * sqrt(Nnrange1 * Nnrange2);
     nn_data.nisdf = int32(max(1, ceil(nmu_target)));
     % nn_data.assigned = true;
     isdf.save2mod(nn_data, id_nn);

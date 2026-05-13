@@ -46,9 +46,9 @@ switch config.FREQUENCY.frequency_dependence
       QPerror(msg);
       gw_fullfreq_ra(GWinfo, config);
     elseif config.FREQUENCY.frequency_dependence_method == 2
-      QPlog('Performing full-frequency GW (contour deformation method)...', 1);
-      GWenergy.Eres = gw_fullfreq_cd_res(GWinfo, config);
-      GWenergy.Eint = gw_fullfreq_cd_int(GWinfo, config);
+      QPlog('Performing full-frequency GW (contour deformation method, Gamma service path)...', 1);
+      GWenergy.Eres = gw_fullfreq_cd_res_Gamma(config);
+      GWenergy.Eint = gw_fullfreq_cd_int_Gamma(config);
     else
       msg = sprintf('config.FREQUENCY.frequency_dependence_method = %d is not supported', ...
       config.FREQUENCY.frequency_dependence_method);
