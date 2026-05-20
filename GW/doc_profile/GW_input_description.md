@@ -50,6 +50,9 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 <a href="#cd_residual_method">cd_residual_method</a> |
 <a href="#cd_int_parameter">cd_integration_parameter</a> |
 
+### &FULLFREQ
+<a href="#verify_w_isdf">verify_w_isdf</a> |
+
 ### &ISDF
 <a href="#isisdf">isisdf</a> |
 <a href="#isdf_ratio">isdf_ratio</a> |
@@ -139,6 +142,16 @@ Parameters are grouped by block (namelist-style) and include descriptions, expec
 | <a name="weight"></a>`weight`                   | string | No | `'add'`       | Weighting strategy                  |
 | <a name="sys"></a>`sys`                         | struct | No | `[]`          | System placeholder object           |
 | <a name="is_helper"></a>`is_helper`             | int | No | `0`              | Whether to calculate the helper function       |
+---
+
+### Namelist: &FULLFREQ
+
+Optional block for full-frequency / CD helpers (single-`k`, Gamma path). All keys are lowercased when read.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| <a name="verify_w_isdf"></a>`verify_w_isdf` | bool | No | `.false.` | If `.true.`, `gw_fullfreq_cd_core_Gamma` (ISDF branch, \(\mathrm{Re}\,\omega\approx 0\)) prints a Frobenius check of dense \(W\) vs \(-D H K^{-1} H' D\) (same spirit as `gw_cohsex_multi_k`). Hartree units; expect extra console output. **Must appear only in this block** (not under `&FREQUENCY`). |
+
 ---
 
 ## 📎 Appendix

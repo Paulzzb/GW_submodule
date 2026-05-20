@@ -22,9 +22,9 @@ function fout = qp_cohsex_fout(E, config)
 
   Eo = double(system_data.Eo(nbmin:nbmax, 1:nk, 1)) * ry2ev;
   Vxc = double(system_data.Vxc(nbmin:nbmax, 1:nk, 1));
-  Ex = -double(E.Ex(:, 1:nk)) * ry2ev;
-  Esx_x = -double(E.Esx_x(:, 1:nk)) * ry2ev;
-  Ecoh = -double(E.Ecoh(:, 1:nk)) * ry2ev;
+  Ex = double(E.Ex(:, 1:nk)) * ry2ev;
+  Esx_x = double(E.Esx_x(:, 1:nk)) * ry2ev;
+  Ecoh = double(E.Ecoh(:, 1:nk)) * ry2ev;
   Sig = Ex + Esx_x + Ecoh;
   Eqp0 = Eo + Sig - Vxc;
   Emf = Eo;

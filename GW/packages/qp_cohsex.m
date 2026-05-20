@@ -15,6 +15,9 @@ function E = qp_cohsex(config)
       end
       Esx_x = gw_fullfreq_cd_res_Gamma(config);
       Ecoh = gw_fullfreq_cd_int_Gamma(config);
+      ry2ev = constant_map().ry2ev;
+      Esx_x = Esx_x / ry2ev;
+      Ecoh = Ecoh / ry2ev;
     otherwise
       error('qp_cohsex:InvalidFrequencyDependence', 'Invalid frequency dependence.');
   end

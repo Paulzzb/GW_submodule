@@ -16,7 +16,6 @@ system_data = system.get();
 k_data = lattice.manager('k', 'get');
 q_data = lattice.manager('q', 'get');
 r_lat_data = lattice.manager('r_lat', 'get');
-d_lat_data = lattice.manager('d_lat', 'get');
 coul_data = coulomb.get();
 
 if k_data.nibz ~= 1 || q_data.nibz ~= 1 || q_data.nbz ~= 1
@@ -53,10 +52,13 @@ if nsum <= nv
     'Invalid summation range: nv=%d, nsum=%d (need nsum>nv).', nv, nsum);
 end
 
+nv_list = 1:nv;
+nc_list = (nv + 1):nsum;
+nc = numel(nc_list);
+
 iqibz = q_data.bz2ibz(1);
 iqrot = q_data.bz2rot(1);
 iGo = r_lat_data.qindx_S(1, 1, 2);
-vol = double(d_lat_data.DL_vol);
 
 vcoul_q = double(coul_data.vcoul(:, iqibz));
 if iqibz == 1
@@ -81,6 +83,13 @@ if isfield(config, 'ISDF') && isfield(config.ISDF, 'isisdf') && config.ISDF.isis
     isdf.set_nrange(id_vc, config.SYSTEM);
     isdf.set_nrange(id_nn, config.SYSTEM);
 
+    % Input key is lowercased by read_input_param -> verify_w_isdf
+    verify_W_isdf = false;
+    if isfield(config, 'FULLFREQ') && isfield(config.FULLFREQ, 'verify_w_isdf')
+      verify_W_isdf = logical(config.FULLFREQ.verify_w_isdf);
+    end
+    vc_data = isdf.get(id_vc);
+
     nm_Womega_nm = zeros(Nn, Nm, Nw);
     for ifreq = 1:Nw
       omega = omega_list(ifreq);
@@ -89,6 +98,74 @@ if isfield(config, 'ISDF') && isfield(config.ISDF, 'isisdf') && config.ISDF.isis
       Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, omega_ry);
       flagherm = abs(real(omega)) < 1e-5;
       tildeWq_nn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_nn, flagherm);
+
+      % Optional: dense G-space W vs ISDF reconstruction (same idea as gw_cohsex_multi_k).
+      % Uses Hartree/Ry Coulomb (no ry2ev on v) to match gen_Kq / gen_tildeWq. Only at ω≈0
+      % (Hermitian K) the static χ matches gen_Kq_Gamma; set &FULLFREQ verify_w_isdf = .true.
+      if verify_W_isdf && flagherm
+        nkbz = k_data.nbz;
+        ng_vc = size(vc_data.helperqG, 1);
+        if ng_vc ~= ng
+          warning('gw_fullfreq_cd_core_Gamma:verifyWng', ...
+            'helperqG row count (%d) ~= ng from vcoul (%d); skip W verify.', ng_vc, ng);
+        else
+          nrangev = double(vc_data.nrange1);
+          nrangec = double(vc_data.nrange2);
+          ev_ry = double(system_data.Eo);
+          spin_id = 1;
+          scal = 4.0;
+          chiq_G = zeros(ng, ng);
+          nrangev_row = reshape(nrangev, 1, []);
+          nrangec_row = reshape(nrangec, 1, []);
+          ncb = numel(nrangec_row);
+          for ikbz = 1:nkbz
+            ikibz_k = k_data.bz2ibz(ikbz);
+            ikrot_k = k_data.bz2rot(ikbz);
+            ikq_bz = r_lat_data.qindx_X(iqibz, ikbz, 1);
+            iGo_x = r_lat_data.qindx_X(iqibz, ikbz, 2);
+            ikq_ibz = k_data.bz2ibz(ikq_bz);
+            ikq_rot = k_data.bz2rot(ikq_bz);
+            f_c = double(system_data.f(nrangec_row, ikq_ibz, spin_id));
+            e_c = ev_ry(nrangec_row, ikq_ibz, spin_id);
+            for iv = nrangev_row
+              Mgvc_blk = zeros(ng, ncb);
+              for jc_id = 1:ncb
+                jc = nrangec_row(jc_id);
+                pchk = struct();
+                pchk.is = [iv, ikibz_k, ikrot_k, spin_id];
+                pchk.os = [jc, ikq_ibz, ikq_rot, spin_id];
+                pchk.qs = [iGo_x, iqibz, iqrot];
+                Mgvc_blk(:, jc_id) = double(SCATTER_Bamp(pchk));
+              end
+              f_v = double(system_data.f(iv, ikibz_k, spin_id));
+              e_v = ev_ry(iv, ikibz_k, spin_id);
+              occ = f_v - f_c;
+              
+                % den = e_v - e_c;
+              den = omega_ry - e_c - e_v;
+              valid = (abs(occ) >= 1e-8) & (abs(den) >= 1e-12);
+              if ~any(valid)
+                continue;
+              end
+              coeff = occ(valid) ./ den(valid);
+              Mgvc_valid = Mgvc_blk(:, valid);
+              Mgvc_weighted = Mgvc_valid .* reshape(coeff, 1, []);
+              chiq_G = chiq_G + scal * (Mgvc_weighted * Mgvc_valid');
+            end
+          end
+          inveps = eye(ng) - ( diag(vcoul_q) * chiq_G);
+          W_dense_solve = full(inveps \ diag(vcoul_q));
+          W_v = W_dense_solve - diag(vcoul_q);
+          helperqG_vc = double(vc_data.helperqG(:, :, iqibz));
+          K_use = double(Kq_ISDF);
+          W_isdf = -diag(vcoul_q) * helperqG_vc * (K_use \ eye(size(K_use))) * helperqG_vc' * diag(vcoul_q);
+          denom_solve = max(norm(W_v, 'fro'), eps);
+          diff_solve = norm(W_v - W_isdf, 'fro');
+          fprintf(['[gw_fullfreq_cd_core_Gamma verifyW] ifreq=%d iqibz=%d ng=%d Nisdf_nn=%d\n' ...
+            '  ||W_dense-W_isdf||_F=%.6e (rel=%.6e)\n'], ...
+            ifreq, iqibz, ng, size(tildeWq_nn, 1), diff_solve, diff_solve / denom_solve);
+        end
+      end
 
       for n = nstart:nend
         in = n - nstart + 1;
@@ -114,13 +191,11 @@ if isfield(config, 'ISDF') && isfield(config.ISDF, 'isisdf') && config.ISDF.isis
         nm_Womega_nm(in, indm, ifreq) = out_list;
       end
     end
+    nm_Womega_nm = nm_Womega_nm * ry2ev;
     return;
   end
 end
 
-nv_list = 1:nv;
-nc_list = (nv + 1):nsum;
-nc = numel(nc_list);
 Mvc_cache = cell(nv, 1);
 Eden_cache = cell(nv, 1);
 
@@ -154,18 +229,18 @@ for ifreq = 1:Nw
     Mgvc = Mvc_cache{iv};
     Eden = Eden_cache{iv};
     edenDR = (-1.0 ./ (omega - Eden - 1i * eta) + 1.0 ./ (omega + Eden + 1i * eta));
-    chi_acc = chi_acc + 2.0 * Mgvc * (edenDR .* Mgvc') / vol;
+    chi_acc = chi_acc + 2.0 * Mgvc * (edenDR .* Mgvc') ;
   end
 
   if ishermW
-    epsKernel = (Dcoul / vol) \ eye(ng) - chi_acc * vol;
+    epsKernel = (Dcoul ) \ eye(ng) - chi_acc ;
     epsKernel = tril(epsKernel, -1) + tril(epsKernel, -1)' + diag(real(diag(epsKernel)));
     [L, D] = ldl(epsKernel);
     rsqrtD = diag(sqrt(diag(D)).^(-1));
   else
     A = eye(ng) - Dcoul * chi_acc;
     % Avoid explicit inverse: W = (I - A^{-1})Dcoul / vol.
-    W = (Dcoul - (A \ Dcoul)) / vol;
+    W = (Dcoul - (A \ Dcoul));
   end
 
   for n = nstart:nend
@@ -188,7 +263,7 @@ for ifreq = 1:Nw
     end
 
     if ishermW
-      out_list = sum((Dcoul / vol) * abs(Mnm).^2, 1).';
+      out_list = sum(Dcoul * abs(Mnm).^2, 1).';
       Mnm_r = rsqrtD * (L \ Mnm);
       out_list = out_list - sum(abs(Mnm_r).^2, 1).';
       nm_Womega_nm(in, indm, ifreq) = out_list;

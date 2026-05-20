@@ -217,12 +217,12 @@ function [Esx_x, Ecoh] = gw_cohsex_multi_k(config)
                 rho_left_vn = isdf.get_rho_xalpha(id_vn, param);
                 tmp1 = rho_left_vn' * tildeWq_vn * rho_left_vn;
                 tmp1 = real(tmp1);
-                Sigma_sex_x(indib, ikibz) = Sigma_sex_x(indib, ikibz) - tmp1;
+                Sigma_sex_x(indib, ikibz) = Sigma_sex_x(indib, ikibz) + tmp1;
                 % 
                 rho_left_nn = isdf.get_rho_xalpha(id_nn, param);
                 tmp2 = rho_left_nn' * tildeWq_nn * rho_left_nn;
                 tmp2 = real(tmp2);
-                Sigma_coh(indib, ikibz) = Sigma_coh(indib, ikibz) + 0.5 * tmp2;
+                Sigma_coh(indib, ikibz) = Sigma_coh(indib, ikibz) - 0.5 * tmp2;
               end
               for idob = 1:length(nrangec)
                 ob = nrangec(idob);
@@ -230,7 +230,7 @@ function [Esx_x, Ecoh] = gw_cohsex_multi_k(config)
                 rho_left_nn = isdf.get_rho_xalpha(id_nn, param);
                 tmp2 = rho_left_nn' * tildeWq_nn * rho_left_nn;
                 tmp2 = real(tmp2);
-                Sigma_coh(indib, ikibz) = Sigma_coh(indib, ikibz) + 0.5 * tmp2;
+                Sigma_coh(indib, ikibz) = Sigma_coh(indib, ikibz) - 0.5 * tmp2;
               end 
             end
           end

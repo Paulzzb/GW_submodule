@@ -25,10 +25,14 @@ function input_driver(inputfile)
   config = set_default_param_value(config, data);
 
 
-  save()
   % Step 4: Construct GWinfo (Basically, the groundstate data) and GWOptions seperately
   GWgroundstate = construct_GWinfo(data, config);
   GWoptions = construct_GWOptions(data, config);
+
+  % Full-frequency (contour deformation): frequency grids for gw_fullfreq_cd_* / qp_cohsex.
+  if config.FREQUENCY.frequency_dependence == 2
+    config = generate_frequency(GWgroundstate, config);
+  end
 
   % Step 5: save data to files 
   %% [optionsGW, GWinfor] = construct_GW_objects(config, GWinfor);% 

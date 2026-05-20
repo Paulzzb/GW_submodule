@@ -90,7 +90,7 @@ for ik = 1:nkibz
           ngrho_left = SCATTER_Bamp(param);
 
           Ex_t = sum(vcoul_q .* abs(ngrho_left).^2);
-          Ex(ib_out, ik, ispin) = Ex(ib_out, ik, ispin) + Ex_t;
+          Ex(ib_out, ik, ispin) = Ex(ib_out, ik, ispin) - Ex_t;
         end
       end
     end

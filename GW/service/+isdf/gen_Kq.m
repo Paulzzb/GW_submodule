@@ -71,18 +71,36 @@ for ikbz = 1:nkbz
     f_ik = system_data.f(iv, ikibz, ispin);
     e_ik = ev(iv, ikibz, ispin);
     occ = -f_c + f_ik;
-    if eta == 0.0
-      den = omega - e_ik + e_c;
+    if omega == 0 % --> COHSEX
+      den1 = (omega - e_ik + e_c);
+      den2 = (omega + e_ik - e_c);
     else
-      den = omega - e_ik + e_c + 1i * eta * sign(e_ik - e_c);
+      if real(omega) < 1e-12 % On the imaginary axis, eta is set to 0.0
+        den1 = omega - e_ik + e_c;
+        den2 = omega + (e_ik - e_c);
+      else
+        den1 = omega - (e_ik - e_c) - 1i * eta * sign(e_ik - e_c);
+        den2 = omega + (e_ik - e_c) + 1i * eta * sign(e_ik - e_c);
+      end
     end
-    valid = (abs(occ) >= 1e-5) & (abs(den) >= 1e-12);
+    valid = (abs(occ) >= 1e-5) & (abs(den1) >= 1e-12) & (abs(den2) >= 1e-12);
     if ~any(valid)
       continue;
     end
 
     rho_blk = zeros(Nisdf_o, nnz(valid));
-    coeff = occ(valid) ./ den(valid);
+    coeff = occ(valid) ./ den1(valid) - occ(valid) ./ den2(valid);
+    if abs(real(omega)) < 1e-12
+      imcoeff = imag(coeff(:));
+      ref = max(abs(real(coeff(:))));
+      tol = max(1e-12, 1e-10 * max(ref, 1));
+      if any(abs(imcoeff) > tol)
+        warning('gen_Kq:nonrealCoeff', ...
+          ['At Re(omega)~0 expected real transition coefficients coeff=occ./den1-occ./den2; ', ...
+           'max|Im(coeff)|=%.3e tol=%.3e (id_vc=%d, iqibz=%d, ikbz=%d, iv=%d).'], ...
+          max(abs(imcoeff)), tol, id_vc, iqibz, ikbz, iv);
+      end
+    end
     is = [iv, ikibz, ikrot, ispin];
     u_xalpha_is = isdf.get_u_xalpha(id_vc, is, iqrot);
     id_valid = find(valid);
@@ -100,12 +118,11 @@ for ikbz = 1:nkbz
     chiq_ISDF = chiq_ISDF + (rho_weighted * rho_blk');
   end
 end % ikbz
-% when occupation number are either 0 or 1, the extra factor 2.0 is needed (ij-pair and ji-pair).
-chiq_ISDF = 2.0 * chiq_ISDF;
-% when spin == 1, an extra factor 2.0 is needed (up-down and down-up pairs).
 if nspin == 1
-  chiq_ISDF = 2 * chiq_ISDF;
+  chiq_ISDF = 2.0 * chiq_ISDF;
 end
+% when occupation number are either 0 or 1, the extra factor 2.0 is needed (ij-pair and ji-pair).
+% when spin == 1, an extra factor 2.0 is needed (up-down and down-up pairs).
 % symmetrize the matrix if real(omega) = 0.
 if abs(real(omega)) < 1e-12
   chiq_ISDF = (chiq_ISDF + chiq_ISDF') / 2;
