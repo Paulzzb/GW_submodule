@@ -1,0 +1,61 @@
+&CONTROL
+  prefix = 'Si',
+  isgw = 1,
+  groundstate_dir = './Si.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 16,
+  energy_band_index_min = 1,
+  energy_band_index_max = 16,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = -1,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_cutoff = 20.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .true.
+  compute_vn = .true.
+  compute_nn = .false.
+  isdf_ratio_type1 = 4.0
+  isdf_ratio_type2 = 4.0
+  isdf_ratio_type3 = 4.0
+  adaptive_threshold_type1 = 2.0e-6
+  adaptive_threshold_type2 = 2.0e-10
+  adaptive_threshold_type3 = 2.0e-6
+  adaptive_num_add_type1 = 16
+  adaptive_num_add_type2 = 16
+  adaptive_num_add_type3 = 16
+  adaptive_candidate_ratio_type1 = 2.0
+  adaptive_candidate_ratio_type2 = 2.0
+  adaptive_candidate_ratio_type3 = 2.0
+  adaptive_max_add_frac_type1 = 6.0
+  adaptive_max_add_frac_type2 = 8.0
+  adaptive_max_add_frac_type3 = 1.0
+  adaptive_max_cond_type1 = 1e+12
+  adaptive_max_cond_type2 = 1e+12
+  adaptive_max_cond_type3 = 1e+12
+  adaptive_batch_size = 256
+  exxmethod = 'pseudo'
+  is_helper = .false.
+  inv_strategy = 'pseudo'
+  inv_param = 1e-12
+  inv_ratio = 0.75
+  order = 1
+  validate_hf = .true.
+END &ISDF
+
+&COHSEX
+  exact_ch = .true.
+  Ex_use_which_isdf = 'vn'
+END &COHSEX

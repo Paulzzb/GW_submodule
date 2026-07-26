@@ -1,0 +1,67 @@
+&CONTROL
+  prefix = 'Si16',
+  isgw = 1,
+  groundstate_dir = '../../../../systems/Si_SCtest/Si16/Si16.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 64,
+  energy_band_index_min = 1,
+  energy_band_index_max = 64,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 0,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_cutoff = 15.0
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 2,
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .true.
+  compute_vn = .true.
+  compute_nn = .false.
+  isdf_ratio_type1 = 4.0
+  isdf_ratio_type2 = 4.0
+  adaptive_threshold_type1 = 2.0e-6
+  adaptive_threshold_type2 = 2.0e-10
+  adaptive_num_add_type1 = 4
+  adaptive_num_add_type2 = 4
+  adaptive_candidate_ratio_type1 = 2.0
+  adaptive_candidate_ratio_type2 = 2.0
+  adaptive_max_add_frac_type1 = 8.0
+  adaptive_max_add_frac_type2 = 8.0
+  adaptive_max_cond_type1 = 1e+12
+  adaptive_max_cond_type2 = 1e+12
+  adaptive_batch_size = 256
+  exxmethod = 'pseudo'
+  is_helper = .false.
+  inv_strategy = 'pseudo'
+  inv_param = 1e-12
+  inv_ratio = 0.75
+  order = 1
+  validate_hf = .true.
+END &ISDF
+
+&SUPERCELL
+  is_supercell = .true.
+  use_sc_isdf = .true.
+  k1 = 2
+  k2 = 2
+  k3 = 2
+  isdf_source_dir = '../Si2/SAVE'
+  sc_adaptive = .true.
+END &SUPERCELL
+
+&COHSEX
+  exact_ch = .false.
+  Ex_use_which_isdf = 'vn'
+END &COHSEX

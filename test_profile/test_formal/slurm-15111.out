@@ -1,0 +1,93 @@
+/usr/bin/id: cannot find name for user ID 1155
+/usr/bin/id: cannot find name for group ID 1156
+/usr/bin/id: cannot find name for user ID 1155
+=== demo_sc_scaling [11 11 11] profile run ===
+GW_ROOT      = /data-storage/home/huwei/zzb/GW_double_test
+UC_SAVE_DIR  = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE
+OUT_DIR      = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling
+SLURM_CPUS_PER_TASK = unset
+SLURM_CPUS_ON_NODE  = 96
+HOST_CPUS (nproc)   = 1
+LOG_FILE     = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/log/demo_sc_scaling_k11_11_11_profile.log
+Started at   = 2026-06-14T01:37:03+0800
+============================================
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2023 The MathWorks, Inc.
+                  R2023a (9.14.0.2206163) 64-bit (glnxa64)
+                             February 22, 2023
+
+Warning: X does not support locale en_US.UTF-8
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+[run_demo_sc_scaling_profile] resolve_parpool_workers -> 96
+[run_demo_sc_scaling_profile] UC=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE k=[11 11 11] workers=96 out=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 96 workers.
+[run_demo_sc_scaling_profile] parpool NumWorkers=96
+GW module root path set to: /data-storage/home/huwei/zzb/GW_double_test/
+[FORMAL] unit cell /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/../../../../Materialtest/systems/LiH/1_ecut5/LiH.save -> supercell [11 11 11], fft [99 99 99], nb=10648, ng=16135, ne=10648, nsym=1 (no symmetry)
+demo_sc_scaling: UC [9 9 9] -> SC [99 99 99], nb 8 -> 10648, ng 257 -> 16135
+GW module root path set to: /data-storage/home/huwei/zzb/GW_double_test/
+[parallel.driver] reuse existing pool (96 workers)
+
+[demo_isdf_scaling] type=vc ck=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE/isdf_adaptive_checkpoint_vc_id1.mat ratio=[11 11 11]
+SC_ISDF: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE/isdf_adaptive_checkpoint_vc_id1.mat -> pool id=1, nisdf 8 -> 10648, uc fft [9  9  9], sc fft [99  99  99], ratio [11  11  11]
+[demo_isdf_scaling] id=1 desc=vc_sc_11_11_11 | nc=9.7e+05 ng=45553 Nmu=10648 nb1=4 nb2=4 | batch=10648
+[Warning: Matrix is close to singular or badly scaled. Results may be
+inaccurate. RCOND =  3.677701e-24.] 
+[> In demo_isdf_scaling>local_mu_coul_contract (line 202)
+In demo_isdf_scaling (line 81)
+In demo_sc_scaling (line 67)
+In run_demo_sc_scaling_profile (line 45)
+] 
+[Warning: Matrix is close to singular or badly scaled. Results may be
+inaccurate. RCOND =  3.033405e-24.] 
+[> In demo_isdf_scaling>local_mu_coul_contract (line 202)
+In demo_isdf_scaling (line 81)
+In demo_sc_scaling (line 67)
+In run_demo_sc_scaling_profile (line 45)
+] 
+[demo_isdf_scaling] vcVvc 10648x10648
+
+[demo_isdf_scaling] type=nn ck=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE/isdf_adaptive_checkpoint_nn_id5.mat ratio=[11 11 11]
+SC_ISDF: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE/isdf_adaptive_checkpoint_nn_id5.mat -> pool id=2, nisdf 16 -> 21296, uc fft [9  9  9], sc fft [99  99  99], ratio [11  11  11]
+[demo_isdf_scaling] id=2 desc=nn_sc_11_11_11 | nc=9.7e+05 ng=45553 Nmu=21296 nb1=8 nb2=8 | batch=21296
+[Warning: Matrix is close to singular or badly scaled. Results may be
+inaccurate. RCOND =  3.677701e-24.] 
+[> In demo_isdf_scaling>local_mu_coul_contract (line 202)
+In demo_isdf_scaling (line 89)
+In demo_sc_scaling (line 67)
+In run_demo_sc_scaling_profile (line 45)
+] 
+[Warning: Matrix is close to singular or badly scaled. Results may be
+inaccurate. RCOND =  1.819265e-23.] 
+[> In demo_isdf_scaling>local_mu_coul_contract (line 202)
+In demo_isdf_scaling (line 89)
+In demo_sc_scaling (line 67)
+In run_demo_sc_scaling_profile (line 45)
+] 
+[demo_isdf_scaling] vcVnn 10648x21296
+
+[demo_GW_scaling] formal COHSEX | nv=5324 nsum=10648 bands [1,10648] Nmu_vc=10648 Nmu_nn=21296
+[demo_GW_scaling] Time for inveps = 12603.4386 s
+[Warning: Matrix is close to singular or badly scaled. Results may be
+inaccurate. RCOND =  1.753743e-21.] 
+[> In demo_GW_scaling (line 108)
+In demo_sc_scaling (line 68)
+In run_demo_sc_scaling_profile (line 45)
+] 
+[demo_GW_scaling] Sigma operator time = 43.3009 s
+[demo_GW_scaling] Self-energies time = 38.9945 s
+formal_profile_browser_fix: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/profile_demo_sc -> open index.html
+[run_demo_sc_scaling_profile] wall=16540.034 s report=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/demo_sc_scaling_report.txt
+[run_demo_sc_scaling_profile] profile=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/profile_demo_sc/index.html
+FINISHED wall=16540.034 s profile=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/profile_demo_sc
+IdleTimeout has been reached.
+Parallel pool using the 'Processes' profile is shutting down.
+Finished at  = 2026-06-14T06:15:27+0800
+Report: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/demo_sc_scaling_report.txt
+Profile: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_111111_demo_scaling/profile_demo_sc/index.html
+Log: /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/log/demo_sc_scaling_k11_11_11_profile.log

@@ -1,0 +1,333 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  breaklines=true,
+  frame=single,
+  columns=fullflexible
+}
+
+\title{Supercell ISDF (SC\_ISDF): Algorithm and Code Implementation}
+\author{GW\_double\_test / test\_SC}
+\date{June 11, 2026}
+
+\begin{document}
+\maketitle
+
+%======================================================================
+\section{Introduction}
+%======================================================================
+
+In GW and COHSEX calculations, the interpolation separable density fitting (ISDF)
+method approximates the exchange interaction using a small set of real-space
+sampling points $\{\mathbf R_\mu\}$ with associated wavefunction values
+$\zeta_\mu(\mathbf r) = \psi(\mathbf r_\mu)$.
+Adaptive ISDF on the \emph{unit cell} selects these points iteratively until a
+Schur-complement accuracy threshold is met.
+
+For \emph{supercell} calculations (larger real-space FFT grids and more atoms),
+re-running full adaptive ISDF is expensive.
+\textbf{SC\_ISDF} reuses the unit-cell adaptive grid: it replicates the sampling
+points into each translated unit-cell image inside the supercell, recomputes FFT
+linear indices on the supercell grid, and then rebuilds coefficients and
+$\tilde V^q$ on the supercell wavefunctions.
+
+This document maps each algorithmic step to the MATLAB implementation in
+\texttt{GW\_double\_test/service/+isdf/}.
+Test cases live under \texttt{test\_profile/test\_SC/} (Si and LiH).
+
+%======================================================================
+\section{Algorithm and Corresponding Code}
+%======================================================================
+
+%----------------------------------------------------------------------
+\subsection{Supercell and Unit Cell}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+\paragraph{Real-space FFT grids.}
+Let the unit cell use FFT dimensions $\mathbf N_{\mathrm{uc}} = (N_1,N_2,N_3)$
+and the supercell be a $k$-fold replication
+$\mathbf k = (k_1,k_2,k_3)$ in the three lattice directions:
+\begin{equation}
+  \mathbf N_{\mathrm{sc}} = \mathbf N_{\mathrm{uc}} \odot \mathbf k,
+  \qquad
+  N_{\mathrm{sc},i} = N_{\mathrm{uc},i}\, k_i .
+\end{equation}
+The GW code requires \texttt{FFT.get().fftgrid} on the supercell to equal
+$\mathbf N_{\mathrm{sc}}$ before calling SC\_ISDF.
+
+\paragraph{Sampling-point replication.}
+Unit-cell ISDF provides $N_\mu^{\mathrm{uc}}$ points with RLU coordinates
+$\mathbf R^{\mathrm{uc}}_\mu \in [0,N_{\mathrm{uc},1})\times\cdots$
+(modulo periodicity).
+For each image $(i_1,i_2,i_3)$ with $0\le i_j<k_j$,
+\begin{equation}
+  \mathbf R^{\mathrm{sc}}_{\mu,(i_1,i_2,i_3)}
+  = \mathbf R^{\mathrm{uc}}_\mu
+    + \bigl(i_1 N_{\mathrm{uc},1},\, i_2 N_{\mathrm{uc},2},\, i_3 N_{\mathrm{uc},3}\bigr)
+  \pmod{\mathbf N_{\mathrm{sc}}}.
+\end{equation}
+This yields
+$N_\mu^{\mathrm{sc}} = N_\mu^{\mathrm{uc}}\, k_1 k_2 k_3$ points.
+Coarse and extra subsets ($N_{\mathrm{coarse}}$, $N_{\mathrm{extra}}$) are
+replicated likewise.
+
+\paragraph{Linear index on the supercell fine grid.}
+Each $\mathbf R^{\mathrm{sc}}$ is mapped to a linear index on the supercell FFT mesh:
+\begin{equation}
+  \mathrm{lin}(\mathbf R)
+  = 1 + R_1 + R_2 N_{\mathrm{sc},1} + R_3 N_{\mathrm{sc},1} N_{\mathrm{sc},2}.
+\end{equation}
+
+\paragraph{Symmetry rotation table.}
+For each sampling row $a$ and crystal symmetry $S$,
+\begin{equation}
+  \bigl(\mathrm{R\_rot\_extra}\bigr)_{a,S}
+  = \mathrm{lin}\!\bigl(\mathrm{round}(\mathbf R_a \cdot S)\bigr),
+\end{equation}
+using the supercell \texttt{Rgrid\_RLU} and \texttt{symmetry.get()} operations.
+
+\paragraph{Post-replication pipeline.}
+After grid replication:
+\begin{enumerate}
+  \item Extract $\texttt{coeff\_seper}$ on the supercell WFs at $\mathrm{lin}(\mathbf R_\mu)$
+        (\texttt{gen\_coeff\_from\_fine\_grid}).
+  \item Build a symmetry-closed \texttt{bundle\_struct} with
+        \texttt{R\_rot\_in\_bundle} and \texttt{sampling2bundle}
+        (\texttt{gen\_bundle}).
+  \item Form $\tilde V^q$ via the standard ISDF SVD/$C^{-1/2}$ path
+        (\texttt{gen\_tildeVq}).
+  \item Optionally validate Hartree--Fock exchange energies
+        (\texttt{isdf\_validation} / \texttt{isdf\_validate\_HF}).
+\end{enumerate}
+
+\subsubsection{Code Implementation}
+
+\begin{table}[h]
+\centering
+\caption{SC\_ISDF core functions (\texttt{service/+isdf/SC\_ISDF.m})}
+\begin{tabular}{ll}
+\toprule
+Sub-function & Role \\
+\midrule
+\texttt{sc\_isdf\_load\_source} & Load pool id or \texttt{.mat} checkpoint \\
+\texttt{sc\_isdf\_resolve\_uc\_fftgrid} & Infer $\mathbf N_{\mathrm{uc}}$ from ratio \\
+\texttt{sc\_isdf\_duplicate\_sampling} & Eq.\ replication of $\mathbf R_\mu$ \\
+\texttt{sc\_isdf\_rlu\_to\_lin} & Linear index on supercell FFT \\
+\texttt{sc\_isdf\_build\_supercell\_object} & Assemble \texttt{isdf\_m}, set \texttt{interp\_scheme=adaptive\_sc} \\
+\texttt{sc\_isdf\_build\_R\_rot\_extra} & Symmetry table on supercell \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Public entry point:
+\begin{lstlisting}
+id_sc = isdf.SC_ISDF(checkpoint_mat, [k1, k2, k3]);
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\subsection{Input Configuration: \texttt{\&SUPERCELL}}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+When \texttt{use\_sc\_isdf = .true.}, the ISDF driver skips adaptive iteration
+and reads the latest \texttt{isdf\_adaptive\_checkpoint\_\{type\}\_id*.mat}
+from \texttt{isdf\_source\_dir}.
+
+\subsubsection{Code Implementation}
+
+\begin{itemize}
+  \item \texttt{input/allowed\_param\_list.m} --- field whitelist
+  \item \texttt{input/default\_param\_values.m} --- defaults (\texttt{false}, $k=1$)
+  \item \texttt{input/set\_default\_param\_value.m} --- validation
+  \item \texttt{input/display\_input\_summary.m} --- runtime printout
+\end{itemize}
+
+Example (\texttt{Si8\_from\_Si2/test}):
+\begin{lstlisting}
+&SUPERCELL
+  is_supercell = .true.
+  use_sc_isdf = .true.
+  k1 = 2
+  k2 = 2
+  k3 = 1
+  isdf_source_dir = '../Si2/SAVE'
+END &SUPERCELL
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\subsection{ISDF Driver Branch}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+Standard path: coarse grid $\to$ adaptive ISDF $\to$ \texttt{gen\_tildeVq}.
+
+SC path:
+\[
+  \text{SC\_ISDF}
+  \;\to\; \text{gen\_coeff\_from\_fine\_grid}
+  \;\to\; \text{gen\_bundle}
+  \;\to\; \text{gen\_tildeVq}
+  \;\to\; \text{validate\_hf}.
+\]
+
+\subsubsection{Code Implementation}
+
+File: \texttt{service/+isdf/driver.m}
+\begin{itemize}
+  \item \texttt{local\_use\_sc\_isdf(config)} --- gate on \texttt{SUPERCELL.use\_sc\_isdf}
+  \item \texttt{local\_sc\_isdf\_pipeline} --- orchestrates the SC chain
+  \item \texttt{local\_sc\_isdf\_checkpoint} --- locates source \texttt{.mat}
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{Coefficient Extraction on the Supercell}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+For each band $b$, BZ k-index, and spin:
+\begin{equation}
+  \texttt{coeff\_seper}(\mu,b,\mathbf k)
+  = \psi_{b\mathbf k}\!\bigl(\mathbf r_{\mathrm{lin}_\mu}\bigr),
+\end{equation}
+where $\psi_{b\mathbf k}$ includes k-point rotation via
+\texttt{wave\_functions.WF\_apply\_symm}.
+
+\subsubsection{Code Implementation}
+
+\texttt{service/+isdf/+coeff/gen\_coeff\_from\_fine\_grid.m}
+
+Uses \texttt{bundle\_struct.fine\_grid\_lin} from SC\_ISDF, or falls back to
+\texttt{isdf.SC\_ISDF\_r\_sampling\_to\_lin}.
+
+%----------------------------------------------------------------------
+\subsection{Symmetry Bundle Reconstruction}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+Replicated sampling points are not automatically closed under crystal
+symmetry. \texttt{gen\_bundle} collects unique orbit points on the fine FFT
+grid, builds \texttt{sampling2bundle} and \texttt{R\_rot\_in\_bundle}
+(bundle-index rotations), and fills \texttt{WF\_bundle}.
+
+For \texttt{adaptive\_sc} / \texttt{coarse\_sc}, the coarse/extra split follows
+the same logic as unit-cell \texttt{adaptive}.
+
+\subsubsection{Code Implementation}
+
+\texttt{service/+isdf/+rsymm/gen\_bundle.m}
+
+Modifications for SC:
+\begin{itemize}
+  \item Recognise \texttt{adaptive\_sc}, \texttt{coarse\_sc}, \texttt{supercell} schemes
+  \item Load coarse WF from \texttt{coeff\_seper} when \texttt{tmp} is empty
+  \item Skip internal k-rotation self-test on supercell schemes (large \texttt{ikrot})
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{Exchange Operator and HF Validation}
+%----------------------------------------------------------------------
+
+\subsubsection{Equations and Algorithm Description}
+
+\texttt{gen\_tildeVq} uses \texttt{get\_u\_alpha}, which requires a populated
+\texttt{bundle\_struct.R\_rot\_in\_bundle}.
+HF validation compares exact HF exchange $E_x^{\mathrm{HF}}$ with ISDF
+approximation $E_x^{\mathrm{ISDF}}$ over occupied/virtual band pairs in the
+configured index range.
+
+\subsubsection{Code Implementation}
+
+\begin{itemize}
+  \item \texttt{gen\_tildeVq.m} --- unchanged; called after bundle build
+  \item \texttt{get\_u\_xalpha.m} --- reads \texttt{R\_rot\_in\_bundle}, \texttt{WF\_bundle}
+  \item \texttt{+validation/isdf\_validation.m} --- accepts \texttt{adaptive\_sc} scheme
+  \item \texttt{+validation/isdf\_validate\_HF.m} --- writes \texttt{isdf\_validate\_HF\_id*.txt}
+\end{itemize}
+
+%----------------------------------------------------------------------
+\subsection{Test Layout (\texttt{test\_SC})}
+%----------------------------------------------------------------------
+
+\subsubsection{Procedure}
+
+\begin{enumerate}
+  \item Run unit-cell adaptive ISDF with \texttt{validate\_hf = .true.}
+        (\texttt{energy\_band\_index\_max = 2 $\times$ occupied bands}).
+  \item Save checkpoint under \texttt{./SAVE/}.
+  \item For each supercell case, set \texttt{use\_sc\_isdf}, \texttt{k1/k2/k3},
+        and \texttt{isdf\_source\_dir} pointing to the unit-cell \texttt{SAVE/}.
+  \item Run \texttt{run\_sc\_test(case\_dir)}.
+\end{enumerate}
+
+\subsubsection{Si Test Matrix}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Case & $N_{\mathrm{elec}}$ & occupied & \texttt{energy\_band\_index\_max} \\
+\midrule
+Si2 (unit)   &  8 &  4 &  8 \\
+Si8 ($2\!\times\!2\!\times\!1$) & 32 & 16 & 32 \\
+Si16 ($2\!\times\!2\!\times\!2$) & 64 & 32 & 64 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{LiH Test Matrix}
+
+Unit cell: \texttt{Materialtest/systems/LiH/1\_1\_1} ($8$ atoms, FFT $20^3$).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+Case & ratio & $N_{\mathrm{elec}}$ & \texttt{energy\_band\_index\_max} \\
+\midrule
+LiH\_111 (unit) & --- & 16 & 16 \\
+LiH\_222\_from\_111 & $[2,2,2]$ & 128 & 128 \\
+LiH\_444\_from\_111 & $[4,4,4]$ & 1024 & 1024 \\
+LiH\_666\_from\_111 & $[6,6,6]$ & 3456 & 3456 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%======================================================================
+\section{File Index}
+%======================================================================
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+File & Status \\
+\midrule
+\texttt{service/+isdf/SC\_ISDF.m} & New \\
+\texttt{service/+isdf/SC\_ISDF\_r\_sampling\_to\_lin.m} & New \\
+\texttt{service/+isdf/+coeff/gen\_coeff\_from\_fine\_grid.m} & New \\
+\texttt{service/+isdf/driver.m} & Modified \\
+\texttt{service/+isdf/+rsymm/gen\_bundle.m} & Modified \\
+\texttt{service/+isdf/+validation/isdf\_validation.m} & Modified \\
+\texttt{input/*} (SUPERCELL block) & Modified \\
+\texttt{test\_profile/test\_SC/} & New test harness \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

@@ -1,0 +1,10 @@
+Open this folder in your local browser:
+
+  index.html          (profile summary)
+  file0.html          (same as index.html)
+  matlab-report-styles.css  (bundled stylesheet)
+
+Remote server: download/copy this entire directory to your PC,
+then double-click index.html, or run:
+  python3 -m http.server 8765
+and visit http://localhost:8765/index.html

@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#SBATCH -t 30:00:00
+#SBATCH -p normal
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 80
+#SBATCH -w largememory
+
+RUNMATLAB=matlab
+SCRIPT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
+if [ ! -d "$SCRIPT_DIR" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+GW_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+cd "$SCRIPT_DIR" || exit 1
+mkdir -p "$SCRIPT_DIR/log"
+rm -f "$SCRIPT_DIR"/slurm*
+
+$RUNMATLAB -nodisplay -nodesktop -nosplash -logfile "$SCRIPT_DIR/log/test_si111.log" -r "addpath('$GW_ROOT/test_profile'); run_test_profile_case('$SCRIPT_DIR', true); exit"
