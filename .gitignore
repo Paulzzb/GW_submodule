@@ -4,9 +4,12 @@
 *QPenergy
 QPen*
 
+# Platform-specific MEX binaries (built on demand by QPstartup / isdf.*.build_*_mex)
+*.mex*
+
 *QPlog
 *log
-**/ISDF_DB/
+
 
 !GW/example_profile/TMP_files/groundstate.mat
 
@@ -20,6 +23,13 @@ test_profile/**/coarse_FFT_direct.txt
 test_profile/**/*report*.txt
 test_profile/**/*报告*.txt
 test_profile/**/*log*.txt
+
+# tests/: generated SAVE / logs / QE binaries (keep namelist + README)
+tests/**/SAVE/
+tests/**/QPlog*
+tests/**/*.mat
+tests/cases/**/qe.save/**
+!tests/cases/**/qe.save/README.md
 
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
