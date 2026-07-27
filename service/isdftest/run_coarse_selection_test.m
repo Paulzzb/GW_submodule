@@ -1,3 +1,11 @@
+% License-Identifier: GPL
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function report = run_coarse_selection_test()
 % Sandbox test for isdf.coeff.gen_indices_coarse.
 
