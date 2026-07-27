@@ -39,14 +39,6 @@ function report = service_reset_persistent(opts)
     @() isdf.get_rho_xalpha('reset'), 'isdf.get_rho_xalpha(''reset'')';
     @() isdf.prod_C_inv_sqrt('clear'), 'isdf.prod_C_inv_sqrt(''clear'')';
     @() isdf.debug.clear(), 'isdf.debug.clear';
-    @() isdftest.coeff.isdf_apply_symm_on_coarse('reset'), 'isdftest.coeff.isdf_apply_symm_on_coarse(''reset'')';
-    @() isdftest.coeff.isdf_get_coeff('reset'), 'isdftest.coeff.isdf_get_coeff(''reset'')';
-    @() isdftest.adaptive.isdf_schur_update('clear'), 'isdftest.adaptive.isdf_schur_update(''clear'')';
-    @() isdftest.adaptive.adaptive_weight('clear'), 'isdftest.adaptive.adaptive_weight(''clear'')';
-    @() isdftest.get_u_xalpha('reset'), 'isdftest.get_u_xalpha(''reset'')';
-    @() isdftest.get_rho_xalpha('reset'), 'isdftest.get_rho_xalpha(''reset'')';
-    @() isdftest.prod_C_inv_sqrt('clear'), 'isdftest.prod_C_inv_sqrt(''clear'')';
-    @() isdftest.debug.clear(), 'isdftest.debug.clear';
     @() parallel.free(), 'parallel.free';
     @() timing.free(), 'timing.free';
   };
