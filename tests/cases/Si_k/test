@@ -1,0 +1,44 @@
+&CONTROL
+  prefix = 'Si_gamma',
+  isgw = 1,
+  groundstate_dir = './qe.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .false.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  ! Placeholder band window — revise after QE data is in place.
+  number_bands_in_summation = 32,
+  energy_band_index_min = 1,
+  energy_band_index_max = 32,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 0,
+END &FREQUENCY
+
+&CUTOFFS
+  ! Placeholder — revise with groundstate / target accuracy.
+  coulomb_cutoff = 15.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .true.
+  compute_vn = .true.
+  compute_nn = .true.
+  isdf_ratio_type1 = 16.0
+  isdf_ratio_type2 = 16.0
+  isdf_ratio_type3 = 16.0
+  adaptive_batch_size = 8, ...
+  adaptive_weight_batch_size = 64, ...
+  exxmethod = 'pseudo'
+  is_helper = .true.
+  validate_hf = .true.
+END &ISDF
+
+&COHSEX
+  exact_ch = .false.
+END &COHSEX
