@@ -9,6 +9,7 @@ QPen*
 
 *QPlog
 *log
+*.txt
 
 
 !GW/example_profile/TMP_files/groundstate.mat
