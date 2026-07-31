@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/13 ZZ
+
 function sres = gw_fullfreq_cd_res_Gamma(config)
 %GW_FULLFREQ_CD_RES_GAMMA  Residual term for double-(k,q) service path.
 

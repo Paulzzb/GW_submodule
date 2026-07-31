@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function nm_Womega_nm = gw_fullfreq_cd_core_Gamma(config, n_start_end, m_start_end, omega_list, pattern)
 %GW_FULLFREQ_CD_CORE_GAMMA  Single-(k,q) W matrix-element builder on service stack.
 %
