@@ -7,7 +7,6 @@ QPen*
 # Platform-specific MEX binaries (built on demand by QPstartup / isdf.*.build_*_mex)
 *.mex*
 
-*QPlog
 *log
 *.txt
 
@@ -27,7 +26,8 @@ test_profile/**/*log*.txt
 
 # tests/: generated SAVE / logs / QE binaries (keep namelist + README)
 tests/**/SAVE/
-tests/**/QPlog*
+tests/**/r-*.log
+tests/**/l-*.log
 tests/**/*.mat
 tests/cases/**/qe.save/**
 !tests/cases/**/qe.save/README.md
