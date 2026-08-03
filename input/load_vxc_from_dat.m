@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/23 WT ZZ
+
 function Vxc = load_vxc_from_dat(vxc_path, nb, nk, nspin)
 %LOAD_VXC_FROM_DAT  Read QE vxc.dat into [nb x nk x nspin] (eV, as in the file).
 %

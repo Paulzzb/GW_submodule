@@ -4,7 +4,7 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/04/01
+% Last modified: 2026/08/03 ZZ
 
 function gen_coeff(cfg, id)
 % ISDF index-controller function.

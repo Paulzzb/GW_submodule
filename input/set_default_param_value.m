@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function config = set_default_param_value(config, data)
 % This function fills in default values for missing config
 % parameters with the help of system information
@@ -86,53 +94,8 @@ if (config.ISDF.isisdf > 0)
   if (config.ISDF.isdf_ratio_type3 < 0)
     config.ISDF.isdf_ratio_type3 = config.ISDF.isdf_ratio;
   end
-  if (config.ISDF.adaptive_threshold_type1 < 0)
-    config.ISDF.adaptive_threshold_type1 = 2e-4;
-  end
-  if (config.ISDF.adaptive_threshold_type2 < 0)
-    config.ISDF.adaptive_threshold_type2 = 2e-4;
-  end
-  if (config.ISDF.adaptive_threshold_type3 < 0)
-    config.ISDF.adaptive_threshold_type3 = 2e-4;
-  end
-  if (config.ISDF.adaptive_num_add_type1 < 0)
-    config.ISDF.adaptive_num_add_type1 = 16;
-  end
-  if (config.ISDF.adaptive_num_add_type2 < 0)
-    config.ISDF.adaptive_num_add_type2 = 16;
-  end
-  if (config.ISDF.adaptive_num_add_type3 < 0)
-    config.ISDF.adaptive_num_add_type3 = 16;
-  end
-  if (config.ISDF.adaptive_candidate_ratio_type1 < 0)
-    config.ISDF.adaptive_candidate_ratio_type1 = 2.0;
-  end
-  if (config.ISDF.adaptive_candidate_ratio_type2 < 0)
-    config.ISDF.adaptive_candidate_ratio_type2 = 2.0;
-  end
-  if (config.ISDF.adaptive_candidate_ratio_type3 < 0)
-    config.ISDF.adaptive_candidate_ratio_type3 = 2.0;
-  end
-  if (config.ISDF.adaptive_max_add_frac_type1 < 0)
-    config.ISDF.adaptive_max_add_frac_type1 = 1.0;
-  end
-  if (config.ISDF.adaptive_max_add_frac_type2 < 0)
-    config.ISDF.adaptive_max_add_frac_type2 = 1.0;
-  end
-  if (config.ISDF.adaptive_max_add_frac_type3 < 0)
-    config.ISDF.adaptive_max_add_frac_type3 = 1.0;
-  end
-  if (config.ISDF.adaptive_max_cond_type1 < 0)
-    config.ISDF.adaptive_max_cond_type1 = 1e6;
-  end
-  if (config.ISDF.adaptive_max_cond_type2 < 0)
-    config.ISDF.adaptive_max_cond_type2 = 1e6;
-  end
-  if (config.ISDF.adaptive_max_cond_type3 < 0)
-    config.ISDF.adaptive_max_cond_type3 = 1e6;
-  end
   if ~(isfinite(config.ISDF.inv_ratio) && config.ISDF.inv_ratio >= 0 && config.ISDF.inv_ratio <= 1)
-    config.ISDF.inv_ratio = 0.5;
+    config.ISDF.inv_ratio = 0.75;
   end
   if isempty(config.ISDF.sys)
     config.ISDF.sys = data.sys;

@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/01/29 ZZ
+
 function config = read_input_param(filename)
 % This function
 % 1. Reads the input file from filename
@@ -48,7 +56,7 @@ for i = 1:numel(matches)
 
   if ~isfield(def, blockName)
   msg = sprintf('BLOCK NAME NOT DEFINED: %s', blockName);
-  QPerror(msg);
+  output.err(msg);
   end
 
   lines = regexp(blockText, '[\n\r]+', 'split');
@@ -68,7 +76,7 @@ for i = 1:numel(matches)
 
   if ~ismember(key, def.(blockName))
     msg = sprintf('BLOCK "%s" HAS INVALID PARAMETER: %s', blockName, key);
-    QPerror(msg);
+    output.err(msg);
   end
 
   % val = str2double(valStr);

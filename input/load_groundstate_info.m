@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function data = load_groundstate_info(dirin, typein, config)
 % Load groundstate information and convert to @GWinfor format
 %
@@ -22,7 +30,7 @@ switch lower(typein)
     data = load_formal_groundstate(dirin, config);
   otherwise
     msg = sprintf('Unsupported groundstate type: %s', typein);
-    QPerror(msg);
+    output.err(msg);
 end
 
 end
@@ -37,21 +45,21 @@ filePath = fullfile(dirin, 'groundstate.mat');
 
 if ~exist(filePath, 'file')
   msg = sprintf('groundstate.mat not found in directory: %s', dirin);
-  QPerror(msg);
+  output.err(msg);
 end
 
 tmp = load(filePath);
 
 if ~isfield(tmp, 'groundstate')
   msg = 'groundstate.mat does not contain a variable named "groundstate".';
-  QPerror(msg);
+  output.err(msg);
 end
 
 required_fields = {'rhor', 'Vxc', 'ev', 'psig', 'sys', 'occupation', 'reciprocal_grid_info', 'nkibz', 'nspin', 'kibz', 'nspinor'};
 for k = 1:length(required_fields)
   if ~isfield(tmp.groundstate, required_fields{k})
     msg = sprintf('Missing field "%s" in groundstate structure.', required_fields{k});
-    QPerror(msg);
+    output.err(msg);
   end
 end
 

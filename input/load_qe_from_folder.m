@@ -1,22 +1,13 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 WT ZZ
+
 function myneed = load_qe_from_folder(qepath)
-% FUNCTION:     myneed = load_qe_from_folder(qepath)
-%
-% DESCRIPTION:  Read qe-scf information to a struct 'myneed' 
-%
-% INPUT:        qepath  -  
-%               
-% OUTPUT:       klist   - [nkibz x 3] k-point coordinates in fractional units
-%               weight  - [nkibz x 1] integration weights
-%
-% AUTHOR:       Wu, Wentiao, and Meng, Xinyong (Write original code)
-% CONTRIBUTORS: Zhou, Zhengbang (Modify code to this module)
-%
-% CREATED:      2025-07-09
-% LAST UPDATED: 2025-07-09
-% VERSION:      v0.1
-%
-% NOTE:         Part of the src_profile/kgrid/ module for GW k-mesh support
-%==========================================================================
+
   xmlname=[qepath,'/data-file-schema.xml'];
   chargename=[qepath,'/charge-density.hdf5'];
   

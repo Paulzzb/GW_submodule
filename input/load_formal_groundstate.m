@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/01/30 ZZ
+
 function data = load_formal_groundstate(dirin, config)
 %LOAD_FORMAL_GROUNDSTATE  Synthetic supercell groundstate for complexity benchmarks.
 %
