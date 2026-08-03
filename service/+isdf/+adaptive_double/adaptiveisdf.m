@@ -7,11 +7,13 @@
 % Last modified: 2026/05/20 ZZ
 
 function idnew = adaptiveisdf(id, cfg_isdf)
-  % Wall-clock time for the main adaptive phase through the orbit summary (before Verification).
+  % Wall-clock time through rebuild + orbit summary + phase-1 report.
   t_phase1 = tic;
 
-  if nargin < 2
-    cfg_isdf = struct();
+  if nargin < 2 || isempty(cfg_isdf) || ~isstruct(cfg_isdf)
+    error('adaptiveisdf:cfg', ...
+      ['cfg_isdf (config.ISDF) is required. ', ...
+       'Initialize once via default_param_values / set_default_param_value.']);
   end
 
   % 1. Starting grid: from coarse fft grid
@@ -21,7 +23,6 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   if nspin > 1
     error('adaptiveisdf:nspin', 'nspin > 1 is not supported.');
   end
-  wf_data = wave_functions.get();
 
   [ck_loaded, idnew] = isdf.adaptive_double.adaptive_checkpoint_try_load(id);
   if ck_loaded
@@ -41,13 +42,13 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   % isdf.adaptive_double.isdf_exclude_point(id);
   isdf_data = isdf.get(id);
   Nisdf = (isdf_data.nisdf);
-  params = adaptiveisdf_resolve_params(isdf_data.desc, cfg_isdf);
+  params = isdf.adaptive.adaptive_param(isdf_data.desc, cfg_isdf);
   threshold = params.threshold;
   num_add = params.num_add;
   ratio = params.candidate_ratio;
   adaptive_backend = 'adaptive_double';
   adaptive_arithmetic = 'double';
-  adaptiveisdf_print_run_config(id, isdf_data, params, threshold, num_add, ratio, ...
+  isdf.adaptive.adaptiveisdf_print_run_config(id, isdf_data, params, threshold, num_add, ratio, ...
     adaptive_backend, adaptive_arithmetic);
   isdf.adaptive_double.adaptive_weight('set_batch_size', params.weight_batch_size);
   
@@ -78,11 +79,11 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   %    and calculate the loss function 
   w = isdf.adaptive_double.adaptive_weight('get');
   loss0 = sum(w);
-  fprintf('Initial loss: %f\n', loss0);
+  output.msg('v2l', 'adaptiveisdf: initial loss = %.8e', loss0);
   isdf.adaptive_double.adaptive_weight('init_update');
   w = isdf.adaptive_double.adaptive_weight('get');
   loss = sum(w);
-  fprintf('loss after initial update: %f\n', loss);
+  output.msg('v2l', 'adaptiveisdf: loss after initial update = %.8e', loss);
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % Now, do the update
@@ -98,8 +99,9 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   selected_indices = zeros(num_add_i, 1);
   w_candidate = zeros(double(N_candidate), 1);
   fft_data = FFT.get();
-  symm_data = symmetry.get();
   n_iter = 0;
+  n_schur_skip = 0;
+  schur_skip_warned = false;
   loss_history = zeros(double(Naddmax) + 1, 1);
   rel_loss_history = zeros(double(Naddmax) + 1, 1);
   loss_history(1) = loss;
@@ -109,6 +111,27 @@ function idnew = adaptiveisdf(id, cfg_isdf)
     rel_loss_history(1) = NaN;
   end
 
+  live_on = false;
+  if double(Nisdf_new_max) > 0
+    try
+      timing.get();
+    catch %#ok<CTCH>
+      timing.driver();
+    end
+    tm_live = timing.get();
+    tm_live.live.nhash = int32(20);
+    tm_live.live.live_report_min_seconds = 0;
+    tm_live.live.show_expected = false;  % non-linear cost: no continuous (X)
+    timing.save2mod(tm_live);
+    if loss0 > 0
+      live_label0 = sprintf('Adaptive ISDF rel=%.3e', loss / loss0);
+    else
+      live_label0 = 'Adaptive ISDF rel=NaN';
+    end
+    timing.LIVE_timing(live_label0, double(Nisdf_new_max));
+    live_on = true;
+    cleanup_live = onCleanup(@() timing.LIVE_timing()); %#ok<NASGU>
+  end
 
   breakflag = false;
   schur_converged = false;
@@ -150,8 +173,18 @@ function idnew = adaptiveisdf(id, cfg_isdf)
           else
             rel_now = NaN;
           end
-          fprintf('adaptiveisdf: skip index %d (Schur guard failed), relative loss = %.6e\n', ...
+          n_schur_skip = n_schur_skip + 1;
+          output.msg('v2l', ...
+            'adaptiveisdf: skip index %d (Schur guard failed), relative loss = %.6e', ...
             selected_indices(iadd), rel_now);
+          if ~schur_skip_warned && double(Nisdf_new_max) > 0 ...
+              && n_schur_skip > 0.5 * double(Nisdf_new_max)
+            output.warn([ ...
+              'adaptiveisdf: schur_skips=%d > 0.5*Naddmax=%d - method may be stuck. ', ...
+              'Try: (1) decrease adaptive_batch_size  (2) set exxmethod=''pseudo''  then recompute.'], ...
+              n_schur_skip, double(Nisdf_new_max));
+            schur_skip_warned = true;
+          end
           n_schur_fail_this_iter = n_schur_fail_this_iter + 1;
           Nremain = Nremain - 1;
           selected_indices(iadd) = 0;
@@ -176,7 +209,8 @@ function idnew = adaptiveisdf(id, cfg_isdf)
       end
     end
     if n_selected_iter == 0 && n_schur_fail_this_iter > 0
-      fprintf('adaptiveisdf: all candidate Schur updates failed this iteration; treating as converged.\n');
+      output.msg('rs', ...
+        'adaptiveisdf: all candidate Schur updates failed this iteration; treating as converged.');
       schur_converged = true;
       break;
     end
@@ -196,201 +230,33 @@ function idnew = adaptiveisdf(id, cfg_isdf)
     loss = sum(w(global_index_remain));
     loss_history(n_iter + 1) = loss;
     rel_loss_history(n_iter + 1) = loss / loss0;
-    fprintf('Loss: %f\n', loss);
-    fprintf('Relative loss: %f\n', loss / loss0);
+    output.msg('v2l', 'adaptiveisdf: iter=%d  loss=%.8e  rel=%.8e  added=%d/%d', ...
+      n_iter, loss, rel_loss_history(n_iter + 1), Nisdf_new, Nisdf_new_max);
+    if live_on
+      label = sprintf('Adaptive ISDF rel=%.3e', rel_loss_history(n_iter + 1));
+      timing.LIVE_timing(double(numel(selected_now)), label);
+    end
     if breakflag || schur_converged
       break;
     end
   end
 
-
-  % Generate a concise report for adaptive updating.
-  if loss0 > 0
-    rel_loss = loss / loss0;
-  else
-    rel_loss = NaN;
+  if live_on
+    timing.LIVE_timing();
+    live_on = false;
+    clear cleanup_live
   end
 
-  if ~(loss0 > 0)
-    stop_reason = 'invalid_initial_loss';
-  elseif Nisdf_new_max <= 0
-    stop_reason = 'naddmax_zero';
-  elseif rel_loss <= threshold
-    stop_reason = 'reach_threshold';
-  elseif isempty(global_index_remain)
-    stop_reason = 'no_remaining_points';
-  elseif schur_converged
-    stop_reason = 'schur_converged';
-  else
-    stop_reason = 'loop_guard';
-  end
-
-  n_report = min(Nisdf_new, 10);
-  report = struct();
-  report.initial_nisdf = Nisdf;
-  report.added_nisdf = Nisdf_new;
-  report.final_nisdf = Nisdf + Nisdf_new;
-  report.iterations = n_iter;
-  report.loss_initial = loss0;
-  report.loss_final = loss;
-  report.relative_loss = rel_loss;
-  report.threshold = threshold;
-  report.num_add = num_add;
-  report.candidate_ratio = ratio;
-  report.max_add_frac = params.max_add_frac;
-  report.nmu_cap = nmu_cap;
-  report.naddmax = Naddmax;
-  report.isdf_ratio = params.isdf_ratio;
-  report.max_cond = params.max_cond;
-  report.use_cond_guard = logical(params.use_cond_guard);
-  report.param_source = params.source;
-  report.stop_reason = stop_reason;
-  report.adaptive_backend = adaptive_backend;
-  report.adaptive_arithmetic = adaptive_arithmetic;
-  report.isdf_desc = char(string(isdf_data.desc));
-  report.new_indices = isdf_new_indices(1:Nisdf_new);
-  report.loss_history = loss_history(1:n_iter+1);
-  report.relative_loss_history = rel_loss_history(1:n_iter+1);
-
-  fprintf('\n=== Adaptive ISDF Update Report ===\n');
-  fprintf('Backend            : %s\n', adaptive_backend);
-  fprintf('Arithmetic         : %s\n', adaptive_arithmetic);
-  fprintf('ISDF desc          : %s\n', char(string(isdf_data.desc)));
-  fprintf('Coarse ISDF id     : %d\n', int32(id));
-  fprintf('Initial Nisdf      : %d\n', Nisdf);
-  fprintf('Added points       : %d\n', Nisdf_new);
-  fprintf('Final Nisdf        : %d\n', report.final_nisdf);
-  fprintf('Iterations         : %d\n', n_iter);
-  fprintf('Initial loss       : %.8e\n', loss0);
-  fprintf('Final loss         : %.8e\n', loss);
-  fprintf('Relative loss      : %.8e\n', rel_loss);
-  fprintf('Threshold          : %.8e\n', threshold);
-  fprintf('num_add            : %d\n', num_add);
-  fprintf('candidate ratio    : %.4f\n', ratio);
-  fprintf('max add frac       : %.4f\n', params.max_add_frac);
-  fprintf('ISDF ratio         : %.4f\n', params.isdf_ratio);
-  fprintf('max cond           : %.4e\n', params.max_cond);
-  fprintf('use cond guard     : %d\n', logical(params.use_cond_guard));
-  fprintf('Nisdf cap          : %.8e\n', nmu_cap);
-  fprintf('Naddmax            : %d\n', Naddmax);
-  fprintf('param source       : %s\n', params.source);
-  fprintf('Stop reason        : %s\n', stop_reason);
-  if n_report > 0
-    fprintf('New indices (first %d): ', n_report);
-    fprintf('%d ', isdf_new_indices(1:n_report));
-    fprintf('\n');
-  else
-    fprintf('New indices        : <none>\n');
-  end
-  fprintf('Stepwise loss/loss0 after each +Nadd update:\n');
-  if n_iter == 0
-    fprintf('  Step 0: loss/loss0 = %.8e\n', rel_loss_history(1));
-  else
-    for istep = 1:n_iter
-      fprintf('  Step %d: loss = %.8e, loss/loss0 = %.8e\n', ...
-              istep, loss_history(istep+1), rel_loss_history(istep+1));
-    end
-  end
-  fprintf('===================================\n\n');
-
-  % --- Symmetry orbits on the fine FFT grid for newly added centroids ---
-  % (1) How many distinct orbits among the new seeds.
-  % (2) Total fine-grid points in the union of those orbits.
-  % (3) How many of those orbit points lie in the current centroid set (initial + new).
-  Nadded = double(Nisdf_new);
-  if Nadded > 0
-    seeds = unique(isdf_new_indices(1:Nadded));
-    fft_data_orb = FFT.get();
-    R_rot = double(fft_data_orb.R_rot);
-    nr_orb = double(fft_data_orb.nr);
-    U_orb = adaptiveisdf_orbit_union_bfs(seeds, R_rot, nr_orb);
-    n_pts_orbit_union = nnz(U_orb);
-
-    canon = zeros(numel(seeds), 1);
-    for ks = 1:numel(seeds)
-      Om = adaptiveisdf_orbit_mask_bfs(seeds(ks), R_rot, nr_orb);
-      canon(ks) = min(find(Om));
-    end
-    n_orbits_among_new = numel(unique(canon));
-
-    isdf_data_cur = isdf.get(id);
-    Nold_mu = double(isdf_data_cur.nisdf);
-    fine_old = adaptiveisdf_r_sampling_rows_to_lin(isdf_data_cur, fft_data_orb, Nold_mu);
-    current_mask = false(nr_orb, 1);
-    current_mask(fine_old) = true;
-    current_mask(seeds) = true;
-    n_in_current = nnz(U_orb & current_mask);
-
-    current_old_only = false(nr_orb, 1);
-    current_old_only(fine_old) = true;
-    n_in_initial_only = nnz(U_orb & current_old_only);
-
-    fprintf('--- Orbit report (fine FFT grid, spatial symmetries via FFT.R_rot) ---\n');
-    fprintf('  New centroid count (with possible repeats): %d\n', Nadded);
-    fprintf('  Distinct new seeds (fine linear indices): %d\n', numel(seeds));
-    fprintf('  (1) Distinct symmetry orbits among new seeds: %d\n', n_orbits_among_new);
-    fprintf('  (2) Total fine-grid points in union of those orbits: %d\n', n_pts_orbit_union);
-    fprintf('  (3a) Of those orbit points, in initial centroid set only (first Nisdf=%d): %d\n', ...
-      Nisdf, n_in_initial_only);
-    fprintf('  (3b) Of those orbit points, in full current set (initial + new seeds): %d\n', ...
-      n_in_current);
-    fprintf('--- end orbit report ---\n\n');
-    report.orbit_has_data = true;
-    report.orbit_Nadded = Nadded;
-    report.orbit_seeds_count = numel(seeds);
-    report.orbit_n_orbits = n_orbits_among_new;
-    report.orbit_n_pts_union = n_pts_orbit_union;
-    report.orbit_n_in_initial_only = n_in_initial_only;
-    report.orbit_n_in_current = n_in_current;
-  else
-    fprintf('--- Orbit report: no new centroids (Nadded=0), skip. ---\n\n');
-    report.orbit_has_data = false;
-  end
-
-  elapsed_phase1 = toc(t_phase1);
-  report.coarse_isdf_id = id;
-  report.elapsed_phase1_seconds = elapsed_phase1;
-  fpath_r = adaptiveisdf_write_phase1_report(report);
-  fprintf(1, 'adaptiveisdf: wrote phase-1 report to %s (elapsed %.6f s, through orbit summary)\n', ...
-    fpath_r, elapsed_phase1);
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Verification
   [Nisdf_new, ~, ~, ~, Psi_on_grid, Phi_on_grid] = ...
          isdf.adaptive_double.isdf_schur_update('get');
-  
   Nextra = Nisdf_new - Nisdf;
-  % Check if the new-added points correcly indiced.
-  % for i = 1:Nextra
-  %   ind_new = isdf_new_indices(i);
-  %   [Psi_on_new_grid, Phi_on_new_grid] = isdf.adaptive_double.adaptive_weight('get_wf_xga', ind_new);
-  %   Psi_imported = Psi_on_grid(Nisdf+i, :);
-  %   Phi_imported = Phi_on_grid(Nisdf+i, :);
-  %   if norm(Psi_on_new_grid - Psi_imported) > 1e-6
-  %     error('adaptiveisdf:new_indices', 'The new-added points are not correctly indexed.');
-  %   end
-  %   if norm(Phi_on_new_grid - Phi_imported) > 1e-6
-  %     error('adaptiveisdf:new_indices', 'The new-added points are not correctly indexed.');
-  %   end
-  % end
-  %
-  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % CCH = isdf.prod(Psi_on_grid(1:Nisdf_new, :), Psi_on_grid(1:Nisdf_new, :), ...
-  %                 Phi_on_grid(1:Nisdf_new, :), Phi_on_grid(1:Nisdf_new, :));
-  % L_CCH_dir = chol(CCH(1:Nisdf_new, 1:Nisdf_new), "lower");
-  % output = norm(L_CCH_dir - L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro') / norm(L_CCH(1:Nisdf_new, 1:Nisdf_new), 'fro');
-  % fprintf('Difference between direct Cholesky and adaptive Cholesky: %f\n', output);
-
-  % output = norm(...
-  %          invL_CCH(1:Nisdf_new, 1:Nisdf_new) * L_CCH(1:Nisdf_new, 1:Nisdf_new)...
-  %           - eye(Nisdf_new), 'fro') / norm(eye(Nisdf_new), 'fro');
-  % fprintf('Difference between invL_CCH * L_CCH and eye: %f\n', output);
-
-  % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  idnew = isdf.isdf_add(isdf_data.desc);
   % Build a new ISDF object at idnew, keep original id unchanged.
+  idnew = isdf.isdf_add(isdf_data.desc);
+
   isdf_data_new = isdf.get(idnew);
   isdf_data_new.nrange1 = isdf_data.nrange1;
   isdf_data_new.nrange2 = isdf_data.nrange2;
@@ -406,52 +272,12 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   isdf_data_new.N_coarse = int32(Nisdf);
   isdf_data_new.N_extra = int32(Nextra);
 
-  % Append newly selected R points.
+  % Append newly selected R points. (Symmetry for extras lives in bundle_struct after refresh.)
+  isdf_data_new.R_rot_extra = int32(zeros(0, 0));
   if Nextra > 0
     new_lin = int32(isdf_new_indices(1:Nextra));
     R_new = double(fft_data.Rgrid_RLU(new_lin, :));
     isdf_data_new.R_sampling_RLU = double([isdf_data.R_sampling_RLU; R_new]);
-    isdf_data_new.R_rot_extra = zeros(Nisdf_new, symm_data.nsym, 'int32');
-    for is = 1:int32(symm_data.nsym)
-      % if is > symm_data.nsym / (1 + symm_data.is_t_rev)
-      %   is_t = is - symm_data.nsym / (1 + symm_data.is_t_rev);
-      % else
-      %   is_t = is;
-      % end
-      is_t = is;
-      isdf_data_new.R_rot_extra(1:Nisdf, is) = isdf_data.R_rot_coarse(1:Nisdf, is_t);
-      % Select appropriate rotation matrix
-      mtrx_RLU_R = symm_data.rot_mtrx_RLU_R(:, :, is);
-      M2 = double( mtrx_RLU_R );
-      M2_r_RLU = (fft_data.Rgrid_RLU * M2);  % nr x 3
-      if norm(M2_r_RLU - round(M2_r_RLU)) > 1e-3
-        error('Non-integer mapping found in rotation. Check the rotation matrices and FFT grid.');
-      end
-      M2_r_RLU = int32(round(M2_r_RLU));
-      % Update R_rot_extra for extra grid points
-      iv_mod = int32(mod(M2_r_RLU + fft_data.fftgrid, fft_data.fftgrid));  % nr x 3
-      i4 = 1 + iv_mod(:,1) + iv_mod(:,2)*fft_data.fftgrid(1) + iv_mod(:,3)*fft_data.fftgrid(1)*fft_data.fftgrid(2);  % nr x 1
-      isdf_data_new.R_rot_extra(Nisdf+1:Nisdf_new, is) = int32(i4(isdf_new_indices(1:Nextra)));
-      % % Update R_rot_extra for coarse grid points
-      % R_coarse_scal = double(isdf_data.fftgrid_c) ./ double(fft_data.fftgrid);
-      % R_coarse_scal_RLU = isdf_data.R_sampling_RLU(1:Nisdf, :) .* R_coarse_scal;
-      % if norm(R_coarse_scal_RLU - round(R_coarse_scal_RLU)) > 1e-4
-      %   error('Non-integer mapping found in rotation. Check the rotation matrices and FFT grid.');
-      % end
-      % R_coarse_scal_RLU = round(R_coarse_scal_RLU);
-      % M2_r_RLU_c = round(R_coarse_scal_RLU * M2);
-      % if norm(M2_r_RLU_c - round(M2_r_RLU_c)) > 1e-4
-      %   error('Non-integer mapping found in rotation. Check the rotation matrices and FFT grid.');
-      % end
-      % M2_r_RLU_c = round(M2_r_RLU_c);
-      % iv_mod_c = int32(mod(M2_r_RLU_c + fftgrid, fftgrid));  % nr x 3
-      % i4_c = 1 + iv_mod_c(:,1) + iv_mod_c(:,2)*isdf_data.fftgrid_c(1) ...
-      % + iv_mod_c(:,3)*isdf_data.fftgrid_c(1)*isdf_data.fftgrid_c(2);
-      % isdf_data_new.R_rot_extra(1:Nisdf, is) = ...
-      % int32(i4_c);
-    end 
-
-
   end
 
   % Rebuild coeff_seper with enlarged first dimension.
@@ -485,279 +311,68 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   % isdf_data_new.coeff_seper = isdf_data.coeff_seper;
   isdf_data_new.coeff_seper = coeff_new;
   isdf_data_new.tmp = isdf_data.coeff_seper;
-  %
-  % R_new = double(fft_data.Rgrid_RLU(isdf_new_indices(1:Nextra), :));
-  % isdf_data_new.R_sampling_RLU = [isdf_data.R_sampling_RLU; R_new];
   isdf_data_new.R_rot_coarse = isdf_data.R_rot_coarse;
-
-  % if Nextra > 0
-  %   for isym = 1:symm_data.nsym
-  %     isdf_data_new.R_rot_extra(:, isym) = ...
-  %     fft_data.R_rot(isdf_new_indices(1:Nextra), isym);
-  %   end
-  % end
-  
   isdf_data_new.bundle_struct = isdf_data.bundle_struct;
   isdf_data_new.assigned = true;
   isdf.save2mod(isdf_data_new, idnew);
-  % idnew = isdf.isdf_add(isdf_data.desc);
   isdf.rsymm.bundle_refresh(id, Nextra, isdf_new_indices, idnew);
-  % isdf.rsymm.gen_bundle(idnew);
-
-  % Mark heavy q-dependent tensors dirty to avoid using stale dimensions.
-  % isdf_data_new.tildeVq = zeros(0, 0, 0, 0);
-  % isdf_data_new.helperqG = zeros(0, 0, 0, 0);
-  
-
-  % validation using changing
-  % isdf.changing(idnew);
-  % isdf.gen_tildeVq(idnew);
-  % isdf.validation.isdf_validation(idnew);
-
   isdf.adaptive_double.adaptive_checkpoint_save(id, idnew);
+
+
+
+
+
+  % Generate a concise report for adaptive updating.
+  if loss0 > 0
+    rel_loss = loss / loss0;
+  else
+    rel_loss = NaN;
+  end
+
+  if ~(loss0 > 0)
+    stop_reason = 'invalid_initial_loss';
+  elseif Nisdf_new_max <= 0
+    stop_reason = 'naddmax_zero';
+  elseif rel_loss <= threshold
+    stop_reason = 'reach_threshold';
+  elseif isempty(global_index_remain)
+    stop_reason = 'no_remaining_points';
+  elseif schur_converged
+    stop_reason = 'schur_converged';
+  else
+    stop_reason = 'loop_guard';
+  end
+
+  report = struct();
+  report.iterations = n_iter;
+  report.loss_initial = loss0;
+  report.loss_final = loss;
+  report.relative_loss = rel_loss;
+  report.stop_reason = stop_reason;
+  report.adaptive_backend = adaptive_backend;
+  report.adaptive_arithmetic = adaptive_arithmetic;
+  report.loss_history = loss_history(1:n_iter+1);
+  report.relative_loss_history = rel_loss_history(1:n_iter+1);
+  report.schur_skips = n_schur_skip;
+  report = isdf.adaptive.adaptive_fill_report(report, id, idnew, params);
+
+  elapsed_phase1 = toc(t_phase1);
+  report.elapsed_phase1_seconds = elapsed_phase1;
+  fpath_r = isdf.adaptive.adaptiveisdf_write_phase1_report(report);
+
+  output.msg('nrs', '[Adaptive ISDF] desc=%s  id=%d  backend=%s', ...
+    char(string(isdf_data.desc)), int32(id), adaptive_backend);
+  output.msg('rs', '  Nisdf %d -> %d  (+%d)  iters=%d  stop=%s', ...
+    Nisdf, report.final_nisdf, Nextra, n_iter, stop_reason);
+  output.msg('rs', '  loss0=%.6e  loss=%.6e  rel=%.6e  (thr=%.6e)', ...
+    loss0, loss, rel_loss, threshold);
+  output.msg('rs', '  schur_skips=%d  (details at verbose>=2 / log)', n_schur_skip);
+  output.msg('rs', '  wrote %s  (%.1f s)', fpath_r, elapsed_phase1);
+
   isdf.numerical_cond_report('adaptive', id, idnew, isdf_data.desc, ...
     loss_history(1), loss, report.final_nisdf);
-  fprintf('Saved adaptive ISDF to new id = %d\n', idnew);
+  output.msg('rs', '  Saved adaptive ISDF -> id=%d', idnew);
 
-end
-
-function fpath = adaptiveisdf_write_phase1_report(r)
-% Write adaptive loop + orbit summary to adaptiveisdf_id<coarse_isdf_id>.txt in pwd.
-
-  cid = double(r.coarse_isdf_id);
-  fname = sprintf('adaptiveisdf_id%d.txt', cid);
-  fpath = fullfile(pwd, fname);
-  fid = fopen(fpath, 'w');
-  if fid < 0
-    error('adaptiveisdf:reportOpen', 'Cannot open for write: %s', fpath);
-  end
-  oc = onCleanup(@() fclose(fid)); %#ok<NASGU>
-
-  fprintf(fid, '=== adaptiveisdf phase-1 report (coarse ISDF id = %d) ===\n', cid);
-  fprintf(fid, 'Generated: %s\n', datestr(now, 'yyyy-mm-dd HH:MM:SS'));
-  fprintf(fid, ['Elapsed wall time (tic/toc): from function start through orbit summary ', ...
-    '(excludes Verification and later): %.9f s\n\n'], double(r.elapsed_phase1_seconds));
-
-  fprintf(fid, '\n=== Adaptive ISDF Update Report ===\n');
-  if isfield(r, 'adaptive_backend')
-    fprintf(fid, 'Backend            : %s\n', char(string(r.adaptive_backend)));
-  end
-  if isfield(r, 'adaptive_arithmetic')
-    fprintf(fid, 'Arithmetic         : %s\n', char(string(r.adaptive_arithmetic)));
-  end
-  if isfield(r, 'isdf_desc')
-    fprintf(fid, 'ISDF desc          : %s\n', char(string(r.isdf_desc)));
-  end
-  fprintf(fid, 'Coarse ISDF id     : %d\n', cid);
-  fprintf(fid, 'Initial Nisdf      : %d\n', int32(r.initial_nisdf));
-  fprintf(fid, 'Added points       : %d\n', int32(r.added_nisdf));
-  fprintf(fid, 'Final Nisdf        : %d\n', int32(r.final_nisdf));
-  fprintf(fid, 'Iterations         : %d\n', int32(r.iterations));
-  fprintf(fid, 'Initial loss       : %.8e\n', r.loss_initial);
-  fprintf(fid, 'Final loss         : %.8e\n', r.loss_final);
-  fprintf(fid, 'Relative loss      : %.8e\n', r.relative_loss);
-  fprintf(fid, 'Threshold          : %.8e\n', r.threshold);
-  fprintf(fid, 'num_add            : %d\n', int32(r.num_add));
-  fprintf(fid, 'candidate ratio    : %.8e\n', r.candidate_ratio);
-  fprintf(fid, 'max add frac       : %.8e\n', r.max_add_frac);
-  fprintf(fid, 'ISDF ratio         : %.8e\n', r.isdf_ratio);
-  fprintf(fid, 'max cond           : %.8e\n', r.max_cond);
-  if isfield(r, 'use_cond_guard')
-    fprintf(fid, 'use cond guard     : %d\n', logical(r.use_cond_guard));
-  end
-  fprintf(fid, 'Nisdf cap          : %.8e\n', r.nmu_cap);
-  fprintf(fid, 'Naddmax            : %d\n', int32(r.naddmax));
-  fprintf(fid, 'param source       : %s\n', char(string(r.param_source)));
-  fprintf(fid, 'Stop reason        : %s\n', char(string(r.stop_reason)));
-  n_rep = min(int32(r.added_nisdf), int32(10));
-  if n_rep > 0
-    fprintf(fid, 'New indices (first %d): ', double(n_rep));
-    ni = r.new_indices(1:double(n_rep));
-    fprintf(fid, '%d ', ni);
-    fprintf(fid, '\n');
-  else
-    fprintf(fid, 'New indices        : <none>\n');
-  end
-  fprintf(fid, 'Stepwise loss/loss0 after each +Nadd update:\n');
-  n_it = int32(r.iterations);
-  lh = r.loss_history;
-  rlh = r.relative_loss_history;
-  if n_it == 0
-    fprintf(fid, '  Step 0: loss/loss0 = %.8e\n', rlh(1));
-  else
-    for istep = 1:double(n_it)
-      fprintf(fid, '  Step %d: loss = %.8e, loss/loss0 = %.8e\n', istep, lh(istep + 1), rlh(istep + 1));
-    end
-  end
-  fprintf(fid, '===================================\n\n');
-
-  if isfield(r, 'orbit_has_data') && r.orbit_has_data
-    fprintf(fid, '--- Orbit report (fine FFT grid, spatial symmetries via FFT.R_rot) ---\n');
-    fprintf(fid, '  New centroid count (with possible repeats): %d\n', int32(r.orbit_Nadded));
-    fprintf(fid, '  Distinct new seeds (fine linear indices): %d\n', int32(r.orbit_seeds_count));
-    fprintf(fid, '  (1) Distinct symmetry orbits among new seeds: %d\n', int32(r.orbit_n_orbits));
-    fprintf(fid, '  (2) Total fine-grid points in union of those orbits: %d\n', int32(r.orbit_n_pts_union));
-    fprintf(fid, '  (3a) Of those orbit points, in initial centroid set only (first Nisdf=%d): %d\n', ...
-      int32(r.initial_nisdf), int32(r.orbit_n_in_initial_only));
-    fprintf(fid, '  (3b) Of those orbit points, in full current set (initial + new seeds): %d\n', ...
-      int32(r.orbit_n_in_current));
-    fprintf(fid, '--- end orbit report ---\n\n');
-  else
-    fprintf(fid, '--- Orbit report: no new centroids (Nadded=0), skip. ---\n\n');
-  end
-
-  fprintf(fid, '=== end adaptiveisdf phase-1 report ===\n');
-end
-
-function Om = adaptiveisdf_orbit_mask_bfs(seed, R_rot, nr)
-  Om = false(nr, 1);
-  dq = seed;
-  Om(seed) = true;
-  head = 1;
-  while head <= numel(dq)
-    i = dq(head);
-    head = head + 1;
-    for is = 1:size(R_rot, 2)
-      j = R_rot(i, is);
-      if j >= 1 && j <= nr && ~Om(j)
-        Om(j) = true;
-        dq(end + 1) = j; %#ok<AGROW>
-      end
-    end
-  end
-end
-
-function U = adaptiveisdf_orbit_union_bfs(seeds, R_rot, nr)
-  U = false(nr, 1);
-  for k = 1:numel(seeds)
-    U = U | adaptiveisdf_orbit_mask_bfs(seeds(k), R_rot, nr);
-  end
-end
-
-function lin = adaptiveisdf_r_sampling_rows_to_lin(isdf_data, fft_data, Nmu)
-  ni = double(fft_data.fftgrid(:)).';
-  Rgrid = double(fft_data.Rgrid_RLU);
-  lin = zeros(Nmu, 1);
-  Rs = double(isdf_data.R_sampling_RLU(1:Nmu, :));
-  for i = 1:Nmu
-    v = round(Rs(i, :));
-    v = mod(v, ni);
-    [is_hit, k] = ismember(v, Rgrid, 'rows');
-    if ~is_hit
-      dd = zeros(size(Rgrid, 1), 3);
-      for ddim = 1:3
-        t = abs(Rgrid(:, ddim) - v(ddim));
-        dd(:, ddim) = min(t, min(abs(t - ni(ddim)), abs(t + ni(ddim))));
-      end
-      [~, k] = min(sum(dd, 2));
-    end
-    lin(i) = k;
-  end
-end 
-
-function adaptiveisdf_print_run_config(id, isdf_data, params, threshold, num_add, ratio, ...
-    adaptive_backend, adaptive_arithmetic)
-  fprintf('\n=== Adaptive ISDF start ===\n');
-  fprintf('Backend            : %s\n', adaptive_backend);
-  fprintf('Arithmetic         : %s\n', adaptive_arithmetic);
-  fprintf('ISDF desc          : %s\n', char(string(isdf_data.desc)));
-  fprintf('Coarse ISDF id     : %d\n', int32(id));
-  fprintf('Initial Nisdf      : %d\n', int32(isdf_data.nisdf));
-  fprintf('Threshold          : %.8e\n', threshold);
-  fprintf('num_add            : %d\n', int32(num_add));
-  fprintf('candidate ratio    : %.4f\n', ratio);
-  fprintf('ISDF ratio         : %.4f\n', params.isdf_ratio);
-  fprintf('max cond           : %.4e\n', params.max_cond);
-  fprintf('use cond guard     : %d\n', logical(params.use_cond_guard));
-  fprintf('weight batch size  : %d\n', int32(params.weight_batch_size));
-  fprintf('param source       : %s\n', params.source);
-  fprintf('===========================\n\n');
-end
-
-function params = adaptiveisdf_resolve_params(desc, cfg_isdf)
-  desc = lower(strtrim(char(string(desc))));
-  params = struct();
-  params.threshold = 2e-4;
-  params.num_add = int32(16);
-  params.candidate_ratio = 2.0;
-  params.max_add_frac = 1.0;
-  params.isdf_ratio = 8.0;
-  params.max_cond = 1e6;
-  params.use_cond_guard = true;
-  params.weight_batch_size = 256;
-  params.source = "legacy";
-
-  if isempty(cfg_isdf) || ~isstruct(cfg_isdf)
-    return;
-  end
-
-  if strcmp(desc, 'vc')
-    suffix = 'type1';
-  elseif strcmp(desc, 'vn')
-    suffix = 'type2';
-  elseif strcmp(desc, 'nn')
-    suffix = 'type3';
-  else
-    return;
-  end
-
-  params.threshold = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_threshold_' suffix], params.threshold);
-  num_add_d = adaptiveisdf_get_cfg_integer(cfg_isdf, ['adaptive_num_add_' suffix], double(params.num_add));
-  params.num_add = int32(num_add_d);
-  params.candidate_ratio = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_candidate_ratio_' suffix], params.candidate_ratio);
-  params.max_add_frac = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_max_add_frac_' suffix], params.max_add_frac);
-  params.isdf_ratio = adaptiveisdf_get_cfg_positive(cfg_isdf, ['isdf_ratio_' suffix], params.isdf_ratio);
-  params.max_cond = adaptiveisdf_get_cfg_positive(cfg_isdf, ['adaptive_max_cond_' suffix], params.max_cond);
-  params.use_cond_guard = adaptiveisdf_get_cfg_logical(cfg_isdf, 'adaptive_use_cond_guard', params.use_cond_guard);
-  params.weight_batch_size = adaptiveisdf_get_cfg_integer(cfg_isdf, 'adaptive_weight_batch_size', params.weight_batch_size);
-  params.weight_batch_size = adaptiveisdf_get_cfg_integer(cfg_isdf, 'adaptive_batch_size', params.weight_batch_size);
-  params.source = "config";
-end
-
-function val = adaptiveisdf_get_cfg_positive(cfg, field_name, fallback)
-  val = fallback;
-  if ~isfield(cfg, field_name)
-    return;
-  end
-  v = double(cfg.(field_name));
-  if isfinite(v) && v > 0
-    val = v;
-  end
-end
-
-function val = adaptiveisdf_get_cfg_integer(cfg, field_name, fallback)
-  val = fallback;
-  if ~isfield(cfg, field_name)
-    return;
-  end
-  v = double(cfg.(field_name));
-  if isfinite(v) && v >= 1
-    val = max(1, round(v));
-  end
-end
-
-function val = adaptiveisdf_get_cfg_logical(cfg, field_name, fallback)
-  val = fallback;
-  if ~isfield(cfg, field_name)
-    return;
-  end
-  v = cfg.(field_name);
-  if islogical(v)
-    val = logical(v);
-    return;
-  end
-  if isnumeric(v) && isfinite(v) && isscalar(v)
-    val = logical(v ~= 0);
-    return;
-  end
-  if ischar(v) || isstring(v)
-    s = lower(strtrim(char(string(v))));
-    if any(strcmp(s, {'true', '.true.', '1', 'yes', 'on'}))
-      val = true;
-    elseif any(strcmp(s, {'false', '.false.', '0', 'no', 'off'}))
-      val = false;
-    end
-  end
 end
 
 function root = local_get_import_isdf_root(cfg_isdf)
@@ -777,7 +392,7 @@ function root = local_get_import_isdf_root(cfg_isdf)
   end
   root = char(strtrim(v));
   if exist(root, 'file') ~= 2 && exist(root, 'dir') ~= 7
-    fprintf(1, 'adaptiveisdf: import_isdf_adaptive_root not found: %s\n', root);
+    output.msg('rs', 'adaptiveisdf: import_isdf_adaptive_root not found: %s', root);
     root = '';
   end
 end

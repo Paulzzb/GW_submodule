@@ -127,9 +127,6 @@ function gen_bundle(id)
     return;
   end
 
-  N_coarse = double(isdf_data.N_coarse);
-  N_extra = double(isdf_data.N_extra);
-
   % Do a test, test if the wavefunction on the bundle is correct
   is_t_rev = symm_data.is_t_rev;
   for ispin = 1:wf_data.nspin
@@ -167,15 +164,13 @@ function gen_bundle(id)
         % Apply S_q to wf_bundle
         for iq = 1:k_data.nbz
           iqrot = double(k_data.bz2rot(iq));
-          % ind = isdf_data.R_rot_extra(N_old+1:N_new+N_old, iqrot);
-          % wf_Sq_dir = wf_dir(ind);
           %
           ind = R_rot_in_bundle(:, iqrot);
           wf_Sq_bundle = wf_bz_in_bundle(ind);
           wf_Sq_xalpha = wf_Sq_bundle(sampling2bundle(N_old+1:N_old+N_new));
           % wf_tmp = wf_Sq_xalpha(N_old+1:N_old+N_bundle);
-          % Direct way.
-          ind = isdf_data.R_rot_extra(N_coarse + 1:N_coarse + N_extra, iqrot);
+          % Direct way: rotate fine-grid sampling indices (local R_rot from R_sampling_RLU).
+          ind = R_rot(:, iqrot);
           wf_Sq_xalpha_dir = wf_dir(ind);
           if norm(wf_Sq_xalpha - wf_Sq_xalpha_dir) > 8e-5
             error('The wavefunction on the bundle is not correct');

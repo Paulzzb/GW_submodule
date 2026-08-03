@@ -103,9 +103,6 @@ function out = changing(id)
   out.R_rot_in_bundle = R_rot_in_bundle;
   out.WF_bundle = WF_bundle;
 
-  N_coarse = double(isdf_data.N_coarse);
-  N_extra = double(isdf_data.N_extra);
-
   % Do a test, test if the wavefunction on the bundle is correct
   is_t_rev = symm_data.is_t_rev;
   for ispin = 1:wf_data.nspin
@@ -148,8 +145,8 @@ function out = changing(id)
           ind = R_rot_in_bundle(:, iqrot);
           wf_Sq_bundle = wf_bz_in_bundle(ind);
           wf_Sq_xalpha = wf_Sq_bundle(sampling2bundle);
-          % Direct way.
-          ind = isdf_data.R_rot_extra(N_coarse + 1:N_coarse + N_extra, iqrot);
+          % Direct way: rotate fine-grid sampling indices (local R_rot from R_sampling_RLU).
+          ind = R_rot(:, iqrot);
           wf_Sq_xalpha_dir = wf_dir(ind);
           if norm(wf_Sq_xalpha - wf_Sq_xalpha_dir) > 8e-5
             error('The wavefunction on the bundle is not correct');
