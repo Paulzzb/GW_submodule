@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function init_from_config(config)
 %INIT_FROM_CONFIG  Snapshot config.ISDF debug flags for the whole MATLAB session path.
 %

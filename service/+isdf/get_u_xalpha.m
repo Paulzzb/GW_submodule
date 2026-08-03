@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function u_xalpha = get_u_xalpha(id, isc, iqrot)
 
   persistent firsttime N_MAX nsym is_t_rev inv_rot_index R_rot sampling2bundle u_xalpha_sampling_debug_on

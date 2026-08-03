@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function idnew = adaptiveisdf(id, cfg_isdf)
   % Wall-clock time for the main adaptive phase through the orbit summary (before Verification).
   t_phase1 = tic;

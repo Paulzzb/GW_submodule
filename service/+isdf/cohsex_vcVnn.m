@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function hVh = cohsex_vcVnn(id_vc, id_nn, nv, nsum, nbmin, nbmax, ikibz, ispin)
 %COHSEX_VCVNN  Cross Coulomb matrix <mu_vc | V | nu_nn> in ISDF mu-space (service +isdf).
 %

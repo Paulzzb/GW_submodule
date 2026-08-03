@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function build_schur_rank1_prod_mex()
 %BUILD_SCHUR_RANK1_PROD_MEX Build fused rank-1 Schur/prod MEX kernel (double).
 %

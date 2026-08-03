@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function rho_xalpha = get_rho_xalpha(id, param)
 % GET_RHO_XALPHA  ISDF density on sampling points, then left-apply Lambda^{-ratio}V'.
 %

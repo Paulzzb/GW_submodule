@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/13 ZZ
+
 function tildeWq = gen_tildeWq(id_vc, iqibz, Kq, id_outer, flagherm)
 % Kq is calculated by gen_Kq.m, which is using vc data
 % Now, formally,

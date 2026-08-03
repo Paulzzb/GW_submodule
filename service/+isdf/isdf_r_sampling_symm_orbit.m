@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function [N_r_orbit, Nr, Rgrid_RLU, Rgrid_rep_RLU, ir2rep, ir2rot] = isdf_r_sampling_symm_orbit(id)
 %ISDF_R_SAMPLING_SYMM_ORBIT Build symmetry-orbit mapping on ISDF sampling points.
 %

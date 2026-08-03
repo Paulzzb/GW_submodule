@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/06/11 ZZ
+
 function attach_gamma_trunc_factors(id, inv_ratio)
 %ATTACH_GAMMA_TRUNC_FACTORS  Identity SVD factors after gen_tildeVq_Gamma.
 %

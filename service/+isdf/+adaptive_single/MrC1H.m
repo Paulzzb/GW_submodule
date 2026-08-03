@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function varargout = MrC1H(mode, varargin)
 %MRC1H Persistent cache for MrC1H row blocks.
 %   isdf.adaptive_single.MrC1H('ensure', Nw, Nisdfmax)

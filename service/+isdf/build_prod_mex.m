@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/13 ZZ
+
 function build_prod_mex()
 %BUILD_PROD_MEX Build MEX backend for isdf.prod (double).
 %

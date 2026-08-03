@@ -1,5 +1,5 @@
 % 
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 % 
 % Copyright (C) 2026
 % 
@@ -11,7 +11,7 @@ function isdf_driver(input_dir)
   % isdf_driver - driver for implementing ISDF\
   % Results are saved in ISDF_DB in input_dir
   % -----------------------------------------------------------------
-  cleanup = QPlog_push('isdf_driver');
+  cleanup = output.push('isdf_driver');
   
   def = filename_map();
 
@@ -28,13 +28,13 @@ function isdf_driver(input_dir)
   clear TEMP;
   % -----------------------------------------------------------------
   if ~isempty(config.CONTROL.log_file)
-    QPlog_logfile(config.CONTROL.log_file);
+    output.set_logfile(config.CONTROL.log_file);
   end
   % -----------------------------------------------------------------
   % Return if no isdf required
   if ~config.ISDF.isisdf
-    QPlog("ISDF is not implemented!\n", 0);
-    QPlog("Return directly!\n", 0);
+    output.msg('v0s', 'ISDF is not implemented!');
+    output.msg('v0s', 'Return directly!');
     return
   end
   %
@@ -49,12 +49,12 @@ function isdf_driver(input_dir)
   db_dir = fullfile(TMPdir, def.isdf_database);
   if ~exist(db_dir, "dir") % No database for isdf, create one, then do the
                            % following calculation.
-    QPlog("No ISDF database found!\n", 0);
+    output.msg('v0s', '%s', "No ISDF database found!\n");
     msg = sprintf("Create a new database at %s!\n", db_dir);
-    QPlog(msg, 0);
+    output.msg('v0s', '%s', msg);
     meta = db_create(dbroot, new_describer, 1);
   else
-    QPlog("ISDF database found, check descriptor!\n", 1);
+    output.msg('v1s', '%s', "ISDF database found, check descriptor!\n");
     meta = db_read_meta(db_dir);
     old_describer = meta.desc;
     isdf_flag_compute = isdf_desc_compare(new_describer, old_describer);
@@ -63,9 +63,9 @@ function isdf_driver(input_dir)
   db_save(dbroot, meta);
 
   if isempty(GWinfo.psir) && config.ISDF.isisdf
-    QPlog('Converting wavefunction from reciprocial space to real space ...', 1);
+    output.msg('v1s', '%s', 'Converting wavefunction from reciprocial space to real space ...');
     GWinfo.psir = get_wavefunc_real(GWinfo.psig, GWinfo.Ggrid4psig);
-    QPlog('Wavefunction in real space prepared.', 2);
+    output.msg('v2s', '%s', 'Wavefunction in real space prepared.');
 
   end
   %
@@ -87,21 +87,21 @@ function isdf_driver(input_dir)
   end
   time1 = toc(starttimetype1);
   msg = sprintf('Time for computing vc: %f\n', time1);
-  QPlog(msg, 0);
+  output.msg('v0s', '%s', msg);
   starttimetype2 = tic;
   if isdf_flag_compute(2)
     [info1, info2, info3, info4] = isdf_sub("vs", indicater, dbroot, GWinfo, config);
   end
   time2 = toc(starttimetype2);
   msg = sprintf('Time for computing vn: %f\n', time2);
-  QPlog(msg, 0);
+  output.msg('v0s', '%s', msg);
   starttimetype3 = tic;
   if isdf_flag_compute(3)
     [info1, info2, info3, info4] = isdf_sub("ss", indicater, dbroot, GWinfo, config);
   end
   time3 = toc(starttimetype3);
   msg = sprintf('Time for computing nn: %f\n', time3);
-  QPlog(msg, 0);
+  output.msg('v0s', '%s', msg);
 
   % Add some extra data
 
@@ -112,14 +112,14 @@ function isdf_driver(input_dir)
     meta = db_write(dbroot, meta, 4, "vcVnn", hVh);
     time4 = toc(starttimetype4);
     msg = sprintf('Time for computing vcVnn: %f\n', time4);
-    QPlog(msg, 0);
+    output.msg('v0s', '%s', msg);
     msg = sprintf('ISDF driver done');
-    QPlog(msg, 0);
+    output.msg('v0s', '%s', msg);
   end
 
   
   timeISDF = toc(startisdf);
   msg = sprintf('Time of ISDF driver: %f\n', timeISDF);
-  QPlog(msg, 0);
+  output.msg('v0s', '%s', msg);
   %
 end %function

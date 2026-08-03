@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/13 ZZ
+
 function out = prod(Psi, psi, Phi, phi)
   persistent has_mex
   if isempty(has_mex)

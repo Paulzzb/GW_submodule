@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/06/11 ZZ
+
 function [nrange1, nrange2, Nn1, Nn2] = resolve_nrange(desc, cfg_system)
 %RESOLVE_NRANGE  Band ranges for vc/vn/nn from config.SYSTEM (no pool id).
 

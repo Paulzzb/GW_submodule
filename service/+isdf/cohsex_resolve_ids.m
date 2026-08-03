@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function [id_vc, id_vn, id_nn] = cohsex_resolve_ids(config)
 %COHSEX_RESOLVE_IDS  Map GW config to ISDF pool slots for static COHSEX (service +isdf).
 %

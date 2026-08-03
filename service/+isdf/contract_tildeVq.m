@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/06/11 ZZ
+
 function val = contract_tildeVq(id, iqibz, c)
 % CONTRACT_TILDEVQ  val = c' tildeVq c with c already transformed (from get_rho_xalpha).
 %

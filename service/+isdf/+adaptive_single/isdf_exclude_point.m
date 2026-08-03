@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function isdf_exclude_point(id)
 %Because we realize that, the given fftgrid could lead to ill-conditioned
 % Gram--matrix, indicating removing some ill-scaled points could be

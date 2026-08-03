@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/06 ZZ
+
 function [nrange1, nrange2] = isdf_get_nrange(id)
   % Get band index ranges (nrange1, nrange2) for ISDF type "nn" / "vn" / "vc".
   wf_data = wave_functions.get();

@@ -1,12 +1,83 @@
-function varargout = isdf_schur_update(mode, varargin)
-%ISDF_SCHUR_UPDATE  Hybrid precision: isdf.prod in single, Schur algebra in double.
+% License-Identifier: BSD-3-Clause
 %
-%   Wavefunction blocks (Psi_on_grid, Phi_on_grid) and isdf.prod I/O stay single.
-%   CCH / L_CCH / invL_CCH and subsequent linear algebra use double.
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/07/28 ZZ
+
+function varargout = isdf_schur_update(mode, varargin)
+%ISDF_SCHUR_UPDATE  Persistent Schur / Cholesky state for adaptive ISDF (hybrid precision).
+%
+% ---------------------------------------------------------------------------
+% Purpose
+% ---------------------------------------------------------------------------
+% Maintain a growing Gram matrix CCH of ISDF sampling orbitals and its Cholesky
+% factorization while adaptiveisdf adds new centroids one-by-one (or in batches).
+%
+%   CCH ≈ <Psi, Phi> products on the current sampling set (via isdf.prod).
+%   L_CCH * L_CCH' = CCH(1:Nisdf,1:Nisdf)   (lower Cholesky)
+%   invL_CCH ≈ inv(L_CCH)                   (used for cheap rank-1 Schur updates)
+%
+% Precision (this package: +adaptive_single) — HYBRID:
+%   - Psi_on_grid / Phi_on_grid and isdf.prod I/O: single
+%   - CCH / L_CCH / invL_CCH and Schur algebra: double
+%   (Contrast +adaptive_double / +adaptive: all of the above in double.)
+%
+% ---------------------------------------------------------------------------
+% Modes
+% ---------------------------------------------------------------------------
+%   isdf_schur_update('init', Nisdf, Psi, Phi [, max_cond_number, use_cond_guard])
+%       Build CCH = prod(Psi,Phi) on the initial set, Cholesky + invL, seed
+%       cch_lambda_max. Preallocates buffers to Nisdfmax = 2*Nisdf.
+%
+%   ok = isdf_schur_update('update', Nadd, Psi_new, Phi_new [, selected_global_idx])
+%       Append Nadd new sampling points. Returns false if the candidate is
+%       rejected (non-positive Schur complement or cond guard). See UPDATE
+%       section below. Hot path is Nadd == 1.
+%
+%   [Nisdf, Nadd, invL_CCH, L_CCH, Psi, Phi] = isdf_schur_update('get')
+%       Read persistent factors / grids (optional trailing outputs).
+%
+%   isdf_schur_update('clear')
+%       Clear all persistent variables.
+%
+% ---------------------------------------------------------------------------
+% UPDATE (Nadd == 1) — key path used by adaptiveisdf
+% ---------------------------------------------------------------------------
+% Partition old block (size oldNisdf) and the new row/column:
+%
+%   CCH_new = [ C11 , C21' ; C21 , C22 ]
+%
+% where C21 = C2C1H (new vs old products), C22 = C2C2H (new vs new).
+% Schur complement of the new diagonal block:
+%
+%   S = C22 - L21 * L21' ,   L21 = C21 * inv(L11)
+%
+% For Nadd==1, S is a scalar; L22 = sqrt(S). Then extend
+%   L_CCH  and  invL_CCH  with the new row (block inverse of lower-triangular L).
+%
+% Acceptance checks (any failure => ok=false, state unchanged for that point):
+%   1) S > 0  (and L22 finite / positive on MEX paths)
+%   2) cond guard: S >= cch_lambda_max / max_cond_number  (if use_cond_guard)
+%
+% Implementation order for Nadd==1, oldNisdf>0 (first success wins):
+%   A) isdf_schur_rank1_prod_mex  — fuse prod + rank-1 Schur in one MEX
+%   B) MATLAB: build C2C1H / C2C2H (optionally via MrC1H cache), then
+%      isdf_schur_rank1_mex, else pure MATLAB L21 / S / L22 / invL update
+%   C) After accept: copy Psi/Phi rows, Nisdf++, refresh cch_lambda_max
+%
+% Nadd > 1: block Cholesky of S (no cond-guard / MEX fast path); less common.
+%           Will be implemented in the future.
+%
+% Local helpers (below):
+%   get_max_diag_LCCH      — Maximum elements of |diag(L_CCH)| 
+%   isdf_schur_cond_guard_ok — apply max_cond_number gate + stderr message
+%
 
   persistent Nisdf Nadd CCH invL_CCH L_CCH Psi_on_grid Phi_on_grid ...
              Nisdfmax has_rank1_mex has_rank1_prod_mex ...
-             cch_lambda_max_proxy max_cond_number use_cond_guard
+             cch_lambda_max max_cond_number use_cond_guard
 
   if nargin < 1
     error('isdf_schur_update:mode', 'First argument ''mode'' is required.');
@@ -39,8 +110,8 @@ function varargout = isdf_schur_update(mode, varargin)
               [L21_row, L22_mex, invL_new_old] = ...
                 isdf.adaptive_single.isdf_schur_rank1_prod_mex(invL_CCH, oldNisdf, ...
                   Psi_on_new_grid, Phi_on_new_grid, Psi_on_grid, Phi_on_grid);
-              if isdf_schur_rank1_ok(L22_mex) && ...
-                 isdf_schur_cond_guard_ok(real(L22_mex)^2, cch_lambda_max_proxy, max_cond_number, use_cond_guard, selected_global_idx)
+              if isfinite(L22_mex) && real(L22_mex) > 0 && ...
+                 isdf_schur_cond_guard_ok(real(L22_mex)^2, cch_lambda_max, max_cond_number, use_cond_guard, selected_global_idx)
                 L_CCH(newIdx, oldIdx) = L21_row;
                 L_CCH(newIdx, newIdx) = L22_mex;
                 invL22 = double(1.0) / L22_mex;
@@ -49,7 +120,7 @@ function varargout = isdf_schur_update(mode, varargin)
                 Psi_on_grid(newIdx, :) = Psi_on_new_grid;
                 Phi_on_grid(newIdx, :) = Phi_on_new_grid;
                 Nisdf = oldNisdf + Nadd;
-                cch_lambda_max_proxy = isdf_schur_lambda_max_proxy(invL_CCH, Nisdf, cch_lambda_max_proxy);
+                cch_lambda_max = get_max_diag_LCCH(invL_CCH, Nisdf, cch_lambda_max);
                 if nargout >= 1, varargout{1} = update_ok; end
                 return;
               end
@@ -83,8 +154,8 @@ function varargout = isdf_schur_update(mode, varargin)
             try
               [L21_row, L22_mex, invL_new_old] = ...
                 isdf.adaptive_single.isdf_schur_rank1_mex(invL_CCH, oldNisdf, C2C1H, C2C2H);
-              if isdf_schur_rank1_ok(L22_mex) && ...
-                 isdf_schur_cond_guard_ok(real(L22_mex)^2, cch_lambda_max_proxy, max_cond_number, use_cond_guard, selected_global_idx)
+              if isfinite(L22_mex) && real(L22_mex) > 0 && ...
+                 isdf_schur_cond_guard_ok(real(L22_mex)^2, cch_lambda_max, max_cond_number, use_cond_guard, selected_global_idx)
                 L_CCH(newIdx, oldIdx) = L21_row;
                 L_CCH(newIdx, newIdx) = L22_mex;
                 invL22 = double(1.0) / L22_mex;
@@ -93,7 +164,7 @@ function varargout = isdf_schur_update(mode, varargin)
                 Psi_on_grid(newIdx, :) = Psi_on_new_grid;
                 Phi_on_grid(newIdx, :) = Phi_on_new_grid;
                 Nisdf = oldNisdf + Nadd;
-                cch_lambda_max_proxy = isdf_schur_lambda_max_proxy(invL_CCH, Nisdf, cch_lambda_max_proxy);
+                cch_lambda_max = get_max_diag_LCCH(invL_CCH, Nisdf, cch_lambda_max);
                 if nargout >= 1, varargout{1} = update_ok; end
                 return;
               end
@@ -110,12 +181,17 @@ function varargout = isdf_schur_update(mode, varargin)
         S = double(C2C2H) - L21_row * L21_row';
         S_real = real(S);
         if S_real <= 0
-          isdf_schur_update_log_nonpositive(S_real, selected_global_idx);
+          if isempty(selected_global_idx)
+            fprintf(2, 'isdf_schur_update: non-positive Schur complement S=%.6e (Nadd=1); skip update.\n', S_real);
+          else
+            fprintf(2, 'isdf_schur_update: non-positive Schur complement S=%.6e at index %d (Nadd=1); skip update.\n', ...
+              S_real, round(double(selected_global_idx(1))));
+          end
           update_ok = false;
           if nargout >= 1, varargout{1} = update_ok; end
           return;
         end
-        if ~isdf_schur_cond_guard_ok(S_real, cch_lambda_max_proxy, max_cond_number, use_cond_guard, selected_global_idx)
+        if ~isdf_schur_cond_guard_ok(S_real, cch_lambda_max, max_cond_number, use_cond_guard, selected_global_idx)
           update_ok = false;
           if nargout >= 1, varargout{1} = update_ok; end
           return;
@@ -157,7 +233,7 @@ function varargout = isdf_schur_update(mode, varargin)
       Psi_on_grid(newIdx, :) = Psi_on_new_grid;
       Phi_on_grid(newIdx, :) = Phi_on_new_grid;
       Nisdf = oldNisdf + Nadd;
-      cch_lambda_max_proxy = isdf_schur_lambda_max_proxy(invL_CCH, Nisdf, cch_lambda_max_proxy);
+      cch_lambda_max = get_max_diag_LCCH(invL_CCH, Nisdf, cch_lambda_max);
       if nargout >= 1, varargout{1} = update_ok; end
 
     case 'init'
@@ -198,7 +274,7 @@ function varargout = isdf_schur_update(mode, varargin)
       if nargin >= 6 && ~isempty(varargin{5})
         use_cond_guard = logical(varargin{5});
       end
-      cch_lambda_max_proxy = isdf_schur_lambda_max_proxy(invL_CCH, Nisdf, 0.0);
+      cch_lambda_max = get_max_diag_LCCH(invL_CCH, Nisdf, 0.0);
       Nadd = Nisdf;
 
     case 'get'
@@ -220,46 +296,33 @@ function varargout = isdf_schur_update(mode, varargin)
 
     case 'clear'
       clear Nisdf Nadd CCH invL_CCH L_CCH Psi_on_grid Phi_on_grid Nisdfmax ...
-            has_rank1_mex has_rank1_prod_mex cch_lambda_max_proxy max_cond_number use_cond_guard
+            has_rank1_mex has_rank1_prod_mex cch_lambda_max max_cond_number use_cond_guard
 
     otherwise
       error('isdf_schur_update:mode', 'Unknown mode ''%s''.', mode);
   end
 end
 
-function ok = isdf_schur_rank1_ok(L22)
-  ok = isfinite(L22) && real(L22) > 0;
-end
-
-function isdf_schur_update_log_nonpositive(S_real, selected_global_idx)
-  if isempty(selected_global_idx)
-    fprintf(2, 'isdf_schur_update: non-positive Schur complement S=%.6e (Nadd=1); skip update.\n', S_real);
-  else
-    fprintf(2, 'isdf_schur_update: non-positive Schur complement S=%.6e at index %d (Nadd=1); skip update.\n', ...
-      S_real, round(double(selected_global_idx(1))));
-  end
-end
-
-function lambda_max_proxy = isdf_schur_lambda_max_proxy(invL_CCH, Nisdf, prev_lambda_max_proxy)
+function lambda_max = get_max_diag_LCCH(invL_CCH, Nisdf, prev_lambda_max)
   if Nisdf <= 0
-    lambda_max_proxy = prev_lambda_max_proxy;
+    lambda_max = prev_lambda_max;
     return;
   end
   d = abs(diag(invL_CCH(1:Nisdf, 1:Nisdf)));
   d = d(isfinite(d) & d > 0);
   if isempty(d)
-    lambda_max_proxy = prev_lambda_max_proxy;
+    lambda_max = prev_lambda_max;
     return;
   end
   lambda_max_now = 1.0 / min(double(d));
-  if isempty(prev_lambda_max_proxy) || ~isfinite(prev_lambda_max_proxy)
-    lambda_max_proxy = lambda_max_now;
+  if isempty(prev_lambda_max) || ~isfinite(prev_lambda_max)
+    lambda_max = lambda_max_now;
   else
-    lambda_max_proxy = max(prev_lambda_max_proxy, lambda_max_now);
+    lambda_max = max(prev_lambda_max, lambda_max_now);
   end
 end
 
-function ok = isdf_schur_cond_guard_ok(S_real, lambda_max_proxy, max_cond_number, use_cond_guard, selected_global_idx)
+function ok = isdf_schur_cond_guard_ok(S_real, lambda_max, max_cond_number, use_cond_guard, selected_global_idx)
   if ~use_cond_guard
     ok = true;
     return;
@@ -268,15 +331,15 @@ function ok = isdf_schur_cond_guard_ok(S_real, lambda_max_proxy, max_cond_number
     ok = true;
     return;
   end
-  s_min_allowed = double(lambda_max_proxy) / double(max_cond_number);
+  s_min_allowed = double(lambda_max) / double(max_cond_number);
   ok = isfinite(S_real) && double(S_real) >= s_min_allowed;
   if ~ok
     if isempty(selected_global_idx)
-      fprintf(2, 'isdf_schur_update: skip update due to cond guard, S=%.6e < %.6e (lambda_max_proxy=%.6e, cond_max=%.6e).\n', ...
-        double(S_real), s_min_allowed, double(lambda_max_proxy), double(max_cond_number));
+      fprintf(2, 'isdf_schur_update: skip update due to cond guard, S=%.6e < %.6e (lambda_max=%.6e, cond_max=%.6e).\n', ...
+        double(S_real), s_min_allowed, double(lambda_max), double(max_cond_number));
     else
-      fprintf(2, 'isdf_schur_update: skip index %d due to cond guard, S=%.6e < %.6e (lambda_max_proxy=%.6e, cond_max=%.6e).\n', ...
-        round(double(selected_global_idx(1))), double(S_real), s_min_allowed, double(lambda_max_proxy), double(max_cond_number));
+      fprintf(2, 'isdf_schur_update: skip index %d due to cond guard, S=%.6e < %.6e (lambda_max=%.6e, cond_max=%.6e).\n', ...
+        round(double(selected_global_idx(1))), double(S_real), s_min_allowed, double(lambda_max), double(max_cond_number));
     end
   end
 end

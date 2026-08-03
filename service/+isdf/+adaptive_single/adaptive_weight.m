@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/05/20 ZZ
+
 function varargout = adaptive_weight(mode, varargin)
 %ADAPTIVE_WEIGHT  Persistent state for adaptive weights (skeleton).
 %   Mirror of isdf.adaptive_single.isdf_schur_update: init / update / get / clear. Implementation TBD.

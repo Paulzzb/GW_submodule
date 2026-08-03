@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -65,6 +65,9 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
   prev_Ex_t = nan(preview_rows, 1);
   prev_Ex_ISDF = nan(preview_rows, 1);
   n_ob_sample = 0;
+  diff_warn_tol = 1e-4;
+  n_mismatch = 0;
+  max_abs_mismatch = 0.0;
 
   total_triples = max(1, double(nibz) * double(nspin) * double(nb));
 
@@ -200,8 +203,17 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
             Ex_t = sum(vcoul_q .* abs(ngrho_left).^2);
             Ex_ISDF = c_rho' * isdf_data.tildeVq(:, :, iqibz) * c_rho;
             Ex_ISDF = real(Ex_ISDF);
-            if abs(Ex_ISDF - Ex_t) > 1e-4
-              warning('isdf_validate_HF: Ex_ISDF - Ex_t = %f', Ex_ISDF - Ex_t);
+            d_isdf_t = Ex_ISDF - Ex_t;
+            ad_isdf_t = abs(d_isdf_t);
+            if ad_isdf_t > diff_warn_tol
+              n_mismatch = n_mismatch + 1;
+              if ad_isdf_t > max_abs_mismatch
+                max_abs_mismatch = ad_isdf_t;
+              end
+              output.msg('v2l', ...
+                ['isdf_validate_HF: |Ex_ISDF-Ex_t|=%.6e (Ex_ISDF-Ex_t=%+.6e) ', ...
+                 'ib=%d ik=%d iqibz=%d ob=%d'], ...
+                ad_isdf_t, d_isdf_t, ib, ik, iqibz, ob);
             end
             E_HF(ib, ik, ispin) = E_HF(ib, ik, ispin) + Ex_t;
             E_HF_ISDF(ib, ik, ispin) = E_HF_ISDF(ib, ik, ispin) + Ex_ISDF;
@@ -233,6 +245,10 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
       end % ib
     end % ispin
   end % ik
+
+  output.msg('rs', ...
+    'isdf_validate_HF: mismatches(|Ex_ISDF-Ex_t|>%.0e)=%d / %d samples, max|d|=%.6e', ...
+    diff_warn_tol, n_mismatch, n_ob_sample, max_abs_mismatch);
 
   % --- Band-resolved report: E_HF(ib,ik,ispin) vs E_HF_ISDF (sums over ob paths) ---
   sum_E_HF = sum(E_HF(:));
