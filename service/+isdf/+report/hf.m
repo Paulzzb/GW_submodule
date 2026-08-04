@@ -13,7 +13,6 @@ function fpath = hf(report, outDir)
 %   fpath = isdf.report.hf(report, outDir)   % default: pwd
 %
 % Disk name: filename_map().hf_report -> o-ISDF_HF_id%d
-% Also writes legacy isdf_validate_HF_id%d.txt for one compatibility round.
 % See +report/NAMING.md.
 
   if nargin < 2 || isempty(outDir)
@@ -64,7 +63,11 @@ function fpath = hf(report, outDir)
   output.msg('o hf_report', 'N (total ob samples) = %d', double(report.n_samples));
   output.msg('o hf_report', 'N_rel (samples with |Ex_t| >= tol for relative stats) = %d', double(report.n_samples_rel));
   output.msg('o hf_report', '');
-  local_msg_block(local_table2char(report.stats));
+  local_msg_block(local_table2chend
+
+  function local_msg_block(s)
+    if isempty(s)
+      returnar(report.stats));
   output.msg('o hf_report', '');
   output.msg('o hf_report', 'Note: Diff = Ex_t - Ex_ISDF; relative columns use only samples with |Ex_t| >= tol (N_rel may differ from N).');
 
@@ -77,10 +80,6 @@ function fpath = hf(report, outDir)
   output.msg('o hf_report', '=== end of report ===');
 
   output.close('hf_report');
-
-  % Compatibility round: keep old basename for existing tests / parsers.
-  fpath_legacy = fullfile(outDir, sprintf('isdf_validate_HF_id%d.txt', id));
-  copyfile(fpath, fpath_legacy);
 end
 
 function local_msg_block(s)

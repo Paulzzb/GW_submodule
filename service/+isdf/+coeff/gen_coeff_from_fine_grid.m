@@ -9,19 +9,19 @@
 function gen_coeff_from_fine_grid(id)
 %GEN_COEFF_FROM_FINE_GRID  Fill coeff_seper from existing fine-grid sampling indices.
 %
-% Expects isdf_data.bundle_struct.fine_grid_lin (or R_sampling_RLU rows) after
-% SC_ISDF replication. Does not change the sampling grid itself.
+% Expects isdf_data.bundle_struct.fine_grid_lin after SC_ISDF replication.
+% Does not change the sampling grid itself.
 
   isdf_data = isdf.get(id);
   wf_data = wave_functions.get();
   k_data = lattice.manager('k', 'get');
 
-  if isfield(isdf_data, 'bundle_struct') && isfield(isdf_data.bundle_struct, 'fine_grid_lin') ...
-      && ~isempty(isdf_data.bundle_struct.fine_grid_lin)
-    lin = int32(isdf_data.bundle_struct.fine_grid_lin(:));
-  else
-    lin = isdf.SC_ISDF_r_sampling_to_lin(isdf_data);
+  if ~(isfield(isdf_data, 'bundle_struct') && isfield(isdf_data.bundle_struct, 'fine_grid_lin') ...
+      && ~isempty(isdf_data.bundle_struct.fine_grid_lin))
+    error('isdf:gen_coeff_from_fine_grid:NoFineGridLin', ...
+      'ISDF id=%d missing bundle_struct.fine_grid_lin (expected after SC_ISDF).', int32(id));
   end
+  lin = int32(isdf_data.bundle_struct.fine_grid_lin(:));
 
   Nmu = numel(lin);
   nb = wf_data.nb;

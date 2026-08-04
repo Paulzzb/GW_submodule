@@ -21,7 +21,7 @@ function cond(action, varargin)
     case 'init'
       def = filename_map();
       output.open('cond_report', fullfile(pwd, def.cond_report), 'w');
-      output.msg('o cond_report', '=== isdf numerical_cond_report ===');
+      output.msg('o cond_report', '=== isdf.report.cond ===');
       output.msg('o cond_report', 'Generated: %s', datestr(now, 31));
       output.msg('o cond_report', 'pwd: %s', pwd);
       output.msg('o cond_report', '');

@@ -10,7 +10,7 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
 % ISDF_COARSE_VALIDATE_ENERGIES  Compare direct Coulomb exchange-style energy vs ISDF tildeVq contraction.
 %
 % Text report (band summary, preview, stats, global sums) is written by isdf.report.hf to
-%   <outDir>/o-ISDF_HF_id<id> (and legacy isdf_validate_HF_id<id>.txt; see NAMING.md).
+%   <outDir>/o-ISDF_HF_id<id> (see +report/NAMING.md).
 % A one-line message with the absolute path is printed to the command window after a successful write.
 %
 % Mirrors the accumulation loops in gen_indices_coarse_test (SCATTER_Bamp vs c_rho' * tildeVq * c_rho).

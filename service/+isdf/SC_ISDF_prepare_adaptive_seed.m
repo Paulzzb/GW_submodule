@@ -20,13 +20,13 @@ function SC_ISDF_prepare_adaptive_seed(id)
       'ISDF id=%d has nisdf < 1 after SC_ISDF.', int32(id));
   end
 
-  if isfield(isdf_data, 'bundle_struct') && isstruct(isdf_data.bundle_struct) ...
+  if ~(isfield(isdf_data, 'bundle_struct') && isstruct(isdf_data.bundle_struct) ...
       && isfield(isdf_data.bundle_struct, 'fine_grid_lin') ...
-      && ~isempty(isdf_data.bundle_struct.fine_grid_lin)
-    lin = int32(isdf_data.bundle_struct.fine_grid_lin(:));
-  else
-    lin = isdf.SC_ISDF_r_sampling_to_lin(isdf_data);
+      && ~isempty(isdf_data.bundle_struct.fine_grid_lin))
+    error('isdf:SC_ISDF_prepare_adaptive_seed:NoFineGridLin', ...
+      'ISDF id=%d missing bundle_struct.fine_grid_lin (expected after SC_ISDF).', int32(id));
   end
+  lin = int32(isdf_data.bundle_struct.fine_grid_lin(:));
 
   [lin, ia] = unique(lin, 'stable');
   if numel(ia) < Nmu

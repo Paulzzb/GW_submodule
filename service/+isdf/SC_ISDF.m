@@ -388,7 +388,12 @@ function R_rot_extra = sc_isdf_build_R_rot_extra(lin_sc, fft_data)
     R_rot_extra(:, is) = int32(i4);
   end
 end
-
+function tf = local_sc_adaptive_enabled(sc)
+  tf = false;
+  if isfield(sc, 'sc_adaptive') && logical(sc.sc_adaptive)
+    tf = true;
+  end
+end
 function id_out = sc_isdf_write_pool(isdf_sc, id_out_opt)
   if ~isempty(id_out_opt)
     id_out = int32(id_out_opt);

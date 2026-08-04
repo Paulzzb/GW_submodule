@@ -13,7 +13,7 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
 %   interp_scheme == "coarse", coeff_seper holds wf_on_coarse, tildeVq is filled.
 %
 % Optional id: omit to use isdf.isdf_current().
-% Optional outDir: directory for o-ISDF_HF_id<id> (default pwd; legacy name also written).
+% Optional outDir: directory for o-ISDF_HF_id<id> (default pwd).
 
   if nargin < 1 || isempty(id)
     id = isdf.isdf_current();
@@ -69,5 +69,5 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
 
   [Esum2, EsumISDF2, DiffEsum2] = isdf.validation.isdf_validate_HF(id, outDir);
   % Text summary is written by isdf.report.hf (called inside isdf_validate_HF) to
-  %   <outDir or pwd>/o-ISDF_HF_id<id> (plus legacy isdf_validate_HF_id<id>.txt).
+  %   <outDir or pwd>/o-ISDF_HF_id<id>.
 end

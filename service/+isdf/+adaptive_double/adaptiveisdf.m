@@ -352,11 +352,11 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   report.loss_history = loss_history(1:n_iter+1);
   report.relative_loss_history = rel_loss_history(1:n_iter+1);
   report.schur_skips = n_schur_skip;
-  report = isdf.adaptive.adaptive_fill_report(report, id, idnew, params);
+  report = isdf.report.fill_adaptive(report, id, idnew, params);
 
   elapsed_phase1 = toc(t_phase1);
   report.elapsed_phase1_seconds = elapsed_phase1;
-  fpath_r = isdf.adaptive.adaptiveisdf_write_phase1_report(report);
+  fpath_r = isdf.report.adaptive(report);
 
   output.msg('nrs', '[Adaptive ISDF] desc=%s  id=%d  backend=%s', ...
     char(string(isdf_data.desc)), int32(id), adaptive_backend);
