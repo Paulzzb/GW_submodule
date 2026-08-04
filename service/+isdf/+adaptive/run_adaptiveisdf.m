@@ -100,8 +100,9 @@ function run_adaptiveisdf(type, output_dir)
     error('run_adaptiveisdf:id', 'No assigned ISDF slot with desc ''%s''.', desc_token);
   end
 
-  isdf.adaptive.isdf_schur_update('clear');
-  isdf.adaptive.adaptive_weight('clear');
+  % adaptiveisdf under +adaptive forwards to +adaptive_double; clear that state.
+  isdf.adaptive_double.isdf_schur_update('clear');
+  isdf.adaptive_double.adaptive_weight('clear');
 
   cleanup_cd = onCleanup(@() cd(profile_dir));
   cd(output_dir);
