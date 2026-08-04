@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function report = val_run_fixed_k_symmetry_validation(ctx, opts)
 % Single-BZ-index k: stabilizer check (exists S with S*k = k mod G*).
 % Compare apply_symm(psi(k)) with psi at the mesh index for S*k.

@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function report = val_run_pair_k_symmetry_validation(ctx, opts)
 % Composite k = (k1, k2) on BZ mesh: pair-product equivariance under S.
 % Compare rotate(conj(psi1).*psi2) with conj(psi1').*psi2' for ki' = S*ki.

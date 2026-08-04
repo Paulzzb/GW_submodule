@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 classdef r_lattice_m
   properties
     b1b2b3(3, 3) double = double(zeros(3, 3)) % columns are b1, b2, b3

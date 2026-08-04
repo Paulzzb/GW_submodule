@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -27,8 +27,6 @@ function report = service_reset_persistent(opts)
     @() wave_functions.WF_apply_symm('reset'), 'wave_functions.WF_apply_symm(''reset'')';
     @() isdf.coeff.isdf_apply_symm_on_coarse('reset'), 'isdf.coeff.isdf_apply_symm_on_coarse(''reset'')';
     @() isdf.coeff.isdf_get_coeff('reset'), 'isdf.coeff.isdf_get_coeff(''reset'')';
-    @() isdf.adaptive.isdf_schur_update('clear'), 'isdf.adaptive.isdf_schur_update(''clear'')';
-    @() isdf.adaptive.adaptive_weight('clear'), 'isdf.adaptive.adaptive_weight(''clear'')';
     @() isdf.adaptive_double.isdf_schur_update('clear'), 'isdf.adaptive_double.isdf_schur_update(''clear'')';
     @() isdf.adaptive_double.adaptive_weight('clear'), 'isdf.adaptive_double.adaptive_weight(''clear'')';
     @() isdf.adaptive_single.isdf_schur_update('clear'), 'isdf.adaptive_single.isdf_schur_update(''clear'')';
@@ -37,10 +35,10 @@ function report = service_reset_persistent(opts)
     % (persistent cache of isdf.debug.on('u_xalpha_sampling'); see get_u_xalpha.m).
     @() isdf.get_u_xalpha('reset'), 'isdf.get_u_xalpha(''reset'')';
     @() isdf.get_rho_xalpha('reset'), 'isdf.get_rho_xalpha(''reset'')';
-    @() isdf.prod_C_inv_sqrt('clear'), 'isdf.prod_C_inv_sqrt(''clear'')';
     @() isdf.debug.clear(), 'isdf.debug.clear';
     @() parallel.free(), 'parallel.free';
     @() timing.free(), 'timing.free';
+    @() output.free(), 'output.free';
   };
 
   if keep_pool

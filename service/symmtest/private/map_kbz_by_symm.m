@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function ik_map = map_kbz_by_symm(ikbz, isym, kptbz, rot_mtrx_RLU_G, tol)
 S = double(rot_mtrx_RLU_G(:, :, isym));
 target = double(kptbz(ikbz, :)) * S;

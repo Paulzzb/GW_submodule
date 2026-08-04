@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function report = build_report_struct(name, err_list, fails, tol)
 report = struct();
 report.name = name;

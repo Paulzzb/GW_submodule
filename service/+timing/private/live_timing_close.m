@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -22,5 +22,7 @@ function tm = live_timing_close(tm)
   end
 
   liv.live_timing_is_on = false;
+  liv.show_expected = true;  % restore default for next LIVE session
+  liv.tic_seg = [];
   tm.live = liv;
 end

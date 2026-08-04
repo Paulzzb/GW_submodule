@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function report = validate_k1k2_mapping(k1k2_representation, k1k2_mapping, marked, kptbz_RLU, rot_mtrx_RLU_G, tol)
 % Validate dense pair mapping against the shared-G0 criterion.
 %

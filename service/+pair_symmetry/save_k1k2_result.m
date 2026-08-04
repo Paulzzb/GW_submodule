@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function save_k1k2_result(save_path, k1k2_representation, k1k2_mapping, marked, tol, nk, nsym, validation_report)
 % Print concise summary and save mapping artifacts for later inspection.
 %

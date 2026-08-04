@@ -1,49 +1,65 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/04/08
+% Last modified: 2026/08/03 ZZ
 %
-% Port of Yambo TIMING_get_time.F for serial MATLAB (double "CPU" row).
+% Wall-clock timing via tic/toc (not cputime). LIVE (E) and section clocks
+% report real elapsed time, which is what interactive MATLAB users expect.
 % Options (char flags in varargin): 'INIT','INIT_SEG','SEG','INIT_SEC','SEC','FIN'
-% Layout: cput_* are 1x2, col1 = elapsed, col2 = reference cputime anchor.
+% Layout: cput_* are 1x2 for compatibility; col1 = elapsed seconds, col2 unused.
 
 function tm = timing_get_time(tm, varargin)
   liv = tm.live;
-  cput_now = cputime;
 
-  if isempty(liv.cput_tot) || size(liv.cput_tot, 1) < 1 || size(liv.cput_tot, 2) < 2
-    liv.cput_tot = [0, cput_now];
-    liv.cput_sec = [0, cput_now];
-    liv.cput_seg = [0, cput_now];
+  if isempty(liv.tic_tot)
+    t0 = tic;
+    liv.tic_tot = t0;
+    liv.tic_sec = t0;
+    liv.tic_seg = t0;
+    liv.cput_tot = [0, 0];
+    liv.cput_sec = [0, 0];
+    liv.cput_seg = [0, 0];
   end
 
   if timing_get_time_has(varargin, 'INIT')
-    liv.cput_seg = [0, cput_now];
-    liv.cput_sec = [0, cput_now];
-    liv.cput_tot = [0, cput_now];
+    t0 = tic;
+    liv.tic_tot = t0;
+    liv.tic_sec = t0;
+    liv.tic_seg = t0;
+    liv.cput_tot = [0, 0];
+    liv.cput_sec = [0, 0];
+    liv.cput_seg = [0, 0];
   end
 
-  liv.cput_tot(1, 1) = cput_now - liv.cput_tot(1, 2);
+  liv.cput_tot(1, 1) = toc(liv.tic_tot);
 
   if timing_get_time_has(varargin, 'INIT_SEC')
-    liv.cput_sec(1, :) = [0, cput_now];
+    liv.tic_sec = tic;
+    liv.cput_sec = [0, 0];
   end
   if timing_get_time_has(varargin, 'INIT_SEG')
-    liv.cput_seg(1, :) = [0, cput_now];
+    liv.tic_seg = tic;
+    liv.cput_seg = [0, 0];
   end
   if timing_get_time_has(varargin, 'SEC')
-    liv.cput_sec(1, 1) = cput_now - liv.cput_sec(1, 2);
+    if isempty(liv.tic_sec)
+      liv.tic_sec = tic;
+    end
+    liv.cput_sec(1, 1) = toc(liv.tic_sec);
   end
   if timing_get_time_has(varargin, 'SEG')
-    if isempty(liv.cput_seg) || numel(liv.cput_seg) < 2
-      liv.cput_seg = [0, cput_now];
+    if isempty(liv.tic_seg)
+      liv.tic_seg = tic;
     end
-    liv.cput_seg(1, 1) = cput_now - liv.cput_seg(1, 2);
+    liv.cput_seg(1, 1) = toc(liv.tic_seg);
   end
   if timing_get_time_has(varargin, 'FIN')
+    liv.tic_seg = [];
+    liv.tic_sec = [];
+    liv.tic_tot = [];
     liv.cput_seg = zeros(0, 0);
     liv.cput_sec = zeros(0, 0);
     liv.cput_tot = zeros(0, 0);

@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function WF_symm = WF_apply_symm(isc)
   % ELsh, spin_sop, idt_index, myid, 
   persistent firsttime nsym is_t_rev fftgrid nr

@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -8,7 +8,7 @@
 %
 % Port of Yambo LIVE_timing_update.F (TTY path: one line, hash bar).
 
-function tm = live_timing_update(tm, xch, ech)
+function tm = live_timing_update(tm, xch, ech, force)
   liv = tm.live;
 
   hn = double(liv.hashes_now);
@@ -17,7 +17,11 @@ function tm = live_timing_update(tm, xch, ech)
   ts = double(liv.time_steps);
   nh = double(liv.nhash);
 
-  if hn == hd && sd ~= 0
+  if nargin < 4
+    force = false;
+  end
+
+  if hn == hd && sd ~= 0 && ~force
     tm.live = liv;
     return;
   end
@@ -46,7 +50,18 @@ function tm = live_timing_update(tm, xch, ech)
   nsp = max(0, nh - hd);
   bar_spaces = repmat(' ', 1, nsp);
 
-  line = sprintf('%s |%s%s| [%03d%%] %s(E) %s(X)', char(nm), bar_hashes, bar_spaces, perc, char(ech), char(xch));
+  % timing_live_m is a classdef object: use isprop, not isfield.
+  show_x = true;
+  if isprop(liv, 'show_expected')
+    show_x = logical(liv.show_expected);
+  end
+  if show_x
+    line = sprintf('%s |%s%s| [%03d%%] %s(E) %s(X)', ...
+      char(nm), bar_hashes, bar_spaces, perc, char(ech), char(xch));
+  else
+    line = sprintf('%s |%s%s| [%03d%%] %s(E)', ...
+      char(nm), bar_hashes, bar_spaces, perc, char(ech));
+  end
   fprintf('%s\n', line);
 
   tm.live = liv;

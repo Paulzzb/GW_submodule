@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/04/19 ZZ
+
 function degeneracy = degeneracy_detect()
   % Detect the degeneracy of a state specified by isc.
   % Return the number of degenerate states, including itself.

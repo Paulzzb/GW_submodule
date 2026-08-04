@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -22,9 +22,15 @@ classdef timing_live_m
     hashes_done = int32(0)
     memory_steps = int32(0)
 
+    % Elapsed seconds in col1 (wall clock via tic/toc). col2 unused (legacy layout).
     cput_seg = zeros(0, 0)
     cput_sec = zeros(0, 0)
     cput_tot = zeros(0, 0)
+
+    % tic ids for wall-clock clocks (empty = not started)
+    tic_seg = []
+    tic_sec = []
+    tic_tot = []
 
     cput_last_report = 0
     cput_last_estimate = 0
@@ -36,13 +42,15 @@ classdef timing_live_m
     log_line_to_dump = false
     log_line = ' '
 
-    % Minimum segment CPU time (seconds) between LIVE bar prints when the hash
-    % advances; 0 => print on every hash change (closer to isdf_coarse_validate_energies).
-    % Yambo LIVE_timing_add uses rts = 5.
+    % Minimum wall seconds between LIVE bar prints when the hash advances;
+    % 0 => print on every hash change.
     live_report_min_seconds = 5
 
     % Empty => timing.report writes to command window; otherwise append path (char).
     report_logfile = ''
+
+    % If false, LIVE bar omits (X) expected-total (use for non-linear workloads).
+    show_expected = true
   end
 
   methods
