@@ -14,8 +14,8 @@ function run_adaptiveisdf(type, output_dir)
 %
 % Inputs:
 %   type       鈥?'nn' or 'vn' (case-insensitive). Selects coarse ISDF slot description and nisdf rule.
-%   output_dir 鈥?Directory where isdf_validate_HF writes the HF report via isdf.report.gen_report
-%                (isdf_validate_HF_id<idnew>.txt for the new adaptive pool id).
+%   output_dir — Directory where isdf_validate_HF writes the HF report via isdf.report.hf
+%                (o-ISDF_HF_id<idnew>; legacy isdf_validate_HF_id<idnew>.txt also written).
 %
 % Usage:
 %   Set MATLAB current folder to a GW test profile that contains SAVE/config.mat and
@@ -108,10 +108,11 @@ function run_adaptiveisdf(type, output_dir)
   cd(output_dir);
   isdf.adaptive.adaptiveisdf(id_slot, cfg);
 
-  rep_hf = dir(fullfile(output_dir, 'isdf_validate_HF_id*.txt'));
+  rep_hf = [dir(fullfile(output_dir, 'o-ISDF_HF_id*')); ...
+            dir(fullfile(output_dir, 'isdf_validate_HF_id*.txt'))];
   if isempty(rep_hf)
     warning('run_adaptiveisdf:noHFReport', ...
-      ['No isdf_validate_HF_id*.txt in output_dir=%s. ', ...
+      ['No o-ISDF_HF_id* / isdf_validate_HF_id*.txt in output_dir=%s. ', ...
        'Check adaptiveisdf / isdf_validation errors.'], output_dir);
   else
     fprintf('run_adaptiveisdf: HF report(s) in output_dir:\n');

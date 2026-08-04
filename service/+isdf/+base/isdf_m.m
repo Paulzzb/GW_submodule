@@ -29,7 +29,6 @@ classdef isdf_m
     tildeVq(:, :, :, :) = zeros(0, 0, 0, 0) % nisdf * nisdf * nkibz * nspin
     helperqG(:, :, :, :) = zeros(0, 0, 0, 0) % ng * nisdf * nkibz * nspin
     CCHq(:, :, :) = zeros(0, 0, 0) % nisdf * nisdf * nkibz (per-q overlap)
-    CCHq_inv_sqrt(:, :, :) = zeros(0, 0, 0) % stored left operator Lambda^{-ratio}*V' per q (padded)
     CCHq_trunc_factors cell = {} % per-q struct: V_trunc, Lambda_trunc, N_keep
     svd_s_cut(1, 1) double = 0 % truncation used in last gen_tildeVq
     svd_ratio(1, 1) double = 0.5 % exponent ratio in Lambda^{-ratio}

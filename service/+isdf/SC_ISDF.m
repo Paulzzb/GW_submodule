@@ -332,7 +332,6 @@ function isdf_sc = sc_isdf_build_supercell_object(isdf_uc, R_sc, lin_sc, ...
   isdf_sc.tildeVq = zeros(0, 0, 0, 0);
   isdf_sc.helperqG = zeros(0, 0, 0, 0);
   isdf_sc.CCHq = zeros(0, 0, 0);
-  isdf_sc.CCHq_inv_sqrt = zeros(0, 0, 0);
   isdf_sc.CCHq_trunc_factors = {};
   isdf_sc.tmp = [];
 

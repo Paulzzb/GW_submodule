@@ -9,7 +9,7 @@
 function tildeVq = gen_tildeVq(id, cfg_isdf)
 % GEN_TILDEVQ  SVD-based tildeVq with X*V*X' form.
 %
-% Accumulates MCHq/CCHq over the BZ, forms truncated C^{-1/2}, stores CCHq and CCHq_inv_sqrt
+% Accumulates MCHq/CCHq over the BZ, forms truncated C^{-1/2}, stores CCHq
 % per q for isdf.get_rho_xalpha (c_t = C^{-1/2} c).
 % cfg_isdf (optional): config.ISDF
 %   trunc = inv_param, ratio = inv_ratio.
@@ -42,22 +42,15 @@ function tildeVq = gen_tildeVq(id, cfg_isdf)
   tildeVq = zeros(Nmu, Nmu, nibz);
   isdf_data.helperqG = zeros(ng, Nmu, nibz);
   isdf_data.CCHq = zeros(Nmu, Nmu, nibz);
-  isdf_data.CCHq_inv_sqrt = zeros(Nmu, Nmu, nibz);
   isdf_data.CCHq_trunc_factors = cell(1, double(nibz));
   if nargin < 2
     cfg_isdf = [];
   end
-  s_cut = 0;
-  ratio = 0.5;
-  if isstruct(cfg_isdf) && isfield(cfg_isdf, 'inv_param') && ~isempty(cfg_isdf.inv_param)
-    s_cut = double(cfg_isdf.inv_param);
-  end
-  if isstruct(cfg_isdf) && isfield(cfg_isdf, 'inv_ratio') && ~isempty(cfg_isdf.inv_ratio)
-    ratio = double(cfg_isdf.inv_ratio);
-  end
+
+  s_cut = double(cfg_isdf.inv_param);
+  ratio = double(cfg_isdf.inv_ratio);
   isdf_data.svd_s_cut = s_cut;
   isdf_data.svd_ratio = ratio;
-  isdf.numerical_cond_report('gen_tildeVq_begin', id, isdf_data.desc, s_cut);
   use_parfor = parallel.enabled();
   g_table_col = fft_data.G_table(:, 1);
 
@@ -120,7 +113,6 @@ function tildeVq = gen_tildeVq(id, cfg_isdf)
     fac.Lambda_trunc = Lambda_trunc_iq;
     fac.N_keep = int32(l_keep);
     isdf_data.CCHq_trunc_factors{double(iqibz)} = fac;
-    isdf.numerical_cond_report('gen_tildeVq_iq', id, iqibz, CCHq, MCHq, l_keep, s_cut);
 
     helperqR = isdf.prod_C_inv_t('prod', 'r', MCHq);
 
@@ -146,6 +138,8 @@ function tildeVq = gen_tildeVq(id, cfg_isdf)
 
   isdf_data.tildeVq = tildeVq;
   isdf.save2mod(isdf_data, id);
+
+  isdf.report.cond('gen_tildeVq', id);
   fprintf('[ISDF] gen_tildeVq done for id=%d (SVD C^{-1/2} path, s_cut=%g).\n', int32(id), s_cut);
 
 end

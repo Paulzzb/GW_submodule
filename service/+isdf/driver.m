@@ -23,7 +23,7 @@ function driver(~, config)
   end
 
   isdf.free();
-  isdf.numerical_cond_report('init');
+  isdf.report.cond('init');
 
   if do_vc
     id_vc_new = local_run_isdf_type(config, cfg, 'vc');

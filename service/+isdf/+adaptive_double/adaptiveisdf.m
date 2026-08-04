@@ -24,22 +24,20 @@ function idnew = adaptiveisdf(id, cfg_isdf)
     error('adaptiveisdf:nspin', 'nspin > 1 is not supported.');
   end
 
-  [ck_loaded, idnew] = isdf.adaptive_double.adaptive_checkpoint_try_load(id);
+  [ck_loaded, idnew] = isdf.adaptive.adaptive_checkpoint_try_load(id);
   if ck_loaded
     return;
   end
 
   import_root = local_get_import_isdf_root(cfg_isdf);
   if ~isempty(import_root)
-    [ck_loaded, idnew] = isdf.adaptive_double.adaptive_checkpoint_import_from_isdf(id, import_root);
+    [ck_loaded, idnew] = isdf.adaptive.adaptive_checkpoint_import_from_isdf(id, import_root);
     if ck_loaded
       return;
     end
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Remove redundant points
-  % isdf.adaptive_double.isdf_exclude_point(id);
   isdf_data = isdf.get(id);
   Nisdf = (isdf_data.nisdf);
   params = isdf.adaptive.adaptive_param(isdf_data.desc, cfg_isdf);
@@ -316,7 +314,7 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   isdf_data_new.assigned = true;
   isdf.save2mod(isdf_data_new, idnew);
   isdf.rsymm.bundle_refresh(id, Nextra, isdf_new_indices, idnew);
-  isdf.adaptive_double.adaptive_checkpoint_save(id, idnew);
+  isdf.adaptive.adaptive_checkpoint_save(id, idnew);
 
 
 
@@ -369,7 +367,7 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   output.msg('rs', '  schur_skips=%d  (details at verbose>=2 / log)', n_schur_skip);
   output.msg('rs', '  wrote %s  (%.1f s)', fpath_r, elapsed_phase1);
 
-  isdf.numerical_cond_report('adaptive', id, idnew, isdf_data.desc, ...
+  isdf.report.cond('adaptive', id, idnew, isdf_data.desc, ...
     loss_history(1), loss, report.final_nisdf);
   output.msg('rs', '  Saved adaptive ISDF -> id=%d', idnew);
 
