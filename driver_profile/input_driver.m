@@ -38,7 +38,6 @@ function input_driver(inputfile)
     fprintf('input_driver: loading cached SAVE data from %s\n', dir);
     % GWgroundstate = load(fNameGWinput, 'GWgroundstate').GWgroundstate;
     cached = load(fullfile(dir, def.config), 'GWoptions', 'config');
-    GWoptions = cached.GWoptions;
     config = cached.config;
     data = load(fullfile(dir, def.data), 'data').data;
     % Fill defaults for fields added after config.mat was saved.
@@ -53,29 +52,25 @@ function input_driver(inputfile)
     % Step 3: Set default values in 'config', error if there exists invalid values.
     config = set_default_param_value(config, data);
 
-    % Step 4: Construct GWinfo (Basically, the groundstate data) and GWOptions seperately
-    % GWgroundstate = construct_GWinfo(data, config);
-    GWoptions = construct_GWOptions(data, config);
-
     % Full-frequency (contour deformation): frequency grids for gw_fullfreq_cd_* / qp_cohsex.
     if config.FREQUENCY.frequency_dependence == 2
       config = generate_frequency(config);
     end
 
-    % Step 5: save data to files
+    % Step 4: save data to files
     fNamedata = fullfile(dir, def.data);
+    fNameconfig = fullfile(dir, def.config);
     if ~exist(dir, 'dir')
       mkdir(dir);
     end
-
     config.ISDFCauchy = setISDFCauchy(data, config);
     save(fNamedata, 'data', '-v7.3', '-nocompression');
+    save(fNameconfig, 'config', '-v7.3', '-nocompression');
   end
   %
-  % Step 8: ( testing )
-  % use structure in service/ to construct 
+  % Step 5:  use structure in service/ to construct 
   service_driver(data, config);
-  % Step 7: display input and groundstate information
+  % Step 6: display input and groundstate information
   display_input_summary(config)
 
 end % function
