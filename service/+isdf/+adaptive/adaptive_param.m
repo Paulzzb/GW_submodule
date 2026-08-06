@@ -36,7 +36,6 @@ function params = adaptive_param(desc, cfg_isdf)
   params.threshold = local_require_positive(cfg_isdf, ['adaptive_threshold_' suffix]);
   params.num_add = int32(local_require_integer(cfg_isdf, ['adaptive_num_add_' suffix]));
   params.candidate_ratio = local_require_positive(cfg_isdf, ['adaptive_candidate_ratio_' suffix]);
-  params.max_add_frac = local_require_positive(cfg_isdf, ['adaptive_max_add_frac_' suffix]);
   params.isdf_ratio = local_require_positive(cfg_isdf, ['isdf_ratio_' suffix]);
   params.max_cond = local_require_positive(cfg_isdf, ['adaptive_max_cond_' suffix]);
   params.use_cond_guard = local_require_logical(cfg_isdf, 'adaptive_use_cond_guard');
@@ -96,22 +95,13 @@ function val = local_require_logical(cfg, field_name)
 end
 
 function val = local_resolve_batch_size(cfg)
-  % Prefer adaptive_batch_size; accept adaptive_weight_batch_size as alias.
-  if isfield(cfg, 'adaptive_batch_size')
-    v = double(cfg.adaptive_batch_size);
-    if isfinite(v) && v >= 1
-      val = max(1, round(v));
-      return;
-    end
+  if ~isfield(cfg, 'adaptive_batch_size')
+    error('adaptive_param:field', 'Missing config.ISDF.adaptive_batch_size');
   end
-  if isfield(cfg, 'adaptive_weight_batch_size')
-    v = double(cfg.adaptive_weight_batch_size);
-    if isfinite(v) && v >= 1
-      val = max(1, round(v));
-      return;
-    end
+  v = double(cfg.adaptive_batch_size);
+  if ~(isfinite(v) && v >= 1)
+    error('adaptive_param:field', ...
+      'config.ISDF.adaptive_batch_size must be an integer >= 1 (got %g).', v);
   end
-  error('adaptive_param:field', ...
-    ['Missing/invalid config.ISDF.adaptive_batch_size ', ...
-     '(or adaptive_weight_batch_size); expect integer >= 1.']);
+  val = max(1, round(v));
 end

@@ -63,11 +63,7 @@ function fpath = hf(report, outDir)
   output.msg('o hf_report', 'N (total ob samples) = %d', double(report.n_samples));
   output.msg('o hf_report', 'N_rel (samples with |Ex_t| >= tol for relative stats) = %d', double(report.n_samples_rel));
   output.msg('o hf_report', '');
-  local_msg_block(local_table2chend
-
-  function local_msg_block(s)
-    if isempty(s)
-      returnar(report.stats));
+  local_msg_block(local_table2char(report.stats));
   output.msg('o hf_report', '');
   output.msg('o hf_report', 'Note: Diff = Ex_t - Ex_ISDF; relative columns use only samples with |Ex_t| >= tol (N_rel may differ from N).');
 

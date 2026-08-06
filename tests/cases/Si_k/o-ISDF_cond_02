@@ -1,0 +1,14 @@
+=== isdf.report.cond ===
+Generated: 2026-08-04 21:35:10
+pwd: /home/zhengbang/Projects/hefeikssolvtopub/tests/cases/Si_k
+
+--- gen_tildeVq ---
+id: 2  desc: vc  nisdf: 392  s_cut: 1.0000e-12
+
+  iqibz: 1  l_keep: 392  cond: 1.7975e+07
+    sigma_max: 4.8878e-01  sigma_min: 2.7192e-08  s_cut: 1.0000e-12
+  iqibz: 2  l_keep: 392  cond: 1.6193e+07
+    sigma_max: 4.6115e-01  sigma_min: 2.8479e-08  s_cut: 1.0000e-12
+  iqibz: 3  l_keep: 392  cond: 1.6317e+07
+    sigma_max: 4.6025e-01  sigma_min: 2.8206e-08  s_cut: 1.0000e-12
+

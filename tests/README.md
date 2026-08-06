@@ -9,7 +9,7 @@
 tests/
   README.md
   run_all.m              % 编排 Si_gamma / Si_k（缺 groundstate 时跳过）
-  run_cohsex.m           % 共享：QPstartup → input_driver → qp_cohsex
+  run_cohsex.m           % 共享：QPstartup → input_driver → qp.launcher
   cases/
     Si_gamma/            % Si，无 k 点（enable_k_points = false）
     Si_k/                % Si，带 k 点

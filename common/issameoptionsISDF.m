@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/06/13 ZZ
+
 function flag = issameoptionsISDF(type, op1, op2)
 %   flag = issameoptionsISDF(op1, op2) returns true if op1 and op2 are the
 %   same options.

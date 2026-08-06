@@ -58,7 +58,6 @@ function fpath = adaptive(r, outDir)
   output.msg('o adaptive_report', 'Threshold          : %.8e', r.threshold);
   output.msg('o adaptive_report', 'num_add            : %d', int32(r.num_add));
   output.msg('o adaptive_report', 'candidate ratio    : %.8e', r.candidate_ratio);
-  output.msg('o adaptive_report', 'max add frac       : %.8e', r.max_add_frac);
   output.msg('o adaptive_report', 'ISDF ratio         : %.8e', r.isdf_ratio);
   output.msg('o adaptive_report', 'max cond           : %.8e', r.max_cond);
   if isfield(r, 'use_cond_guard')

@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/08/04 ZZ
+
 function def = filename_map()
   def.kssolvinput = 'groundstate.mat';
   def.qeinput = 'still_undergoing';
@@ -10,4 +18,7 @@ function def = filename_map()
   def.isdfss = 'isdf_typess.mat';
   def.QPenergy = 'QPenergy';
   def.isdf_database = 'ISDF_DB';
+  def.cond_report = 'o-ISDF_cond';
+  def.hf_report = 'o-ISDF_HF_id%d';
+  def.adaptive_report = 'o-ISDF_adaptive_id%d';
 end % EOF

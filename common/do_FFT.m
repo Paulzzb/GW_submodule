@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/06/26 ZZ
+
 function fftbox = do_FFT(fftbox, Nfft, sign)
 % do_FFT - Perform FFT on a box
 
@@ -7,7 +15,7 @@ function fftbox = do_FFT(fftbox, Nfft, sign)
     fftbox = fftn(fftbox, Nfft);   % Forward FFT
   else
     msg = 'sign is not 1 or -1 in do_FFT';
-    QPerror(msg);
+    output.err(msg);
   end
 end
 

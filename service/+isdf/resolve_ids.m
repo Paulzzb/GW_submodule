@@ -6,10 +6,10 @@
 %
 % Last modified: 2026/05/06 ZZ
 
-function [id_vc, id_vn, id_nn] = cohsex_resolve_ids(config)
-%COHSEX_RESOLVE_IDS  Map GW config to ISDF pool slots for static COHSEX (service +isdf).
+function [id_vc, id_vn, id_nn] = resolve_ids(config)
+%RESOLVE_IDS  Map GW config to ISDF pool slots (vc / vn / nn).
 %
-%   [id_vc, id_nn] = isdf.cohsex_resolve_ids(config)
+%   [id_vc, id_vn, id_nn] = isdf.resolve_ids(config)
 %
 % Resolution order for each label ('vc', 'vn', 'nn'):
 %   1) config.ISDF.id_vc / id_vn / id_nn if nonempty
@@ -21,7 +21,7 @@ function [id_vc, id_vn, id_nn] = cohsex_resolve_ids(config)
   id_vn = local_pick(config, 'id_vn', "vn");
   id_nn = local_pick(config, 'id_nn', "nn");
   if isempty(id_vc) && isempty(id_vn) && isempty(id_nn)
-    error('isdf:cohsex_resolve_ids', 'No ISDF slot assigned for any label.');
+    error('isdf:resolve_ids', 'No ISDF slot assigned for any label.');
   end
 end
 

@@ -32,8 +32,8 @@ function err(text, varargin)
     end
   end
 
-  line1 = sprintf('[QP-ERROR] %s', body);
-  line2 = sprintf('         --> %s', loc);
+  line1 = format_line_(['[QP-ERROR] ', body], {});
+  line2 = format_line_(sprintf('--> %s', loc), {});
 
   % Report/log via emit; stderr always for interactive visibility.
   flags = parse_how_('v0r');

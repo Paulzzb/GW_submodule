@@ -42,7 +42,6 @@ function report = fill_adaptive(report, id_old, id_new, params)
   report.threshold = params.threshold;
   report.num_add = int32(params.num_add);
   report.candidate_ratio = params.candidate_ratio;
-  report.max_add_frac = params.max_add_frac;
   report.isdf_ratio = params.isdf_ratio;
   report.max_cond = params.max_cond;
   report.use_cond_guard = logical(params.use_cond_guard);
@@ -56,7 +55,7 @@ function report = fill_adaptive(report, id_old, id_new, params)
     n1 = 0;
     n2 = 0;
   end
-  report.nmu_cap = params.isdf_ratio * sqrt(double(k_data.nbz)) * params.max_add_frac * sqrt(n1 * n2);
+  report.nmu_cap = params.isdf_ratio * sqrt(double(k_data.nbz)) * sqrt(n1 * n2);
   report.naddmax = int32(max(0, ceil(report.nmu_cap - Nisdf0)));
 
   if isfield(isdf_data, 'bundle_struct') && isstruct(isdf_data.bundle_struct) ...

@@ -113,7 +113,8 @@ if config.ISDF.isisdf
     omega = omega_list(ifreq);
     % gen_Kq_Gamma uses energies in Ry.
     omega_ry = omega / ry2ev;
-    Kq_ISDF = isdf.gen_Kq_Gamma(id_vc, iqibz, omega_ry, broadening_arg);
+    Kq_ISDF = isdf.gen_Kq_Gamma( ...
+      id_vc, iqibz, omega_ry, broadening_arg, isdf.cauchy_opts(config));
     tildeWq_nn = isdf.gen_tildeWq_Gamma(id_vc, iqibz, Kq_ISDF, id_nn, flagherm);
 
     for n = nstart:nend

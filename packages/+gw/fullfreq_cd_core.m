@@ -105,7 +105,7 @@ if isfield(config, 'ISDF') && isfield(config.ISDF, 'isisdf') && config.ISDF.isis
       omega = omega_list(ifreq);
       % service/+isdf/gen_Kq currently uses energies in Ry.
       omega_ry = omega / ry2ev;
-      Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, omega_ry);
+      Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, omega_ry, isdf.cauchy_opts(config));
       flagherm = abs(real(omega)) < 1e-5;
       if ifreq == 1
         flagherm = false;

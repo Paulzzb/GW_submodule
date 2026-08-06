@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/06/13 ZZ
+
 function flag = issamegvec(gvec1, gvec2)
 %   flag = issamegvec(gvec1, gvec2) returns true if gvec1 and gvec2 are the
 %   same gvec.

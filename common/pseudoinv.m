@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/01/27 ZZ
+
 function Adagger = pseudoinv(A, tol)
   % Pseudoinverse of a matrix, with tolerance tol
   % Compute the SVD of A, 

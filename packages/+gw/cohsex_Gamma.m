@@ -106,7 +106,7 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
       
       vcoul_q = coulomb_data.vcoul(:, iqibz);
       vcoul_q(1) = coulomb_data.vcoul0;
-      Kq_ISDF = isdf.gen_Kq_Gamma(id_vc, iqibz);
+      Kq_ISDF = isdf.gen_Kq_Gamma(id_vc, iqibz, [], [], isdf.cauchy_opts(config));
 
       tildeWq_vn = isdf.gen_tildeWq_Gamma(id_vc, iqibz, Kq_ISDF, id_vn); % SEX kernel
       helperqG_vc = double(vc_data.helperqG(:, :, iqibz));

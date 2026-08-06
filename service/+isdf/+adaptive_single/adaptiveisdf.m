@@ -57,7 +57,7 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   end
   nrange1 = double(isdf_data.nrange1);
   nrange2 = double(isdf_data.nrange2);
-  nmu_cap = params.isdf_ratio * sqrt(k_data.nbz) * params.max_add_frac * sqrt(double(numel(nrange1)) * double(numel(nrange2)));
+  nmu_cap = params.isdf_ratio * sqrt(k_data.nbz) * sqrt(double(numel(nrange1)) * double(numel(nrange2)));
   Naddmax = int32(max(0, ceil(nmu_cap - double(Nisdf))));
   R_sampling_indices = isdf_data.bundle_struct.sampling2bundle;
   if isfield(isdf_data.bundle_struct, 'fine_grid_lin') ...

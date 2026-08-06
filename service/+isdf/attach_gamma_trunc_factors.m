@@ -9,7 +9,7 @@
 function attach_gamma_trunc_factors(id, inv_ratio)
 %ATTACH_GAMMA_TRUNC_FACTORS  Identity SVD factors after gen_tildeVq_Gamma.
 %
-% Gamma builders skip the SVD path in gen_tildeVq; gw_x_Gamma / gen_Kq_Gamma
+% Gamma builders skip the SVD path in gen_tildeVq; gw.x_Gamma / gen_Kq_Gamma
 % still expect CCHq_trunc_factors. This sets full-rank identity factors.
 
   isdf_data = isdf.get(id);

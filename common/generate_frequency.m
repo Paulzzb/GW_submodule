@@ -1,5 +1,13 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/07/30 ZZ
+
 % function [grid_real, coeff_real_func, grid_imag, coeff_imag_func]
-function config = generate_frequency(GWinfo, config)
+function config = generate_frequency(config)
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
@@ -51,10 +59,10 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
       end
     case 1
       msg = sprintf('FREQUENCY.cd_residual_method = %d is under developing', config.FREQUENCY.cd_residual_method);
-      QPerror(msg);
+      output.err(msg);
     otherwise
       msg = sprintf('FREQUENCY.cd_residual_method = %d not supported', config.FREQUENCY.cd_residual_method);
-      QPerror(msg);
+      output.err(msg);
   end
   
   
@@ -82,20 +90,20 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
       end
     case 1 % Gauss-Legendre
       msg = sprintf('FREQUENCY.cd_integration_method = %d is under developing', config.FREQUENCY.cd_integration_method);
-      QPerror(msg);
+      output.err(msg);
     otherwise
       msg = sprintf('FREQUENCY.cd_integration_method = %d not supported', config.FREQUENCY.cd_integration_method);
-      QPerror(msg);
+      output.err(msg);
   end
 elseif ((config.FREQUENCY.frequency_dependence_method == 0) || ...
         (config.FREQUENCY.frequency_dependence_method == 1))
   msg = sprintf('FREQUENCY.frequency_dependence_method = %d is frequency independent.\nReturning ...', config.FREQUENCY.frequency_dependence_method);
-  QPlog(msg);
+  output.msg('v1s', '%s', msg);
   return
 else
   msg = sprintf('FREQUENCY.frequency_dependence_method = %d is under developing.\n', ...
    config.FREQUENCY.frequency_dependence_method);
-  QPerror(msg);
+  output.err(msg);
 end % if frequency_dependence == 2
 
 
@@ -105,12 +113,13 @@ config.freqinfo.grid_imag = grid_imag;
 config.freqinfo.coeff_real_func = coeff_real_func;
 config.freqinfo.coeff_imag_func = coeff_imag_func;
 
+% Screen summary is printed by qp.summary(0); keep report-only here.
 msg = sprintf('Frequency grid generated with %d real and %d imaginary frequencies\n', ...
               nrealfreq, nimagfreq);
-QPlog(msg);
+output.msg('v1r', '%s', msg);
 msg = sprintf('Method to generate real frequencies: %d\n', res_method);
-QPlog(msg);
+output.msg('v1r', '%s', msg);
 msg = sprintf('Method to generate imaginary frequencies: %d\n', int_method);
-QPlog(msg);
+output.msg('v1r', '%s', msg);
 
 end % EOF

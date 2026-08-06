@@ -28,6 +28,9 @@ for i = 1:numel(blocks)
     end
 end
 
+% Canonicalize enum-like string values (trim + lowercase). Paths / prefixes untouched.
+config = local_normalize_string_enums(config);
+
 % Fill in default values for missing parameters depending on data.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General parameters
@@ -82,17 +85,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parameters with respect to the ISDF 
 if (config.ISDF.isisdf > 0)
-  if (config.ISDF.isdf_ratio < 0)
-    error('&ISDF->isdf_ratio should be set to a positive value!');
-  end
-  if (config.ISDF.isdf_ratio_type1 < 0)
-    config.ISDF.isdf_ratio_type1 = config.ISDF.isdf_ratio;
-  end
-  if (config.ISDF.isdf_ratio_type2 < 0)
-    config.ISDF.isdf_ratio_type2 = config.ISDF.isdf_ratio;
-  end
-  if (config.ISDF.isdf_ratio_type3 < 0)
-    config.ISDF.isdf_ratio_type3 = config.ISDF.isdf_ratio;
+  if ~(config.ISDF.isdf_ratio_type1 > 0 && config.ISDF.isdf_ratio_type2 > 0 && config.ISDF.isdf_ratio_type3 > 0)
+    error('&ISDF->isdf_ratio_type1/2/3 should be set to positive values!');
   end
   if ~(isfinite(config.ISDF.inv_ratio) && config.ISDF.inv_ratio >= 0 && config.ISDF.inv_ratio <= 1)
     config.ISDF.inv_ratio = 0.75;
@@ -100,7 +94,25 @@ if (config.ISDF.isisdf > 0)
   if isempty(config.ISDF.sys)
     config.ISDF.sys = data.sys;
   end
+  % Fill empty per-type exxmethod from global exxmethod, else default 'pseudo'
+  exx = config.ISDF.exxmethod;
+  if isempty(exx)
+    exx = 'pseudo';
+  end
+  if isempty(config.ISDF.exxmethod_type1)
+    config.ISDF.exxmethod_type1 = exx;
+  end
+  if isempty(config.ISDF.exxmethod_type2)
+    config.ISDF.exxmethod_type2 = exx;
+  end
+  if isempty(config.ISDF.exxmethod_type3)
+    config.ISDF.exxmethod_type3 = exx;
+  end
+  if isempty(config.ISDF.exxmethod)
+    config.ISDF.exxmethod = 'pseudo';
+  end
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Supercell / SC_ISDF
@@ -135,7 +147,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Formal benchmark (synthetic groundstate + Gamma COHSEX path)
 if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'groundstate_type') ...
-    && strcmpi(char(string(config.CONTROL.groundstate_type)), 'formal')
+    && strcmp(config.CONTROL.groundstate_type, 'formal')
   if config.FREQUENCY.frequency_dependence ~= -2
     error('groundstate_type=''formal'' requires FREQUENCY.frequency_dependence = -2.');
   end
@@ -153,4 +165,35 @@ if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'groundstate_type') ...
   config.ISDF.compute_vn = true;
 end
 
+end
+
+function config = local_normalize_string_enums(config)
+%LOCAL_NORMALIZE_STRING_ENUMS  lower() char/string fields in selected blocks.
+%
+% Edit force_lower_blocks to opt in a namelist. Numeric / logical / empty skipped.
+
+  force_lower_blocks = struct( ...
+    'CONTROL', false, ...
+    'ISDF', true, ...
+    'FREQUENCY', true, ...
+    'COHSEX', true);
+
+  blks = fieldnames(force_lower_blocks);
+  for ib = 1:numel(blks)
+    blk = blks{ib};
+    if ~logical(force_lower_blocks.(blk))
+      continue;
+    end
+    if ~isfield(config, blk) || ~isstruct(config.(blk))
+      continue;
+    end
+    keys = fieldnames(config.(blk));
+    for ik = 1:numel(keys)
+      key = keys{ik};
+      v = config.(blk).(key);
+      if ischar(v) || isstring(v)
+        config.(blk).(key) = lower(strtrim(char(string(v))));
+      end
+    end
+  end
 end

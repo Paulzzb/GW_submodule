@@ -1,0 +1,58 @@
+=== adaptiveisdf phase-1 report (coarse ISDF id = 1) ===
+Generated: 2026-08-04 20:48:32
+Elapsed wall time (tic/toc): from function start through rebuild, orbit summary, and this report: 8.014358000 s
+
+=== Adaptive ISDF Update Report ===
+Backend            : adaptive_single
+Arithmetic         : single
+ISDF desc          : vc
+Coarse ISDF id     : 1
+Initial Nisdf      : 8
+Initial bundle size: 0
+Added points       : 384
+Final Nisdf        : 392
+Final bundle size  : 0
+Iterations         : 24
+Initial loss       : 6.95490112e+02
+Final loss         : 1.23069763e-01
+Relative loss      : 1.76954010e-04
+Threshold          : 2.00000000e-04
+num_add            : 16
+candidate ratio    : 2.00000000e+00
+max add frac       : 1.00000000e+00
+ISDF ratio         : 1.60000000e+01
+max cond           : 1.00000000e+12
+use cond guard     : 1
+Nisdf cap          : 4.78932146e+02
+Naddmax            : 471
+param source       : config
+Stop reason        : reach_threshold
+Schur skips        : 0
+Stepwise loss/loss0 after each +Nadd= 16 update:
+  Step 1: loss = 4.03627655e+02, loss/loss0 = 5.80349982e-01
+  Step 2: loss = 2.50815994e+02, loss/loss0 = 3.60632002e-01
+  Step 3: loss = 1.87420502e+02, loss/loss0 = 2.69479752e-01
+  Step 4: loss = 1.41865112e+02, loss/loss0 = 2.03978613e-01
+  Step 5: loss = 9.84787216e+01, loss/loss0 = 1.41596153e-01
+  Step 6: loss = 7.19499283e+01, loss/loss0 = 1.03452124e-01
+  Step 7: loss = 4.48231201e+01, loss/loss0 = 6.44482523e-02
+  Step 8: loss = 2.94686298e+01, loss/loss0 = 4.23710272e-02
+  Step 9: loss = 2.24438896e+01, loss/loss0 = 3.22706103e-02
+  Step 10: loss = 1.40796213e+01, loss/loss0 = 2.02441718e-02
+  Step 11: loss = 1.02231617e+01, loss/loss0 = 1.46992197e-02
+  Step 12: loss = 6.44754171e+00, loss/loss0 = 9.27050132e-03
+  Step 13: loss = 4.18009949e+00, loss/loss0 = 6.01029303e-03
+  Step 14: loss = 2.78115654e+00, loss/loss0 = 3.99884395e-03
+  Step 15: loss = 1.86241353e+00, loss/loss0 = 2.67784321e-03
+  Step 16: loss = 1.12703621e+00, loss/loss0 = 1.62049208e-03
+  Step 17: loss = 7.93020725e-01, loss/loss0 = 1.14023290e-03
+  Step 18: loss = 6.00140750e-01, loss/loss0 = 8.62903369e-04
+  Step 19: loss = 4.36479598e-01, loss/loss0 = 6.27585629e-04
+  Step 20: loss = 3.19619536e-01, loss/loss0 = 4.59560135e-04
+  Step 21: loss = 2.47071564e-01, loss/loss0 = 3.55248136e-04
+  Step 22: loss = 1.92333013e-01, loss/loss0 = 2.76543142e-04
+  Step 23: loss = 1.53023958e-01, loss/loss0 = 2.20023197e-04
+  Step 24: loss = 1.23069763e-01, loss/loss0 = 1.76954010e-04
+===================================
+
+=== end adaptiveisdf phase-1 report ===

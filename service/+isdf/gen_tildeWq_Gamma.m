@@ -7,14 +7,22 @@
 % Last modified: 2026/06/11 ZZ
 
 function tildeWq = gen_tildeWq_Gamma(id_vc, iqibz, Kq, id_outer, flagherm)
-% Kq is calculated by gen_Kq.m, which is using vc data
-% Now, formally,
-%     tildeW_q = <outer|Vq|in> * Kq^{-1} * <in|Vq|outer> + <outer|Vq|outer>,
-% where <outer|Vq|outer> is calculated by gen_tildeVq in isdf.get(id_outer),
-% and <outer|Vq|in> will be calculated here.
-% 
-% Normally, we only need to calculate id_outer.desc = 'vn'. However, in case
-% of COHSEX approximation, we also need to calculate id_outer.desc = 'nn'.
+%GEN_TILDEWQ_GAMMA  Build screened ISDF kernel W~ at Gamma.
+%
+%   tildeWq = isdf.gen_tildeWq_Gamma(id_vc, iqibz, Kq, id_outer)
+%   tildeWq = isdf.gen_tildeWq_Gamma(id_vc, iqibz, Kq, id_outer, flagherm)
+%
+% Forms (this routine computes the K^{-1} contraction; bare V term lives on
+% the outer slot from gen_tildeVq when needed by the caller):
+%
+%   W~(outer,outer) ~ <outer|V_q|vc> K_q^{-1} <vc|V_q|outer>
+%
+%   id_vc     — ISDF slot used to build K (typically desc 'vc')
+%   iqibz     — q IBZ index (Gamma path currently forces iqibz = 1)
+%   Kq        — from isdf.gen_Kq_Gamma
+%   id_outer  — outer slot: usually 'vn' (SEX); 'nn' for COH / full-freq
+%   flagherm  — true: prefer chol(K) (imag-axis / Hermitian K);
+%               false: general K\ (real-axis). Default false.
 
 if nargin < 4
   error('gen_tildeWq: Missing input: id_vc, iqibz, Kq, id_outer');
@@ -25,35 +33,27 @@ if nargin < 5
 end
 
 iqibz = 1;
-flagherm = true;
 
 vc_data = isdf.get(id_vc);
 outer_data = isdf.get(id_outer);
-%
 vc_fac = vc_data.CCHq_trunc_factors{double(iqibz)};
 Nkeep_vc = vc_fac.N_keep;
 outer_fac = outer_data.CCHq_trunc_factors{double(iqibz)};
 Nkeep_outer = outer_fac.N_keep;
-%
 coulomb_data = coulomb.get();
-%
 vcoul_q = coulomb_data.vcoul(:, iqibz);
 if iqibz == 1
   vcoul_q(1) = coulomb_data.vcoul0;
 end
 
-% vcoul_q = vcoul_q * 13.6059;
-%
 tildeWq = zeros(Nkeep_outer, Nkeep_outer);
-% Calculate <outer|Vq|in>
+% <vc|V_q|outer> in G-space (truncated SVD factors)
 helperqG_vc = vc_data.helperqG(:, 1:Nkeep_vc, iqibz);
 helperqG_outer = outer_data.helperqG(:, 1:Nkeep_outer, iqibz);
 
 vc_Vq_outer = helperqG_vc(:, 1:Nkeep_vc)' * diag(vcoul_q) * helperqG_outer(:, 1:Nkeep_outer);
 
-%
-% t = vc_Vq_outer' * inv(Kq) * vc_Vq_outer;
-
+% Contract with K^{-1}: Hermitian path uses chol when possible
 if flagherm
   try
     L_Kq = chol(Kq, "lower");
@@ -65,12 +65,5 @@ if flagherm
 else
   tildeWq = vc_Vq_outer' * (Kq \ vc_Vq_outer);
 end
-
-% if norm(t - tildeWq, 'fro') / norm(t, 'fro') > 1e-6
-%   warning('gen_tildeWq: inconsistent t and tildeWq, rel=%.6e', norm(t - tildeWq, 'fro') / norm(t, 'fro'));
-% end
-% tildeWq = tildeWq + outer_data.tildeVq(:, :, iqibz);
-
-
 
 end

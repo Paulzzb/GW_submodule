@@ -47,9 +47,6 @@ function display_input_summary(config)
   output.msg('r', ' Adaptive CandR T1/T2/T3: %.2f / %.2f / %.2f', ...
     config.ISDF.adaptive_candidate_ratio_type1, config.ISDF.adaptive_candidate_ratio_type2, ...
     config.ISDF.adaptive_candidate_ratio_type3);
-  output.msg('r', ' Adaptive MaxFrac T1/T2/T3: %.2f / %.2f / %.2f', ...
-    config.ISDF.adaptive_max_add_frac_type1, config.ISDF.adaptive_max_add_frac_type2, ...
-    config.ISDF.adaptive_max_add_frac_type3);
   output.msg('r', ' Adaptive MaxCond T1/T2/T3: %.2e / %.2e / %.2e', ...
     config.ISDF.adaptive_max_cond_type1, config.ISDF.adaptive_max_cond_type2, ...
     config.ISDF.adaptive_max_cond_type3);
@@ -73,9 +70,6 @@ function display_input_summary(config)
   end
   if isfield(config.ISDF, 'order')
     output.msg('r', ' ISDF order (tildeVq)  : %d', int32(config.ISDF.order));
-  end
-  if isfield(config.ISDF, 'chol_maxit')
-    output.msg('r', ' ISDF chol_maxit        : %d', int32(config.ISDF.chol_maxit));
   end
 
   output.msg('r', '----------- CUTOFFS Settings -----------');

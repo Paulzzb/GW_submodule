@@ -14,7 +14,9 @@
 %
 %   Physics dispatch:
 %     *gamma  → run_cohsex
-%     others  → run_gw_x  (input_driver + gw_x_k_packages)
+%     others  → run_gw_x  (input_driver + gw.x)
+%   Before each case: wipe SAVE/ and prior run artifacts so nothing is reused
+%   from a previous run (keeps ./test and ./qe.save).
 %   Skips a case if qe.save is not populated yet (prints SKIP).
 %   SrTiO3_k is deferred (large QE output; not in the default list).
 
@@ -57,6 +59,8 @@ for i = 1:numel(cases)
     n_skip = n_skip + 1;
     continue
   end
+
+  clean_case_outputs(case_dir);
 
   is_gamma = ~isempty(regexp(name, 'gamma$', 'once'));
 

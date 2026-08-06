@@ -32,8 +32,7 @@ END &CUTOFFS
   isdf_ratio_type1 = 16.0
   isdf_ratio_type2 = 16.0
   isdf_ratio_type3 = 16.0
-  adaptive_batch_size = 8, ...
-  adaptive_weight_batch_size = 64, ...
+  adaptive_batch_size = 8,
   exxmethod = 'pseudo'
   is_helper = .true.
   validate_hf = .true.

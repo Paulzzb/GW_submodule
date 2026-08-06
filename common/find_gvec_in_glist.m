@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2026/03/19 ZZ
+
 function [ind_k] = find_gvec_in_glist(kpt, kpt_set, fftgrid, TOL)
   % Return the index of kpt in kpt_set
   %       -1 if not found

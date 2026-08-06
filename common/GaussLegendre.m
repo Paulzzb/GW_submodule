@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/06/13 ZZ
+
 function [weight, nodes] = GaussLegendre(n, tol)
 %     [weight, nodes] = GaussLegendre(n, tol)
 % Generate the Gauss quadrature rule on [-1, 1]

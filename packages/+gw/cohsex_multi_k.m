@@ -112,7 +112,7 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
         iqrot = q_data.bz2rot(iqbz);
         if iqibz ~= iqibz_old
           % tildeW_q = isdf.gen_tildeWq(id_vc, iqibz);
-          Kq_ISDF = isdf.gen_Kq(id_vc, iqibz);
+          Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, [], isdf.cauchy_opts(config));
           tildeWq_vn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_vn, true); % for SEX
           tildeWq_nn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_nn, true); % for COH
           % verify
@@ -260,7 +260,7 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
           if iqibz == 1
             vcoul_q(1) = coulomb_data.vcoul0;
           end
-          Kq_ISDF = isdf.gen_Kq(id_vc, iqibz);
+          Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, [], isdf.cauchy_opts(config));
           tildeWq_vn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_vn); % for SEX
           helperqG_vc = double(vc_data.helperqG(:, :, iqibz));
           % Recover helperqR from helperqG (inverse of gen_tildeVq's R->G mapping).

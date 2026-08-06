@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/06/13 ZZ
+
 function iout = findvector(kk, gvec)
 %  iout = mill2nl_findvector(kk, gvec.fftgrid(1), gvec.fftgrid(2), gvec.fftgrid(3));
   iout = 1 + (kk(1) + (kk(1) < 0) * gvec.fftgrid(1) ) ...

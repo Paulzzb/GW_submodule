@@ -7,7 +7,7 @@
 % Last modified: 2026/07/27 ZZ
 
 function E = run_cohsex(case_dir)
-%RUN_COHSEX  Shared launcher: input_driver + qp_cohsex for a case directory.
+%RUN_COHSEX  Shared launcher: input_driver + qp.launcher for a case directory.
 %
 %   E = run_cohsex(CASE_DIR)
 %   E = run_cohsex()            % CASE_DIR = pwd
@@ -63,14 +63,14 @@ input_driver('./test');
 load(fullfile(case_dir, 'SAVE', 'config.mat'), 'config');
 wall_input = toc(t_in);
 
-fprintf('[run_cohsex] Running qp_cohsex(config) ...\n');
+fprintf('[run_cohsex] Running qp.launcher(config) ...\n');
 t_qp = tic;
-E = qp_cohsex(config);
+E = qp.launcher(config);
 wall_qp = toc(t_qp);
 
 fprintf('\n[run_cohsex] Wall clock:\n');
 fprintf('  input_driver + load(config): %.3f s\n', wall_input);
-fprintf('  qp_cohsex:                   %.3f s\n', wall_qp);
+fprintf('  qp.launcher:                 %.3f s\n', wall_qp);
 fprintf('  total:                       %.3f s\n', wall_input + wall_qp);
 
 if isfield(E, 'Eqp')

@@ -49,14 +49,16 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
     end
   end
 
+  cfg_ibmax = isdf_data.nrange2(end);
+  cfg_ibmin = isdf_data.nrange2(1);
 
   ob_list = int32(1:min(double(nv), double(nb)));
   if strcmpi(char(isdf_data.desc), 'vc')
     ib_start = double(nv) + 1;
     ib_end = 2 * double(nv);
   else
-    ib_start = 1;
-    ib_end = 2 * double(nv);
+    ib_start = cfg_ibmin;
+    ib_end = cfg_ibmax;
   end
   ib_start = max(1, ib_start);
   ib_end = min(double(nb), ib_end);

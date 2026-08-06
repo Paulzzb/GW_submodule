@@ -1,3 +1,11 @@
+% License-Identifier: BSD-3-Clause
+%
+% Copyright (C) 2026
+%
+% Authors (see AUTHORS file for details): ZZ
+%
+% Last modified: 2025/07/26 ZZ
+
 function psir = get_wavefunc_real(psig, Ggrid_info)
 
 [nkpts, nspin] = size(psig);

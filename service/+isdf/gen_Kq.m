@@ -6,7 +6,8 @@
 %
 % Last modified: 2026/05/20 ZZ
 
-function Kq_ISDF = gen_Kq(id_vc, iqibz, omega)
+function Kq_ISDF = gen_Kq(id_vc, iqibz, omega, cauchy)
+%GEN_KQ  Build K_q (multi-k). Optional cauchy (4th) used only for nkbz==1, omega~0.
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
@@ -14,8 +15,11 @@ for i = 1:numel(nameConstants)
   eval(sprintf('%s = %.16f;', nameConstants{i}, default_Constant.(nameConstants{i})));
 end
 
-if nargin < 3
+if nargin < 3 || isempty(omega)
   omega = complex(0);
+end
+if nargin < 4 || isempty(cauchy)
+  cauchy = struct('isCauchy', false);
 end
 
 %   \chi_q(\mu, \nu)
@@ -25,21 +29,19 @@ end
 % where eta is a small positive number to avoid division by zero.
 % In case real(omega) == 0, eta is set to 0.0.
 eta = 0.025 / ry2ev;
-warning('Currently, only consider omega = 0 case.');
+output.warn('Currently, only consider omega = 0 case.');
 nspin = 1; ispin = 1;
-warning('Multi-spin is not supported yet.');
+output.warn('Multi-spin is not supported yet.');
 
 system_data = system.get();
 k_data = lattice.manager('k', 'get');
 r_lat_data = lattice.manager('r_lat', 'get');
-% 
 nkbz = k_data.nbz;
 ev = system_data.Eo;
-% ev = system_data.Eo * ry2ev;
 
 vc_data = isdf.get(id_vc);
 if isempty(vc_data.nrange1) || isempty(vc_data.nrange2)
-  error('gen_Kq:nrange', ...
+  output.err( ...
     'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', ...
     int32(id_vc));
 end
@@ -54,6 +56,36 @@ fftgrid = fft_data.fftgrid;
 symm_data = symmetry.get();
 inv_rot_index = symm_data.inv_rot_index;
 
+% Single-k + static omega: optional Cauchy (same gate idea as gen_Kq_Gamma: no real-axis eta).
+use_cauchy = logical(cauchy.isCauchy) && (nkbz == 1) && (abs(omega) < 1e-6);
+if logical(cauchy.isCauchy) && ~use_cauchy
+  output.msg('v1s', ...
+    'Cauchy requested in gen_Kq but nkbz~=1 or omega~=0; using direct chi sum.');
+end
+if use_cauchy
+  s2b = vc_data.bundle_struct.sampling2bundle;
+  nrangec_row = reshape(nrangec, 1, []);
+  Phi = vc_data.bundle_struct.WF_bundle(s2b, nrangev, 1, ispin);
+  Psi = vc_data.bundle_struct.WF_bundle(s2b, nrangec_row, 1, ispin);
+  evOcc = double(ev(nrangev, 1, ispin));
+  evUnocc = double(ev(nrangec_row, 1, ispin));
+  optC = struct('froErr', 1e-6, 'MaxIter', 10);
+  if isfield(cauchy, 'froErr') && ~isempty(cauchy.froErr)
+    optC.froErr = double(cauchy.froErr);
+  end
+  if isfield(cauchy, 'MaxIter') && ~isempty(cauchy.MaxIter)
+    optC.MaxIter = double(cauchy.MaxIter);
+  end
+  [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar(Phi, Psi, evOcc(:), evUnocc(:), optC);
+  chiq_ISDF = -chi_raw;
+  if nspin == 1
+    chiq_ISDF = 2.0 * chiq_ISDF;
+  end
+  chiq_ISDF = 2.0 * chiq_ISDF;  % ij/ji
+  chiq_ISDF = (chiq_ISDF + chiq_ISDF') / 2;
+  Kq_ISDF = inv(chiq_ISDF) + vc_data.tildeVq(:, :, iqibz);
+  return
+end
 
 iqrot = 1;
 chiq_ISDF = zeros(Nisdf_o, Nisdf_o);
@@ -103,7 +135,7 @@ for ikbz = 1:nkbz
       ref = max(abs(real(coeff(:))));
       tol = max(1e-12, 1e-10 * max(ref, 1));
       if any(abs(imcoeff) > tol)
-        warning('gen_Kq:nonrealCoeff', ...
+        output.warn( ...
           ['At Re(omega)~0 expected real transition coefficients coeff=occ./den1-occ./den2; ', ...
            'max|Im(coeff)|=%.3e tol=%.3e (id_vc=%d, iqibz=%d, ikbz=%d, iv=%d).'], ...
           max(abs(imcoeff)), tol, id_vc, iqibz, ikbz, iv);

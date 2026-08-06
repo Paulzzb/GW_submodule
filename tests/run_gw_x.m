@@ -7,7 +7,7 @@
 % Last modified: 2026/07/31 ZZ
 
 function Ex = run_gw_x(case_dir)
-%RUN_GW_X  Shared launcher: input_driver + gw_x_k_packages for a case directory.
+%RUN_GW_X  Shared launcher: input_driver + gw.x for a case directory.
 %
 %   Ex = run_gw_x(CASE_DIR)
 %   Ex = run_gw_x()            % CASE_DIR = pwd
@@ -63,14 +63,14 @@ input_driver('./test');
 load(fullfile(case_dir, 'SAVE', 'config.mat'), 'config');
 wall_input = toc(t_in);
 
-fprintf('[run_gw_x] Running gw_x_k_packages(config) ...\n');
+fprintf('[run_gw_x] Running gw.x(config) ...\n');
 t_x = tic;
-Ex = gw_x_k_packages(config);
+Ex = gw.x(config);
 wall_x = toc(t_x);
 
 fprintf('\n[run_gw_x] Wall clock:\n');
 fprintf('  input_driver + load(config): %.3f s\n', wall_input);
-fprintf('  gw_x_k_packages:             %.3f s\n', wall_x);
+fprintf('  gw.x:             %.3f s\n', wall_x);
 fprintf('  total:                       %.3f s\n', wall_input + wall_x);
 fprintf('[run_gw_x] size(Ex) = [%d %d], ||Ex||_F = %.6e\n', ...
   size(Ex, 1), size(Ex, 2), norm(Ex, 'fro'));

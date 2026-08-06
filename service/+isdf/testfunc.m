@@ -61,7 +61,7 @@ end
 function ids = local_ids_to_build(config)
   ids = int32([]);
   if ~isfield(config, 'ISDF') || ~isstruct(config.ISDF)
-    [id_vc, id_vn, id_nn] = isdf.cohsex_resolve_ids(config);
+    [id_vc, id_vn, id_nn] = isdf.resolve_ids(config);
     ids = local_nonempty_ids([id_vc, id_vn, id_nn]);
     return
   end
@@ -76,7 +76,7 @@ function ids = local_ids_to_build(config)
   if isfield(isdf_cfg, 'compute_nn') && logical(isdf_cfg.compute_nn)
     want{end + 1} = 'nn'; %#ok<AGROW>
   end
-  [id_vc, id_vn, id_nn] = isdf.cohsex_resolve_ids(config);
+  [id_vc, id_vn, id_nn] = isdf.resolve_ids(config);
   map = struct('vc', id_vc, 'vn', id_vn, 'nn', id_nn);
   for k = 1:numel(want)
     label = want{k};

@@ -84,6 +84,12 @@ function stage0(config)
       'Frequency: %d real / %d imag (methods %d / %d)', ...
       nreal, nimag, res_m, int_m);
   end
+
+  if isdf.cauchy_opts(config).isCauchy
+    output.msg('v0s', 'Cauchy: on');
+  else
+    output.msg('v0s', 'Cauchy: off');
+  end
 end
 
 function s = local_id_str(label, id)
