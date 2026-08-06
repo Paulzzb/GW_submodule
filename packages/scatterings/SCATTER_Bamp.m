@@ -62,8 +62,8 @@ fftbox = conj(wf_left) .* wf_right;
 
 
 if (n_spinor == 2)
-  msg = fprintf("Support for sop calculation is developing\n");
-  error(msg);
+  msg = sprintf('Support for sop calculation is developing.\n');
+  output.err('%s', msg);
 end
 
 fftbox = reshape(fftbox, fftgrid);
