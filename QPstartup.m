@@ -1,4 +1,4 @@
-% License-Identifier: GPL
+% License-Identifier: BSD-3-Clause
 %
 % Copyright (C) 2026
 %
@@ -41,8 +41,6 @@ addpath(genpath([CPATH 'database_profile/']))
 % which() only sees mex for this OS; if absent, compile via mex() into the package dir.
 mex_specs = {
   'isdf.prod_mex', @() isdf.build_prod_mex
-  'isdf.adaptive.isdf_schur_rank1_mex', @() isdf.adaptive.build_schur_rank1_mex
-  'isdf.adaptive.isdf_schur_rank1_prod_mex', @() isdf.adaptive.build_schur_rank1_prod_mex
   'isdf.adaptive_double.isdf_schur_rank1_mex', @() isdf.adaptive_double.build_schur_rank1_mex
   'isdf.adaptive_double.isdf_schur_rank1_prod_mex', @() isdf.adaptive_double.build_schur_rank1_prod_mex
   'isdf.adaptive_single.isdf_schur_rank1_mex', @() isdf.adaptive_single.build_schur_rank1_mex
