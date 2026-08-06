@@ -9,7 +9,9 @@
 function sint = fullfreq_cd_int_Gamma(config)
 %GW_FULLFREQ_CD_INT_GAMMA  Imaginary-axis integral term for double-(k,q) service path.
 
-cleanup = output.push('Fullfreq-CD-Integral-Gamma');
+cleanup = output.push('+gw/fullfreq_cd_int_Gamma.m'); %#ok<NASGU>
+output.msg('v0s', 'Start integral term (Gamma).');
+tStart = tic;
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
@@ -32,7 +34,8 @@ grid_imag = config.freqinfo.grid_imag;
 coeff_imag_func = config.freqinfo.coeff_imag_func;
 
 pattern = ones(n_ener, nsum, nfreq_imag);
-nm_Womega_nm_list = gw.fullfreq_cd_core_Gamma(config, [nbmin, nbmax], [1, nsum], grid_imag, pattern);
+nm_Womega_nm_list = gw.fullfreq_cd_core_Gamma( ...
+  config, [nbmin, nbmax], [1, nsum], grid_imag, pattern, false);
 
 sint = zeros(n_ener, 1);
 for ibe = 1:n_ener
@@ -47,5 +50,7 @@ for ibe = 1:n_ener
 end
 
 sint = sint / pi;
+
+output.msg('v0s', 'Integral finished in %.2f seconds.', toc(tStart));
 
 end

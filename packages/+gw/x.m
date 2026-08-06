@@ -8,9 +8,10 @@
 
 function Ex = x(config)
 
-msg = sprintf('[Exchange] Start computing Sigma_x (exchange part) with service packages...\n');
+cleanup = output.push('+gw/x.m'); 
+
+msg = sprintf('Computing Fock energies...');
 output.msg('v0s', '%s', msg);
-tStart = tic;
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
@@ -22,8 +23,6 @@ end
 nbmin = config.SYSTEM.energy_band_index_min;
 nbmax = config.SYSTEM.energy_band_index_max;
 nspin = 1;
-msg = sprintf('nspin and ispin are set to 1 for now.\n');
-output.warn('%s', msg);
 
 % Pull runtime package data from service managers
 r_lat_m = lattice.manager('r_lat', 'get');
@@ -51,9 +50,6 @@ if size(vcoul_all, 2) < nqibz
   output.err('vcoul column size (%d) is smaller than nqibz (%d).', size(vcoul_all, 2), nqibz);
 end
 
-msg = sprintf('[Exchange] Using service-package Sigma_x calculation.\n');
-output.msg('v0s', '%s', msg);
-
 Ex = zeros(nbmax - nbmin + 1, nkibz, nspin);
 tStandard = tic;
 
@@ -61,9 +57,21 @@ isisdf = logical(config.ISDF.isisdf);
 id_ex = [];
 ex_data = [];
 if isisdf
-  [id_ex, ex_label] = local_resolve_ex_isdf_slot(config);
-  msg = sprintf('[Exchange] ISDF Sigma_x: %s adaptive slot + get_rho_xalpha + tildeVq.\n', ex_label);
-  output.msg('v0s', '%s', msg);
+  ex_label = "vn";
+  if isfield(config, 'COHSEX') && isfield(config.COHSEX, 'ex_use_which_isdf') ...
+      && ~isempty(config.COHSEX.ex_use_which_isdf)
+    ex_label = lower(string(config.COHSEX.ex_use_which_isdf));
+  end
+  if ~ismember(ex_label, ["vn", "nn"])
+    output.err( ...
+      'COHSEX.ex_use_which_isdf must be ''vn'' or ''nn'', got ''%s''.', ex_label);
+  end
+  [~, id_vn, id_nn] = isdf.resolve_ids(config);
+  if ex_label == "vn"
+    id_ex = id_vn;
+  else
+    id_ex = id_nn;
+  end
   if isempty(id_ex)
     output.err( ...
       ['ISDF exchange requires %s slot (adaptive). ' ...
@@ -77,12 +85,6 @@ if isisdf
     isdf.gen_tildeVq(id_ex, config.ISDF);
     ex_data = isdf.get(id_ex);
   end
-  msg = sprintf('[Exchange] ISDF %s id=%d, nisdf=%d, scheme=%s\n', ...
-    ex_label, id_ex, ex_data.nisdf, char(ex_data.interp_scheme));
-  output.msg('v0s', '%s', msg);
-else
-  msg = sprintf('[Exchange] Dense G-space Sigma_x (SCATTER_Bamp).\n');
-  output.msg('v0s', '%s', msg);
 end
 
 for ik = 1:nkibz
@@ -131,28 +133,7 @@ for ik = 1:nkibz
   end
 end
 
-msg = sprintf('[Exchange] Standard loop completed in %.2f seconds.\n', toc(tStandard));
+msg = sprintf('Completed in %.2f seconds.', toc(tStandard));
 output.msg('v1s', '%s', msg);
 
-msg = sprintf('[Exchange] Finished. Total time: %.2f seconds.\n', toc(tStart));
-output.msg('v0s', '%s', msg);
-
 end % EOF
-
-function [id_ex, ex_label] = local_resolve_ex_isdf_slot(config)
-  ex_label = "vn";
-  if isfield(config, 'COHSEX') && isfield(config.COHSEX, 'ex_use_which_isdf') ...
-      && ~isempty(config.COHSEX.ex_use_which_isdf)
-    ex_label = lower(string(config.COHSEX.ex_use_which_isdf));
-  end
-  if ~ismember(ex_label, ["vn", "nn"])
-    output.err( ...
-      'COHSEX.ex_use_which_isdf must be ''vn'' or ''nn'', got ''%s''.', ex_label);
-  end
-  [~, id_vn, id_nn] = isdf.cohsex_resolve_ids(config);
-  if ex_label == "vn"
-    id_ex = id_vn;
-  else
-    id_ex = id_nn;
-  end
-end

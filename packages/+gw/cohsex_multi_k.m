@@ -19,6 +19,10 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
 %   - Assigned slots desc ''vc'' and ''nn'' with coeff_seper, or config.ISDF.id_vc / id_nn.
 %   - Single IBZ k index ikibz = 1 and ispin = 1 for this prototype (multi-k extension later).
 
+  cleanup = output.push('+gw/cohsex_multi_k.m'); %#ok<NASGU>
+  output.msg('v0s', 'Start computing Esx_x / Ecoh (multi-k).');
+  tStart = tic;
+
   default_Constant = constant_map();
   nameConstants = fieldnames(default_Constant);
   for i = 1:numel(nameConstants)
@@ -47,8 +51,6 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
 
   nspin = 1;
   ispin = 1;
-  msg = sprintf('Multi-spin is not supported yet.\n');
-  output.warn('%s', msg);
 
 
   if (config.ISDF.isisdf)
@@ -69,9 +71,9 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
       exact_ch_debug = logical(config.COHSEX.exact_ch_debug);
     end
     if ~exact_CH
-      [id_vc, id_vn, id_nn] = isdf.cohsex_resolve_ids(config);
+      [id_vc, id_vn, id_nn] = isdf.resolve_ids(config);
     else
-      [id_vc, id_vn, ~] = isdf.cohsex_resolve_ids(config);
+      [id_vc, id_vn, ~] = isdf.resolve_ids(config);
     end
     
     if isempty(id_vn) && isempty(id_vc)
@@ -457,8 +459,8 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
       chi_acc = chi_acc + scal * Mgvc * diag(eden) * Mgvc';
     end
     inveps = eye(ng) - Dcoul * chi_acc;
-    msg = sprintf('[noISDF] timeforW = %.4f sec.\n', toc(startforW));
-    output.msg('v0s', '%s', msg);
+    msg = sprintf('noISDF timeforW = %.4f sec.\n', toc(startforW));
+    output.msg('v1s', '%s', msg);
 
     startSigma = tic;
     Esx_x = zeros(nband, nkibz);
@@ -500,10 +502,9 @@ function [Esx_x, Ecoh] = cohsex_multi_k(config)
         Ecoh(indib, 1) = Ecoh(indib, 1) + 0.5 * diag_term;
       end
     end
-    msg = sprintf('[noISDF] timeforEsx_xExEch = %.4f sec.\n', toc(startSigma));
-    output.msg('v0s', '%s', msg);
+    msg = sprintf('noISDF timeforEsx_xExEch = %.4f sec.\n', toc(startSigma));
+    output.msg('v1s', '%s', msg);
   end
 
-  % Esx_x = real(diag(Esx_x));
-  % Ecoh = real(diag(Ecoh));
+  output.msg('v0s', 'Finished. Total time: %.2f seconds.', toc(tStart));
 end

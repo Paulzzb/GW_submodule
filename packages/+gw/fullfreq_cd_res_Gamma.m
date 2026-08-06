@@ -9,7 +9,9 @@
 function sres = fullfreq_cd_res_Gamma(config)
 %GW_FULLFREQ_CD_RES_GAMMA  Residual term for double-(k,q) service path.
 
-cleanup = output.push('Fullfreq-CD-Residual-Gamma');
+cleanup = output.push('+gw/fullfreq_cd_res_Gamma.m'); %#ok<NASGU>
+output.msg('v0s', 'Start residual term (Gamma).');
+tStart = tic;
 
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
@@ -76,7 +78,8 @@ for ibe = (nv_ener + 1):n_ener
   end
 end
 
-nm_Womega_nm_list = gw.fullfreq_cd_core_Gamma(config, [nbmin, nbmax], [1, nsum], grid_real, pattern);
+nm_Womega_nm_list = gw.fullfreq_cd_core_Gamma( ...
+  config, [nbmin, nbmax], [1, nsum], grid_real, pattern, true);
 
 sres = zeros(n_ener, 1);
 
@@ -115,5 +118,7 @@ for ibe = (nv_ener + 1):n_ener
     end
   end
 end
+
+output.msg('v0s', 'Residual finished in %.2f seconds.', toc(tStart));
 
 end

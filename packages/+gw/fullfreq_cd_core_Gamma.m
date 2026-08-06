@@ -6,14 +6,18 @@
 %
 % Last modified: 2026/05/20 ZZ
 
-function nm_Womega_nm = fullfreq_cd_core_Gamma(config, n_start_end, m_start_end, omega_list, pattern)
+function nm_Womega_nm = fullfreq_cd_core_Gamma(config, n_start_end, m_start_end, omega_list, pattern, on_real_axis)
 %GW_FULLFREQ_CD_CORE_GAMMA  Single-(k,q) W matrix-element builder on service stack.
 %
-%   nm_Womega_nm = gw.fullfreq_cd_core_Gamma(config, [n1 n2], [m1 m2], omega_list, pattern)
+%   nm_Womega_nm = gw.fullfreq_cd_core_Gamma(config, [n1 n2], [m1 m2], ...
+%                                            omega_list, pattern, on_real_axis)
 %
+% on_real_axis: true  = real-axis grid (use broadening / non-Hermitian K)
+%               false = imaginary-axis grid (eta=0 / Hermitian K)
 % Computes <nm|W(q=Gamma;omega)|nm> for n in [n1,n2], m in [m1,m2], only
 % for entries enabled by pattern (Nn x Nm x Nw).
 
+cleanup = output.push('+gw/fullfreq_cd_core_Gamma.m');
 default_Constant = constant_map();
 nameConstants = fieldnames(default_Constant);
 for i = 1:numel(nameConstants)
@@ -45,6 +49,9 @@ if ~isequal(size(pattern), [Nn, Nm, Nw])
   output.err( ...
     'Pattern size must be [%d, %d, %d].', Nn, Nm, Nw);
 end
+if nargin < 6
+  output.err('on_real_axis (true=real, false=imag) is required.');
+end
 
 ev = double(system_data.Eo(:, 1, 1)) * ry2ev;
 focc = double(system_data.f(:, 1, 1));
@@ -74,143 +81,62 @@ if iqibz == 1
 end
 ng = numel(vcoul_q);
 Dcoul = spdiags(vcoul_q(:), 0, ng, ng);
-Dcoul = Dcoul * ry2ev;
 
 % ISDF branch (preliminary): use vc/nn slots from service +isdf pool.
-if isfield(config, 'ISDF') && isfield(config.ISDF, 'isisdf') && config.ISDF.isisdf
-  use_isdf = true;
-  [id_vc, ~, id_nn] = isdf.cohsex_resolve_ids(config);
+if config.ISDF.isisdf
+  [id_vc, ~, id_nn] = isdf.resolve_ids(config);
   if isempty(id_vc) || isempty(id_nn)
     msg = sprintf( ...
       ['config.ISDF.isisdf=true but vc/nn slots are not both available. ', ...
-       'Fallback to dense Gamma path.\n']);
-    output.warn('%s', msg);
-    use_isdf = false;
+       'Calculation of vc/nn is required for full-frequency CD.']);
+    output.err('%s', msg);
   end
 
-  if use_isdf
-    isdf.set_nrange(id_vc, config.SYSTEM);
-    isdf.set_nrange(id_nn, config.SYSTEM);
+  % isdf.set_nrange(id_vc, config.SYSTEM);
+  % isdf.set_nrange(id_nn, config.SYSTEM);
 
-    % Input key is lowercased by read_input_param -> verify_w_isdf
-    verify_W_isdf = false;
-    if isfield(config, 'FULLFREQ') && isfield(config.FULLFREQ, 'verify_w_isdf')
-      verify_W_isdf = logical(config.FULLFREQ.verify_w_isdf);
-    end
-    vc_data = isdf.get(id_vc);
+  nn_data = isdf.get(id_nn);
+  s2b_nn = nn_data.bundle_struct.sampling2bundle;
+  fac_nn = nn_data.CCHq_trunc_factors{double(1)};
+  s_ratio_nn = nn_data.svd_ratio;
 
-    nm_Womega_nm = zeros(Nn, Nm, Nw);
-    for ifreq = 1:Nw
-      omega = omega_list(ifreq);
-      % service/+isdf/gen_Kq currently uses energies in Ry.
-      omega_ry = omega / ry2ev;
-      Kq_ISDF = isdf.gen_Kq(id_vc, iqibz, omega_ry);
-      flagherm = abs(real(omega)) < 1e-5;
-      if ifreq == 1
-        flagherm = false;
-      end
-      if flagherm
-        Kq_ISDF = (Kq_ISDF + Kq_ISDF') / 2;
-      end
-      tildeWq_nn = isdf.gen_tildeWq(id_vc, iqibz, Kq_ISDF, id_nn, flagherm);
-
-      % Optional: dense G-space W vs ISDF reconstruction (same idea as gw.cohsex_multi_k).
-      % Uses Hartree/Ry Coulomb (no ry2ev on v) to match gen_Kq / gen_tildeWq. Only at ω≈0
-      % (Hermitian K) the static χ matches gen_Kq_Gamma; set &FULLFREQ verify_w_isdf = .true.
-      if verify_W_isdf && flagherm
-        nkbz = k_data.nbz;
-        ng_vc = size(vc_data.helperqG, 1);
-        if ng_vc ~= ng
-          msg = sprintf( ...
-            'helperqG row count (%d) ~= ng from vcoul (%d); skip W verify.\n', ng_vc, ng);
-          output.warn('%s', msg);
-        else
-          nrangev = double(vc_data.nrange1);
-          nrangec = double(vc_data.nrange2);
-          ev_ry = double(system_data.Eo);
-          spin_id = 1;
-          scal = 4.0;
-          chiq_G = zeros(ng, ng);
-          nrangev_row = reshape(nrangev, 1, []);
-          nrangec_row = reshape(nrangec, 1, []);
-          ncb = numel(nrangec_row);
-          for ikbz = 1:nkbz
-            ikibz_k = k_data.bz2ibz(ikbz);
-            ikrot_k = k_data.bz2rot(ikbz);
-            ikq_bz = r_lat_data.qindx_X(iqibz, ikbz, 1);
-            iGo_x = r_lat_data.qindx_X(iqibz, ikbz, 2);
-            ikq_ibz = k_data.bz2ibz(ikq_bz);
-            ikq_rot = k_data.bz2rot(ikq_bz);
-            f_c = double(system_data.f(nrangec_row, ikq_ibz, spin_id));
-            e_c = ev_ry(nrangec_row, ikq_ibz, spin_id);
-            for iv = nrangev_row
-              Mgvc_blk = zeros(ng, ncb);
-              for jc_id = 1:ncb
-                jc = nrangec_row(jc_id);
-                pchk = struct();
-                pchk.is = [iv, ikibz_k, ikrot_k, spin_id];
-                pchk.os = [jc, ikq_ibz, ikq_rot, spin_id];
-                pchk.qs = [iGo_x, iqibz, iqrot];
-                Mgvc_blk(:, jc_id) = double(SCATTER_Bamp(pchk));
-              end
-              f_v = double(system_data.f(iv, ikibz_k, spin_id));
-              e_v = ev_ry(iv, ikibz_k, spin_id);
-              occ = f_v - f_c;
-              
-                % den = e_v - e_c;
-              den = omega_ry - e_c - e_v;
-              valid = (abs(occ) >= 1e-8) & (abs(den) >= 1e-12);
-              if ~any(valid)
-                continue;
-              end
-              coeff = occ(valid) ./ den(valid);
-              Mgvc_valid = Mgvc_blk(:, valid);
-              Mgvc_weighted = Mgvc_valid .* reshape(coeff, 1, []);
-              chiq_G = chiq_G + scal * (Mgvc_weighted * Mgvc_valid');
-            end
-          end
-          inveps = eye(ng) - ( diag(vcoul_q) * chiq_G);
-          W_dense_solve = full(inveps \ diag(vcoul_q));
-          W_v = W_dense_solve - diag(vcoul_q);
-          helperqG_vc = double(vc_data.helperqG(:, :, iqibz));
-          K_use = double(Kq_ISDF);
-          W_isdf = -diag(vcoul_q) * helperqG_vc * (K_use \ eye(size(K_use))) * helperqG_vc' * diag(vcoul_q);
-          denom_solve = max(norm(W_v, 'fro'), eps);
-          diff_solve = norm(W_v - W_isdf, 'fro');
-          msg = sprintf(['[gw.fullfreq_cd_core_Gamma verifyW] ifreq=%d iqibz=%d ng=%d Nisdf_nn=%d\n' ...
-            '  ||W_dense-W_isdf||_F=%.6e (rel=%.6e)\n'], ...
-            ifreq, iqibz, ng, size(tildeWq_nn, 1), diff_solve, diff_solve / denom_solve);
-          output.msg('v2s', '%s', msg);
-        end
-      end
-
-      for n = nstart:nend
-        in = n - nstart + 1;
-        row_pattern = pattern(in, :, ifreq);
-        indm = find(row_pattern > 0);
-        if isempty(indm)
-          continue;
-        end
-        mlisttmp = mlist(indm);
-
-        rho_mat = zeros(size(tildeWq_nn, 1), numel(mlisttmp));
-        param = struct();
-        param.is = [n, 1, 1, 1];
-        param.qs = [iGo, iqibz, iqrot];
-        for im = 1:numel(mlisttmp)
-          m = mlisttmp(im);
-          param.os = [m, 1, 1, 1];
-          rho_mat(:, im) = isdf.get_rho_xalpha(id_nn, param);
-        end
-
-        Wrho = tildeWq_nn * rho_mat;
-        out_list = sum(conj(rho_mat) .* Wrho, 1).';
-        nm_Womega_nm(in, indm, ifreq) = out_list;
-      end
-    end
-    nm_Womega_nm = nm_Womega_nm * ry2ev;
-    return;
+  if on_real_axis
+    broadening_arg = config.FREQUENCY.broadening / ry2ev;  % eV
+    flagherm = false;
+  else
+    broadening_arg = [];  % eta = 0 in gen_Kq_Gamma
+    flagherm = true;
   end
+
+  nm_Womega_nm = zeros(Nn, Nm, Nw);
+  for ifreq = 1:Nw
+    omega = omega_list(ifreq);
+    % gen_Kq_Gamma uses energies in Ry.
+    omega_ry = omega / ry2ev;
+    Kq_ISDF = isdf.gen_Kq_Gamma(id_vc, iqibz, omega_ry, broadening_arg);
+    tildeWq_nn = isdf.gen_tildeWq_Gamma(id_vc, iqibz, Kq_ISDF, id_nn, flagherm);
+
+    for n = nstart:nend
+      in = n - nstart + 1;
+      row_pattern = pattern(in, :, ifreq);
+      indm = find(row_pattern > 0);
+      if isempty(indm)
+        continue;
+      end
+      mlisttmp = mlist(indm);
+
+      ispin = 1;
+      u_ib_xalpha = nn_data.bundle_struct.WF_bundle(s2b_nn, n, 1, ispin);
+      u_ob_xalpha = nn_data.bundle_struct.WF_bundle(s2b_nn, mlisttmp, 1, ispin);
+      rho_mat = conj(u_ib_xalpha) .* u_ob_xalpha;
+      rho_mat = diag(fac_nn.Lambda_trunc.^(s_ratio_nn-1)) * (fac_nn.V_trunc' * rho_mat);
+
+      Wrho = tildeWq_nn * rho_mat;
+      out_list = sum(conj(rho_mat) .* Wrho, 1).';
+      nm_Womega_nm(in, indm, ifreq) = out_list;
+    end
+  end
+  return;
 end
 
 Mvc_cache = cell(nv, 1);

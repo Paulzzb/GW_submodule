@@ -19,6 +19,10 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
   %   - ISDF slots desc 'vc' / 'vn' / 'nn' as required by exact_ch.
   %   - nqbz == 1; ispin = 1 (multi-spin not supported).
 
+    cleanup = output.push('+gw/cohsex_Gamma.m'); %#ok<NASGU>
+    output.msg('v0s', 'Start computing Esx_x / Ecoh (Gamma).');
+    tStart = tic;
+
     default_Constant = constant_map();
     nameConstants = fieldnames(default_Constant);
     for i = 1:numel(nameConstants)
@@ -48,9 +52,6 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
     dv = d_lat_data.DL_vol / double(fft_data.nr);
 
     ispin = 1;
-    msg = sprintf('Multi-spin is not supported yet.\n');
-    output.warn('%s', msg);
-  
     exact_CH = logical(config.COHSEX.exact_ch);
 
     if (exact_CH && ~config.ISDF.isisdf)
@@ -62,9 +63,9 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
     if (config.ISDF.isisdf)
       % ---- ISDF path: resolve COHSEX slot ids ----
       if exact_CH
-        [id_vc, id_vn, ~] = isdf.cohsex_resolve_ids(config);
+        [id_vc, id_vn, ~] = isdf.resolve_ids(config);
       else
-        [id_vc, id_vn, id_nn] = isdf.cohsex_resolve_ids(config);
+        [id_vc, id_vn, id_nn] = isdf.resolve_ids(config);
       end
 
       if isempty(id_vn) && isempty(id_vc)
@@ -224,8 +225,8 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
         chi_acc = chi_acc + scal * Mgvc * diag(eden) * Mgvc';
       end
       inveps = eye(ng) - Dcoul * chi_acc;
-      msg = sprintf('[noISDF] time for W = %.4f sec.\n', toc(startforW));
-      output.msg('v0s', '%s', msg);
+      msg = sprintf('noISDF time for W = %.4f sec.\n', toc(startforW));
+      output.msg('v1s', '%s', msg);
   
       startSigma = tic;
       Esx_x = zeros(nband, nkibz);
@@ -267,7 +268,9 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
           Ecoh(indib, 1) = Ecoh(indib, 1) + 0.5 * diag_term;
         end
       end
-      msg = sprintf('[noISDF] time for Esx_x / Ecoh = %.4f sec.\n', toc(startSigma));
-      output.msg('v0s', '%s', msg);
+      msg = sprintf('noISDF time for Esx_x / Ecoh = %.4f sec.\n', toc(startSigma));
+      output.msg('v1s', '%s', msg);
     end
+
+    output.msg('v0s', 'Finished. Total time: %.2f seconds.', toc(tStart));
 end
