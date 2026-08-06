@@ -52,7 +52,7 @@ function input_driver(inputfile)
     % Step 3: Set default values in 'config', error if there exists invalid values.
     config = set_default_param_value(config, data);
 
-    % Full-frequency (contour deformation): frequency grids for gw_fullfreq_cd_* / qp_cohsex.
+    % Full-frequency (contour deformation): frequency grids for gw.fullfreq_cd_* / qp.launcher.
     if config.FREQUENCY.frequency_dependence == 2
       config = generate_frequency(config);
     end
