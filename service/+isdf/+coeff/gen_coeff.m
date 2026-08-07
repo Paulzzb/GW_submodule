@@ -4,12 +4,19 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/08/05 ZZ
+% Last modified: 2026/08/07 ZZ
 
-function gen_coeff(cfg, id)
+function idx_mu = gen_coeff(cfg, id)
 % ISDF index-controller function.
-% This dispatcher selects an index-generation route and forwards control
-% to the corresponding implementation function.
+% This dispatcher selects an index-generation route and returns fine-grid
+% linear indices. Slot fill / bundle init is done by the caller via
+% isdf.rsymm.init_from_indices(id, idx_mu).
+%
+%   idx_mu = isdf.coeff.gen_coeff(cfg, id)
+%
+% Also writes interp_scheme on the ISDF slot (method metadata).
+% For method 'coarse', the legacy gen_coeff_coarse path still fills the slot
+% itself and this function returns empty indices.
 %
 % Default method for all types is 'pseudo'. Enum strings on cfg are assumed
 % normalized by set_default_param_value (trim + lowercase).
@@ -29,7 +36,7 @@ function gen_coeff(cfg, id)
     case 'nn'
       field = 'exxmethod_type3';
     otherwise
-      output.error('ISDF.gen_coeff: unknown ISDF index type: %s', desc);
+      output.err('ISDF.gen_coeff: unknown ISDF index type: %s', desc);
   end
   default_method = 'pseudo';
 
@@ -46,21 +53,34 @@ function gen_coeff(cfg, id)
 
   switch method
     case 'default'
-      isdf.coeff.gen_coeff_default(cfg, id);
+      idx_mu = isdf.coeff.gen_coeff_default(cfg, id);
+      scheme = "default";
 
     case 'qrcp'
-      isdf.coeff.gen_coeff_qrcp(cfg, id);
+      idx_mu = isdf.coeff.gen_coeff_qrcp(cfg, id);
+      scheme = "qrcp";
 
     case 'kmeans'
-      isdf.coeff.gen_coeff_kmeans(cfg, id);
+      idx_mu = isdf.coeff.gen_coeff_kmeans(cfg, id);
+      scheme = "kmeans";
 
     case 'coarse'
+      % Legacy path: fills the slot itself; no indices returned for
+      % init_from_indices. Not part of the indices-only +coeff redesign yet.
       isdf.coeff.gen_coeff_coarse(id);
+      idx_mu = int32([]);
+      return;
 
     case 'pseudo'
-      isdf.coeff.gen_coeff_pseudo(id);
+      idx_mu = isdf.coeff.gen_coeff_pseudo(id);
+      scheme = "pseudo";
 
     otherwise
-      error('ISDF.gen_coeff: unknown ISDF index method: %s', method);
+      output.err('ISDF.gen_coeff: unknown ISDF index method: %s', method);
   end
+
+  idx_mu = int32(idx_mu(:));
+  isdf_data = isdf.get(id);
+  isdf_data.interp_scheme = scheme;
+  isdf.save2mod(isdf_data, id);
 end

@@ -32,6 +32,17 @@ tests/**/*.mat
 tests/cases/**/qe.save/**
 !tests/cases/**/qe.save/README.md
 
+# example/: same policy for QE binaries; keep README placeholders.
+# Si_k ships a small (~1MB) qe.save for multi-k smoke; gamma/large GS stay local.
+example/**/SAVE/
+example/**/r-*.log
+example/**/l-*.log
+example/**/*.mat
+example/**/isdf_report/
+example/cases/**/qe.save/**
+!example/cases/**/qe.save/README.md
+!example/cases/Si_k/qe.save/**
+
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
 # !./GW/test/data/Si8/IntermediateFiles/molinfo.mat

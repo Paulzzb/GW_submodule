@@ -4,15 +4,15 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/08/04 ZZ
+% Last modified: 2026/08/06 ZZ
 
 function E = qp_driver(input_dir)
-%QP_DRIVER  Load SAVE config and run package COHSEX QP path.
+%QP_DRIVER  Restore SAVE services and run package QP path.
 %
 %   E = qp_driver(input_dir)
 %
-%   input_dir — directory containing config.mat (usually CASE/SAVE after
-%   input_driver). Delegates to qp_cohsex.
+%   input_dir — SAVE directory (config.mat, data.mat, relay_stage.mat).
+%   Reloads relay into memory (MATLAB-safe restart), then qp.launcher.
 
   if nargin < 1 || isempty(input_dir)
     error('qp_driver:input_dir', 'input_dir is required (e.g. ''./SAVE'').');
@@ -27,7 +27,24 @@ function E = qp_driver(input_dir)
   TEMP = load(fName, 'config');
   config = TEMP.config;
 
-  cleanup = output.push('qp_driver'); %#ok<NASGU>
+  stage_path = fullfile(input_dir, def.stage);
+  if exist(stage_path, 'file') ~= 2
+    error('qp_driver:stage', ...
+      'Missing %s. Run input_driver first.', stage_path);
+  end
+  fprintf('qp_driver: loading relay stage from %s\n', stage_path);
+  relay.stage_from_db(stage_path);
+  relay.restore();
+  if isfield(config, 'ISDF') && config.ISDF.isisdf
+    fData = fullfile(input_dir, def.data);
+    if exist(fData, 'file') ~= 2
+      error('qp_driver:data', 'Missing %s (needed to rebuild ISDF pool).', fData);
+    end
+    data = load(fData, 'data').data;
+    isdf.driver(data, config);
+  end
+
+  cleanup = output.push('qp_driver');
   output.showtag(true);
   if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'log_level')
     output.verbose(config.CONTROL.log_level);
@@ -39,9 +56,9 @@ function E = qp_driver(input_dir)
     output.set_logfile(config.CONTROL.log_file);
   end
 
-  output.msg('v0s', '%s', 'QP driver started (qp_cohsex)');
+  output.msg('v0s', '%s', 'QP driver started (qp.launcher)');
   t0 = tic;
-  E = qp_cohsex(config);
+  E = qp.launcher(config);
   output.msg('v0s', '%s', sprintf( ...
     'quasiparticle calculation finished. total time: %.2f seconds.', toc(t0)));
 end

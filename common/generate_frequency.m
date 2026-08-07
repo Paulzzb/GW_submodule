@@ -114,12 +114,10 @@ config.freqinfo.coeff_real_func = coeff_real_func;
 config.freqinfo.coeff_imag_func = coeff_imag_func;
 
 % Screen summary is printed by qp.summary(0); keep report-only here.
-msg = sprintf('Frequency grid generated with %d real and %d imaginary frequencies\n', ...
-              nrealfreq, nimagfreq);
-output.msg('v1r', '%s', msg);
-msg = sprintf('Method to generate real frequencies: %d\n', res_method);
-output.msg('v1r', '%s', msg);
-msg = sprintf('Method to generate imaginary frequencies: %d\n', int_method);
-output.msg('v1r', '%s', msg);
+% (Do not embed '\n' in the string — output.msg already terminates the line.)
+output.msg('nr', 'Frequency grid generated with %d real and %d imaginary frequencies', ...
+  nrealfreq, nimagfreq);
+output.msg('r', 'Method to generate real frequencies: %d', res_method);
+output.msg('r', 'Method to generate imaginary frequencies: %d', int_method);
 
 end % EOF

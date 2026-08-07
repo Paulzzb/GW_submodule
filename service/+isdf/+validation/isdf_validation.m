@@ -6,20 +6,16 @@
 %
 % Last modified: 2026/04/08
 
-function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
-% Run coarse ISDF energy validation for pool id (same physics as isdftest/isdf_coarse_validate_energies).
+function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id)
+% Run ISDF energy validation for pool id.
 %
-% Requires: isdf.coeff.gen_coeff_coarse(id) and isdf.gen_tildeVq(id) so that
-%   interp_scheme == "coarse", coeff_seper holds wf_on_coarse, tildeVq is filled.
+% Requires tildeVq filled (gen_tildeVq). HF text report goes to
+% filename_map().isdf_report_dir via isdf.report.hf.
 %
 % Optional id: omit to use isdf.isdf_current().
-% Optional outDir: directory for o-ISDF_HF_id<id> (default pwd).
 
   if nargin < 1 || isempty(id)
     id = isdf.isdf_current();
-  end
-  if nargin < 2
-    outDir = '';
   end
 
   isdf_data = isdf.get(id);
@@ -40,16 +36,6 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
   end
 
   Nisdf = isdf_data.nisdf;
-  % tildeVq = isdf_data.tildeVq;
-  % if ndims(tildeVq) > 3
-  %   tildeVq = tildeVq(:, :, :, 1);
-  % end
-  % tildeVq = squeeze(tildeVq);
-  % if ndims(tildeVq) ~= 3
-  %   error('isdf:isdf_validation:BadTildeVq', 'tildeVq must be 3-D (Nisdf x Nisdf x nibz) after squeeze.');
-  % end
-
-  wf_on_coarse = isdf_data.coeff_seper;
   R_rot_coarse = isdf_data.R_rot_coarse;
 
   if strcmp(interp_scheme, "coarse")
@@ -59,7 +45,6 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
     end
   end
 
-  % Phase must use the same R_sampling_RLU as gen_tildeVq (row-aligned with coeff_seper).
   R_sampling_RLU = isdf_data.R_sampling_RLU;
   if size(R_sampling_RLU, 1) ~= double(Nisdf)
     error('isdf:isdf_validation:BadRsampling', ...
@@ -67,7 +52,5 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id, outDir)
       size(R_sampling_RLU, 1), double(Nisdf));
   end
 
-  [Esum2, EsumISDF2, DiffEsum2] = isdf.validation.isdf_validate_HF(id, outDir);
-  % Text summary is written by isdf.report.hf (called inside isdf_validate_HF) to
-  %   <outDir or pwd>/o-ISDF_HF_id<id>.
+  [Esum2, EsumISDF2, DiffEsum2] = isdf.validation.isdf_validate_HF(id);
 end

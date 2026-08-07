@@ -8,26 +8,35 @@
 
 function service_driver(data, config)
   % A temporary driver to call service modules for testing and demonstration.
+  %
+  % Stage (relay_stage.mat) caches expensive data-derived modules:
+  %   system / symmetry / FFT / wave_functions (+ pair_symmetry / timing).
+  % Always rebuilt from the current config (and restored deps):
+  %   lattice / coulomb / ISDF.
 
   def = filename_map();
   storage_dir = config.CONTROL.storage_dir;
   stage_path = fullfile(storage_dir, def.stage);
 
+  isdf.debug.init_from_config(config);
+  parallel.driver(data, config);
+
   if isfile(stage_path)
     fprintf('service_driver: loading cached relay stage from %s\n', stage_path);
     relay.stage_from_db(stage_path);
     relay.restore();
+    output.msg('nrs', '----------- Services (relay cache) -----------');
+    output.msg('rs', ' Restored from %s', stage_path);
+    output.msg('r',  ' Cached: system / symmetry / FFT / wave_functions');
+    output.msg('r',  ' Rebuilt each run: lattice / coulomb / ISDF');
+
+    lattice.driver(data, config);
+    coulomb.driver(data, config);
     if config.ISDF.isisdf
-      % Relay only snapshots isdf.manager('get') (one current slot), not the full
-      % vc/vn/nn pool built by isdf.driver. Without rebuilding, qp.launcher cannot
-      % resolve ISDF ids after a cache hit.
       isdf.driver(data, config);
     end
     return
   end
-
-  isdf.debug.init_from_config(config);
-  parallel.driver(data, config);
 
   system.driver(data, config);
   symmetry.driver(data, config);

@@ -65,4 +65,9 @@ function driver(data, config)
 
   % put into persistent variable
   symmetry.save2mod(symm_data);
+
+  % Report (r-*): owned by this driver
+  output.msg('nrs', '----------- Symmetry -----------');
+  output.msg('r', ' nsym / nrot / t_rev     :  %d / %d / %d', ...
+    int32(symm_data.nsym), int32(symm_data.nrot), int32(symm_data.is_t_rev));
 end

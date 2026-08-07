@@ -17,6 +17,9 @@ function init(varargin)
 %     log      - path to log file
 %     verbose  - 0 quiet / 1 normal / 2 debug (default unchanged if omitted)
 %     screen   - logical, write to stdout (default true)
+%
+%   Relative paths are resolved against pwd and stored absolute so later
+%   cd() / ensure_init comparisons stay unambiguous.
 
   p = inputParser;
   addParameter(p, 'report', '', @(x) ischar(x) || isstring(x));
@@ -51,8 +54,8 @@ function init(varargin)
   end
   s.write_to_screen = logical(p.Results.screen);
 
-  report_path = char(string(p.Results.report));
-  log_path = char(string(p.Results.log));
+  report_path = abspath_(p.Results.report);
+  log_path = abspath_(p.Results.log);
 
   if ~isempty(report_path)
     local_ensure_parent(report_path);
@@ -90,6 +93,7 @@ function init(varargin)
   s.sec_tics = {};
   state_('set', s);
 end
+
 
 function local_ensure_parent(path)
   d = fileparts(path);

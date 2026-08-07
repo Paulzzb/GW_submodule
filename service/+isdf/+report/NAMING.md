@@ -7,11 +7,16 @@
 
 ## 1. 产物一览
 
-| 产物 | 磁盘名 | 写手 | 通道 |
-|------|--------|------|------|
-| HF 校验报告 | `o-ISDF_HF_id%d` | `isdf.report.hf` | `output.open` + `filename_map` |
-| Adaptive phase-1 | `o-ISDF_adaptive_id%d` | `isdf.report.adaptive` | `output.open` + `filename_map` |
-| 数值条件诊断 | `o-ISDF_cond` | `isdf.report.cond` | `output.open` + `filename_map` |
+| 产物 | 磁盘路径 | 写手 | 通道 |
+|------|----------|------|------|
+| HF 校验报告 | `isdf_report/o-ISDF_HF_id%d` | `isdf.report.hf` | `output.open` + `filename_map` |
+| Adaptive phase-1 | `isdf_report/o-ISDF_adaptive_id%d` | `isdf.report.adaptive` | `output.open` + `filename_map` |
+| 数值条件诊断 | `isdf_report/o-ISDF_cond` | `isdf.report.cond` | `output.open` + `filename_map` |
+| ISDF run 摘要 | `r-<prefix>.log` | `run_summary` | `output.msg('r'/'rs')` |
+
+System / Symmetry / FFT / Lattice / Wave functions 各段由对应 `*.driver` 结束时写入 `r-*`（不在 `+isdf/+report`）。
+
+目录名固定为 `filename_map().isdf_report_dir`（`isdf_report`）；`isdf.driver` 入口若不存在则 `mkdir`。
 | Coarse grid 摘要 | （无文件） | `+coeff/print_coarse_grid_report` | `fprintf` 屏幕 |
 | Adaptive 填表 | （无文件） | `isdf.report.fill_adaptive` | 填 struct，供 adaptive writer 使用 |
 
@@ -58,29 +63,31 @@
 
 ## 4. `output.open` 逻辑名
 
-逻辑名与磁盘 basename 分开，用稳定短名：
+逻辑名与磁盘 basename **相同**，一律取自 `filename_map` 的值（不再另写短名）：
 
-| 逻辑名（`how`） | 磁盘 |
-|-----------------|------|
+| `filename_map` 键 | 磁盘 / OF 名 |
+|-------------------|--------------|
 | `cond_report` | `o-ISDF_cond` |
-| `hf_report` | `o-ISDF_HF_id%d` |
-| `adaptive_report` | `o-ISDF_adaptive_id%d` |
+| `hf_report` | `o-ISDF_HF_id%d`（`sprintf` 后） |
+| `adaptive_report` | `o-ISDF_adaptive_id%d`（`sprintf` 后） |
 
 示例：
 
 ```matlab
 def = filename_map();
-output.open('cond_report', fullfile(pwd, def.cond_report), 'w');
-output.msg('o cond_report', '...');
+of = def.cond_report;
+output.open(of, fullfile(def.isdf_report_dir, of), 'w');
+output.msg(['o ' of], '...');
 ```
 
 带 id 的产物：
 
 ```matlab
 def = filename_map();
-fpath = fullfile(outDir, sprintf(def.hf_report, id));
-output.open('hf_report', fpath, 'w');
-output.msg('o hf_report', '...');
+of = sprintf(def.hf_report, id);
+fpath = fullfile(def.isdf_report_dir, of);
+output.open(of, fpath, 'w');
+output.msg(['o ' of], '...');
 ```
 
 ---
@@ -92,6 +99,7 @@ output.msg('o hf_report', '...');
 ```
 service/+isdf/+report/
   NAMING.md
+  run_summary.m
   hf.m
   cond.m
   adaptive.m
@@ -100,6 +108,7 @@ service/+isdf/+report/
 
 | 调用入口 | 说明 |
 |----------|------|
+| `isdf.report.run_summary` | 主 log ISDF run summary |
 | `isdf.report.hf` | HF 校验报告 |
 | `isdf.report.cond` | 数值条件诊断 |
 | `isdf.report.adaptive` | Adaptive phase-1 报告 |
@@ -113,6 +122,7 @@ service/+isdf/+report/
 ## 6. `filename_map` 条目
 
 ```matlab
+def.isdf_report_dir = 'isdf_report';
 def.cond_report = 'o-ISDF_cond';
 def.hf_report = 'o-ISDF_HF_id%d';
 def.adaptive_report = 'o-ISDF_adaptive_id%d';

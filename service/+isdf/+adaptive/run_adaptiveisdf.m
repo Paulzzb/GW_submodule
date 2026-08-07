@@ -85,7 +85,10 @@ function run_adaptiveisdf(type, output_dir)
     isdf.save2mod(slot_data, id_slot);
   end
 
-  isdf.coeff.gen_coeff(cfg, id_slot);
+  idx_mu = isdf.coeff.gen_coeff(cfg, id_slot);
+  if ~isempty(idx_mu)
+    isdf.rsymm.init_from_indices(id_slot, idx_mu);
+  end
   isdf.coeff.print_coarse_grid_report(id_slot);
 
   L = isdf.manager('list');
@@ -108,26 +111,32 @@ function run_adaptiveisdf(type, output_dir)
   cd(output_dir);
   isdf.adaptive.launcher(id_slot, cfg);
 
-  rep_hf = dir(fullfile(output_dir, 'o-ISDF_HF_id*'));
+  def = filename_map();
+  report_dir = fullfile(output_dir, def.isdf_report_dir);
+  if ~isfolder(report_dir)
+    report_dir = output_dir;
+  end
+  hf_glob = strrep(def.hf_report, '%d', '*');
+  rep_hf = dir(fullfile(report_dir, hf_glob));
   if isempty(rep_hf)
     warning('run_adaptiveisdf:noHFReport', ...
-      'No o-ISDF_HF_id* in output_dir=%s. Check adaptiveisdf / isdf_validation errors.', ...
-      output_dir);
+      'No %s in %s. Check adaptiveisdf / isdf_validation errors.', ...
+      hf_glob, report_dir);
   else
-    fprintf('run_adaptiveisdf: HF report(s) in output_dir:\n');
+    fprintf('run_adaptiveisdf: HF report(s):\n');
     for ri = 1:numel(rep_hf)
-      fprintf('  %s\n', fullfile(output_dir, rep_hf(ri).name));
+      fprintf('  %s\n', fullfile(report_dir, rep_hf(ri).name));
     end
   end
 
-  def = filename_map();
-  rep_ad = dir(fullfile(output_dir, sprintf(def.adaptive_report, id_slot)));
+  ad_name = sprintf(def.adaptive_report, id_slot);
+  rep_ad = dir(fullfile(report_dir, ad_name));
   if isempty(rep_ad)
     warning('run_adaptiveisdf:noAdaptiveReport', ...
-      'Expected o-ISDF_adaptive_id%d in output_dir=%s.', id_slot, output_dir);
+      'Expected %s in %s.', ad_name, report_dir);
   else
     fprintf('run_adaptiveisdf: adaptiveisdf phase-1 report:\n');
-    fprintf('  %s\n', fullfile(output_dir, rep_ad(1).name));
+    fprintf('  %s\n', fullfile(report_dir, rep_ad(1).name));
   end
 
   fprintf('run_adaptiveisdf: OK (type=%s, coarse id=%d, profile_dir=%s)\n', ...

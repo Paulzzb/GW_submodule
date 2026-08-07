@@ -4,14 +4,19 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/05/23
+% Last modified: 2026/08/07 ZZ
 
-function gen_coeff_pseudo(id)
+function idx_mu = gen_coeff_pseudo(id)
 % ISDF pseudo index initializer:
 %   select one seed by maximal adaptive weight on the full fine grid, then
 %   take the whole symmetry orbit of that seed as the pseudo initial set.
 %   Orbits with CCH condition number >= 1e+10 are rejected; the next-largest
 %   seed outside rejected orbits is tried until a well-conditioned set is found.
+%
+%   idx_mu = isdf.coeff.gen_coeff_pseudo(id)
+%
+% Returns fine-grid linear indices only. Caller fills the ISDF slot via
+% isdf.rsymm.init_from_indices(id, idx_mu).
 
   fft_data = FFT.get();
   wf_data = wave_functions.get();
@@ -19,14 +24,15 @@ function gen_coeff_pseudo(id)
   isdf_data = isdf.get(id);
 
   if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
-    error('isdf:gen_coeff_pseudo:nrange', ...
-      'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', int32(id));
+    output.err( ...
+      'Missing cached nrange in ISDF id=%d. Build it first via isdf.set_nrange(id, config.SYSTEM).', ...
+      int32(id));
   end
 
   nrange1 = double(isdf_data.nrange1(:).');
   nrange2 = double(isdf_data.nrange2(:).');
   if isempty(nrange1) || isempty(nrange2)
-    error('isdf:gen_coeff_pseudo:nrange', 'nrange1/nrange2 must be non-empty.');
+    output.err('nrange1/nrange2 must be non-empty.');
   end
 
   k_data = lattice.manager('k', 'get');
@@ -68,7 +74,7 @@ function gen_coeff_pseudo(id)
     w_pick(excluded_mask(1:Nw)) = -inf;
     [~, seed_idx] = max(w_pick);
     if ~isfinite(w_pick(seed_idx)) || w_pick(seed_idx) < 0
-      error('isdf:gen_coeff_pseudo:NoValidOrbit', ...
+      output.err( ...
         'No pseudo orbit with CCH condition number below %.1e.', max_cch_cond);
     end
 
@@ -79,64 +85,18 @@ function gen_coeff_pseudo(id)
     end
 
     excluded_mask(orbit_mask) = true;
-    fprintf(2, ...
-      'gen_coeff_pseudo: reject seed %d (orbit size %d, CCH cond >= %.1e).\n', ...
+    output.warn( ...
+      'gen_coeff_pseudo: reject seed %d (orbit size %d, CCH cond >= %.1e).', ...
       seed_idx, numel(orbit_idx), max_cch_cond);
   end
 
-  Nmu = int32(numel(orbit_idx));
-  if Nmu < 1
-    error('isdf:gen_coeff_pseudo:EmptyOrbit', 'Pseudo orbit is empty for seed index %d.', seed_idx);
+  if numel(orbit_idx) < 1
+    output.err('Pseudo orbit is empty for seed index %d.', seed_idx);
   end
 
-  R_coarse_RLU = double(fft_data.Rgrid_RLU(orbit_idx, :));
-  wf_on_coarse = wf_data.c(orbit_idx, :, :, :);
-
-  lin2loc = zeros(double(fft_data.nr), 1, 'int32');
-  lin2loc(double(orbit_idx)) = int32(1:double(Nmu));
-  R_rot_coarse = zeros(double(Nmu), symm_data.nsym, 'int32');
-  for isym = 1:symm_data.nsym
-    M2 = symm_data.rot_mtrx_RLU_R(:, :, isym);
-    M2_r_RLU = (R_coarse_RLU * M2);
-    if norm(M2_r_RLU - round(M2_r_RLU)) > double(1e-4)
-      error('isdf:gen_coeff_pseudo:NonIntegerMap', ...
-        'Non-integer mapping under rotation; check rot_mtrx_RLU_R and fftgrid.');
-    end
-    M2_r_RLU = round(M2_r_RLU);
-    iv_mod = int32(mod(M2_r_RLU + gc_s, gc_s));
-    dm = double(iv_mod);
-    g1 = gc_s(1);
-    g12 = gc_s(1) * gc_s(2);
-    rot_lin = int32(round(1 + dm(:, 1) + dm(:, 2) * g1 + dm(:, 3) * g12));
-    rot_loc = lin2loc(double(rot_lin));
-    if any(rot_loc <= 0)
-      error('isdf:gen_coeff_pseudo:OrbitNotClosed', ...
-        'Pseudo orbit is not closed under symmetry isym=%d.', isym);
-    end
-    R_rot_coarse(:, isym) = rot_loc;
-  end
-
-  isdf_data.nisdf = Nmu;
-  isdf_data.N_coarse = Nmu;
-  isdf_data.N_extra = int32(0);
-  isdf_data.coeff_seper = wf_on_coarse;
-  isdf_data.fftgrid_c = int32(fft_data.fftgrid(:).');
-  isdf_data.R_sampling_RLU = R_coarse_RLU;
-  isdf_data.interp_scheme = "pseudo";
-  isdf_data.R_rot_coarse = R_rot_coarse;
-
-  bundle_struct = struct();
-  bundle_struct.N_bundle = isdf_data.N_coarse;
-  bundle_struct.N_coarse = isdf_data.N_coarse;
-  bundle_struct.N_sampling = isdf_data.N_coarse;
-  bundle_struct.R_grid_bundle = R_coarse_RLU;
-  bundle_struct.R_rot_in_bundle = R_rot_coarse;
-  bundle_struct.WF_bundle = wf_on_coarse;
-  bundle_struct.sampling2bundle = int32((1:double(isdf_data.N_coarse)).');
-  bundle_struct.fine_grid_lin = orbit_idx;
-  isdf_data.bundle_struct = bundle_struct;
-
-  isdf.save2mod(isdf_data, id);
+  idx_mu = int32(orbit_idx(:));
+  output.msg('rs', 'gen_coeff_pseudo: id=%d  seed=%d  Nmu=%d', ...
+    int32(id), seed_idx, int32(numel(idx_mu)));
 end
 
 function orbit_mask = local_build_symmetry_orbit(seed_idx, fft_data, symm_data, gc_s)
@@ -150,7 +110,7 @@ function orbit_mask = local_build_symmetry_orbit(seed_idx, fft_data, symm_data, 
       R_frontier = double(fft_data.Rgrid_RLU(frontier, :));
       M2_r_RLU = (R_frontier * M2);
       if norm(M2_r_RLU - round(M2_r_RLU)) > double(1e-4)
-        error('isdf:gen_coeff_pseudo:NonIntegerMap', ...
+        output.err( ...
           'Non-integer mapping under rotation; check rot_mtrx_RLU_R and fftgrid.');
       end
       M2_r_RLU = round(M2_r_RLU);

@@ -75,4 +75,13 @@ function driver(data, config)
   %
   lattice.manager('k', 'save2mod', k);
   lattice.manager('q', 'save2mod', q);
+
+  % Report (r-*): owned by this driver
+  a = double(d_lat_m.a1a2a3);
+  output.msg('nrs', '----------- Lattice -----------');
+  output.msg('r', ' Lattice a1 (Bohr)       :  %12.6f %12.6f %12.6f', a(1, 1), a(2, 1), a(3, 1));
+  output.msg('r', ' Lattice a2 (Bohr)       :  %12.6f %12.6f %12.6f', a(1, 2), a(2, 2), a(3, 2));
+  output.msg('r', ' Lattice a3 (Bohr)       :  %12.6f %12.6f %12.6f', a(1, 3), a(2, 3), a(3, 3));
+  output.msg('r', ' Cell volume (Bohr^3)   :  %.6f', double(d_lat_m.DL_vol));
+  output.msg('r', ' k-points nibz / nbz    :  %d / %d', int32(k.nibz), int32(k.nbz));
 end

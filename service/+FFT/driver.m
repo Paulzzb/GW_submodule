@@ -83,5 +83,10 @@ function driver(data, config)
 
   % Save FFT object to manager cache
   FFT.save2mod(fft_m);
-  
+
+  % Report (r-*): owned by this driver
+  g = double(fft_m.fftgrid(:).');
+  output.msg('nrs', '----------- FFT -----------');
+  output.msg('r', ' FFT grid / Nr           :  [%d %d %d] / %d', ...
+    int32(g(1)), int32(g(2)), int32(g(3)), int32(fft_m.nr));
 end

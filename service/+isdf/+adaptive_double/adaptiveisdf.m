@@ -46,8 +46,10 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   ratio = params.candidate_ratio;
   adaptive_backend = 'adaptive_double';
   adaptive_arithmetic = 'double';
-  isdf.adaptive.adaptiveisdf_print_run_config(id, isdf_data, params, threshold, num_add, ratio, ...
-    adaptive_backend, adaptive_arithmetic);
+  output.msg('nrs', '[Adaptive ISDF] start  desc=%s  id=%d  backend=%s', ...
+    char(string(isdf_data.desc)), int32(id), adaptive_backend);
+  output.msg('rs', '  Nisdf=%d  thr=%.3e  num_add=%d  cand_ratio=%.2f', ...
+    int32(isdf_data.nisdf), threshold, int32(num_add), ratio);
   isdf.adaptive_double.adaptive_weight('set_batch_size', params.weight_batch_size);
   
   if isempty(isdf_data.nrange1) || isempty(isdf_data.nrange2)
@@ -353,10 +355,12 @@ function idnew = adaptiveisdf(id, cfg_isdf)
   report.relative_loss_history = rel_loss_history(1:n_iter+1);
   report.schur_skips = n_schur_skip;
   report = isdf.report.fill_adaptive(report, id, idnew, params);
+  report.adaptive_isdf_id = int32(idnew);
 
   elapsed_phase1 = toc(t_phase1);
   report.elapsed_phase1_seconds = elapsed_phase1;
   fpath_r = isdf.report.adaptive(report);
+  isdf.report.run_summary('adaptive', report);
 
   output.msg('nrs', '[Adaptive ISDF] desc=%s  id=%d  backend=%s', ...
     char(string(isdf_data.desc)), int32(id), adaptive_backend);

@@ -50,4 +50,9 @@ function driver(data, config)
   end
 
   wave_functions.save2mod(wf_data);
+
+  % Report (r-*): owned by this driver
+  output.msg('nrs', '----------- Wave functions -----------');
+  output.msg('r', ' Real-space size / bands :  nc=%d  nb=%d  nk=%d  nspin=%d', ...
+    int32(wf_data.nc), int32(wf_data.nb), int32(wf_data.nk), int32(wf_data.nspin));
 end

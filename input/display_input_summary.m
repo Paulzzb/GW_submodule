@@ -12,7 +12,24 @@ function display_input_summary(config)
 %   Screen (<=5 lines): key CONTROL / ISDF / FREQUENCY fields.
 %   Report: complete parameter dump (former fprintf body).
 
-  local_ensure_report(config);
+  % Open r-<prefix>.log next to the job (output_dir), never inside SAVE.
+  prefix = 'QP';
+  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'prefix') ...
+      && ~isempty(config.CONTROL.prefix)
+    prefix = char(string(config.CONTROL.prefix));
+  end
+  out_dir = '.';
+  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'output_dir') ...
+      && ~isempty(config.CONTROL.output_dir)
+    out_dir = char(string(config.CONTROL.output_dir));
+  end
+  verb = 1;
+  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'log_level') ...
+      && ~isempty(config.CONTROL.log_level)
+    verb = config.CONTROL.log_level;
+  end
+  report_path = fullfile(out_dir, sprintf('r-%s.log', prefix));
+  output.ensure_init('report', report_path, 'verbose', verb);
 
   % ---- screen digest (s only; full detail goes to report) ----
   gs_type = char(string(config.CONTROL.groundstate_type));
@@ -23,7 +40,8 @@ function display_input_summary(config)
   output.msg('s',  ' Storage Dir : %s', stor);
   output.msg('s',  ' ISDF / freq : enabled=%d  freq=%d', ...
     config.ISDF.isisdf,  config.FREQUENCY.frequency_dependence);
-  output.msg('s',  ' (full summary in report file)');
+  % ensure_init stores an absolute path; show that so cwd mistakes are obvious.
+  output.msg('s',  ' Report file : %s', output.get_report_path());
 
   % ---- full report ----
   output.msg('nr', '========== GW Input Summary ==========');
@@ -133,28 +151,4 @@ function display_input_summary(config)
   end
 
   output.msg('r', '====================================');
-end
-
-function local_ensure_report(config)
-  prefix = 'QP';
-  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'prefix') ...
-      && ~isempty(config.CONTROL.prefix)
-    prefix = char(string(config.CONTROL.prefix));
-  end
-
-  % Small text logs live next to the job (output_dir), never inside SAVE/storage_dir.
-  out_dir = '.';
-  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'output_dir') ...
-      && ~isempty(config.CONTROL.output_dir)
-    out_dir = char(string(config.CONTROL.output_dir));
-  end
-
-  verb = 1;
-  if isfield(config, 'CONTROL') && isfield(config.CONTROL, 'log_level') ...
-      && ~isempty(config.CONTROL.log_level)
-    verb = config.CONTROL.log_level;
-  end
-
-  report_path = fullfile(out_dir, sprintf('r-%s.log', prefix));
-  output.ensure_init('report', report_path, 'verbose', verb);
 end

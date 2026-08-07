@@ -67,9 +67,20 @@ function driver(data, config)
   system_data.allocated = true;
   system.save2mod(system_data);
 
-
   system.degeneracy_detect();
 
+  % Report (r-*): owned by this driver
+  output.msg('nrs', '----------- System -----------');
+  output.msg('r', ' Bands / spins / k(ibz)  :  nb=%d  nspin=%d  nk=%d', ...
+    int32(nb), int32(nspin), int32(nk));
+  output.msg('r', ' QP type                 :  %s', char(string(system_data.qptype)));
+  if isstruct(config) && isfield(config, 'SYSTEM')
+    sys = config.SYSTEM;
+    if isfield(sys, 'energy_band_index_min') && isfield(sys, 'energy_band_index_max')
+      output.msg('r', ' QP band window          :  ib=%d .. %d', ...
+        int32(sys.energy_band_index_min), int32(sys.energy_band_index_max));
+    end
+  end
 end
 
 function Vxc = local_vxc_from_groundstate(config, eo_size)

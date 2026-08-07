@@ -6,24 +6,14 @@
 %
 % Last modified: 2026/04/08
 
-function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
+function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id)
 % ISDF_COARSE_VALIDATE_ENERGIES  Compare direct Coulomb exchange-style energy vs ISDF tildeVq contraction.
 %
-% Text report (band summary, preview, stats, global sums) is written by isdf.report.hf to
-%   <outDir>/o-ISDF_HF_id<id> (see +report/NAMING.md).
+% Text report is written by isdf.report.hf under filename_map().isdf_report_dir
+% (see +report/NAMING.md).
 % A one-line message with the absolute path is printed to the command window after a successful write.
 %
-% Mirrors the accumulation loops in gen_indices_coarse_test (SCATTER_Bamp vs c_rho' * tildeVq * c_rho).
-% Optional trailing args:
-%   One matrix R_sampling_RLU (Nwf x 3): same phase as gen_tildeVq, row-aligned with wf_on_coarse.
-%   Or {R_coarse_RLU, fftgrid_i, fftgrid_c}: integer coarse box scaled by fftgrid_i./fftgrid_c (isdftest path).
-%
 % Progress and elapsed / estimated total time use timing.LIVE_timing (CPU time via timing.timing_string).
-% tildeVq, wf_on_coarse, R_rot_coarse, varargin
-
-  if nargin < 2
-    outDir = '';
-  end
 
   wf_data = wave_functions.get();
   k_data = lattice.manager('k', 'get');
@@ -213,62 +203,68 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
   [ib_mn_hf, ik_mn_hf, is_mn_hf] = ind2sub([double(nb), double(nibz), double(nspin)], lin_mn_hf);
   [ib_mn_isdf, ik_mn_isdf, is_mn_isdf] = ind2sub([double(nb), double(nibz), double(nspin)], lin_mn_isdf);
 
-  % Band-resolved summary: keep the table rows short so disp(table) aligns in the command window.
-  row_label = strings(0, 1);
-  row_result = strings(0, 1);
-  row_label(end + 1, 1) = "sum(E_HF)";
-  row_result(end + 1, 1) = string(sprintf('%.8e', sum_E_HF));
-  row_label(end + 1, 1) = "sum(E_HF_ISDF)";
-  row_result(end + 1, 1) = string(sprintf('%.8e', sum_E_ISDF));
-  row_label(end + 1, 1) = "sum(E_HF) - sum(E_HF_ISDF)";
-  row_result(end + 1, 1) = string(sprintf('%.8e', sum_E_HF - sum_E_ISDF));
-  row_label(end + 1, 1) = "mean(E_HF) (over nb*nibz*nspin cells)";
-  row_result(end+1, 1) = string(sprintf('%.8e', mean_E_HF));
-  row_label(end+1, 1) = "mean(E_HF_ISDF) (over nb*nibz*nspin cells)";
-  row_result(end+1, 1) = string(sprintf('%.8e', mean_E_ISDF));
-  row_label(end+1, 1) = "sum(|E_HF - E_HF_ISDF|)";
-  row_result(end+1, 1) = string(sprintf('%.8e', sum_abs_diff_E));
-  row_label(end+1, 1) = "max(|E_HF - E_HF_ISDF|)";
-  row_result(end+1, 1) = string(sprintf('%.8e', max_abs_diff_E));
-  row_label(end+1, 1) = "||vec(E_HF - E_HF_ISDF)||_2";
-  row_result(end+1, 1) = string(sprintf('%.8e', frob_diff));
-  row_label(end+1, 1) = "||vec(E_HF - E_HF_ISDF)||_2 / ||vec(E_HF)||_2";
-  row_result(end+1, 1) = string(sprintf('%.8e', frob_diff / max(frob_hf, eps('double'))));
-  row_label(end+1, 1) = "E_HF minimum";
-  row_result(end+1, 1) = string(sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', min_E_HF, ib_mn_hf, ik_mn_hf, is_mn_hf));
-  row_label(end+1, 1) = "E_HF maximum";
-  row_result(end+1, 1) = string(sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', max_E_HF, ib_mx_hf, ik_mx_hf, is_mx_hf));
-  row_label(end+1, 1) = "E_HF_ISDF minimum";
-  row_result(end+1, 1) = string(sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', min_E_ISDF, ib_mn_isdf, ik_mn_isdf, is_mn_isdf));
-  row_label(end+1, 1) = "E_HF_ISDF maximum";
-  row_result(end+1, 1) = string(sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', max_E_ISDF, ib_mx_isdf, ik_mx_isdf, is_mx_isdf));
+  % Band summary as plain label/value cell columns (no table).
+  band_items = {};
+  band_vals = {};
+  band_items{end + 1} = 'sum(E_HF)'; %#ok<AGROW>
+  band_vals{end + 1} = sprintf('%.8e', sum_E_HF); %#ok<AGROW>
+  band_items{end + 1} = 'sum(E_HF_ISDF)';
+  band_vals{end + 1} = sprintf('%.8e', sum_E_ISDF);
+  band_items{end + 1} = 'sum(E_HF) - sum(E_HF_ISDF)';
+  band_vals{end + 1} = sprintf('%.8e', sum_E_HF - sum_E_ISDF);
+  band_items{end + 1} = 'mean(E_HF) (over nb*nibz*nspin cells)';
+  band_vals{end + 1} = sprintf('%.8e', mean_E_HF);
+  band_items{end + 1} = 'mean(E_HF_ISDF) (over nb*nibz*nspin cells)';
+  band_vals{end + 1} = sprintf('%.8e', mean_E_ISDF);
+  band_items{end + 1} = 'sum(|E_HF - E_HF_ISDF|)';
+  band_vals{end + 1} = sprintf('%.8e', sum_abs_diff_E);
+  band_items{end + 1} = 'max(|E_HF - E_HF_ISDF|)';
+  band_vals{end + 1} = sprintf('%.8e', max_abs_diff_E);
+  band_items{end + 1} = '||vec(E_HF - E_HF_ISDF)||_2';
+  band_vals{end + 1} = sprintf('%.8e', frob_diff);
+  band_items{end + 1} = '||vec(E_HF - E_HF_ISDF)||_2 / ||vec(E_HF)||_2';
+  band_vals{end + 1} = sprintf('%.8e', frob_diff / max(frob_hf, eps('double')));
+  band_items{end + 1} = 'E_HF minimum';
+  band_vals{end + 1} = sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', ...
+    min_E_HF, ib_mn_hf, ik_mn_hf, is_mn_hf);
+  band_items{end + 1} = 'E_HF maximum';
+  band_vals{end + 1} = sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', ...
+    max_E_HF, ib_mx_hf, ik_mx_hf, is_mx_hf);
+  band_items{end + 1} = 'E_HF_ISDF minimum';
+  band_vals{end + 1} = sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', ...
+    min_E_ISDF, ib_mn_isdf, ik_mn_isdf, is_mn_isdf);
+  band_items{end + 1} = 'E_HF_ISDF maximum';
+  band_vals{end + 1} = sprintf('%.8e at (ib=%d, ik=%d, ispin=%d)', ...
+    max_E_ISDF, ib_mx_isdf, ik_mx_isdf, is_mx_isdf);
   if nspin > 1
     for is = 1:double(nspin)
       s_hf = sum(sum(E_HF(:, :, is)));
       s_is = sum(sum(E_HF_ISDF(:, :, is)));
       s_ad = sum(sum(abs(E_HF(:, :, is) - E_HF_ISDF(:, :, is))));
-      row_label(end+1, 1) = string(sprintf('ispin=%d: sum(E_HF)', is));
-      row_result(end+1, 1) = string(sprintf('%.8e', s_hf));
-      row_label(end+1, 1) = string(sprintf('ispin=%d: sum(E_HF_ISDF)', is));
-      row_result(end+1, 1) = string(sprintf('%.8e', s_is));
-      row_label(end+1, 1) = string(sprintf('ispin=%d: sum(|E_HF - E_HF_ISDF|)', is));
-      row_result(end+1, 1) = string(sprintf('%.8e', s_ad));
+      band_items{end + 1} = sprintf('ispin=%d: sum(E_HF)', is); %#ok<AGROW>
+      band_vals{end + 1} = sprintf('%.8e', s_hf); %#ok<AGROW>
+      band_items{end + 1} = sprintf('ispin=%d: sum(E_HF_ISDF)', is);
+      band_vals{end + 1} = sprintf('%.8e', s_is);
+      band_items{end + 1} = sprintf('ispin=%d: sum(|E_HF - E_HF_ISDF|)', is);
+      band_vals{end + 1} = sprintf('%.8e', s_ad);
     end
   end
-  band_summary_tbl = table(row_label, row_result, 'VariableNames', {'Item', 'Result'});
 
   n_rel_samples = st_RelSigned.n;
 
-  vars = {'Ex_t', 'Ex_ISDF', 'Diff', 'AbsDiff', 'Diff_over_abs_Ex_t', 'AbsDiff_over_abs_Ex_t'};
+  stats_vars = {'Ex_t', 'Ex_ISDF', 'Diff', 'AbsDiff', 'Diff_over_abs_Ex_t', 'AbsDiff_over_abs_Ex_t'};
   streams = {st_Ex_t, st_Ex_ISDF, st_Diff, st_AbsDiff, st_RelSigned, st_RelAbs};
-  stat_names = {'Mean'; 'Std'; 'Var'; 'Max'};
-  M = zeros(4, numel(vars));
-  for j = 1:numel(vars)
-    [M(1, j), M(2, j), M(3, j), M(4, j)] = isdf_validate_HF_stream_finalize(streams{j});
+  stats_rows = {'Mean', 'Std', 'Var', 'Max'};
+  stats_M = zeros(4, numel(stats_vars));
+  for j = 1:numel(stats_vars)
+    [stats_M(1, j), stats_M(2, j), stats_M(3, j), stats_M(4, j)] = ...
+      isdf_validate_HF_stream_finalize(streams{j});
   end
-  stats_tbl = array2table(M, 'VariableNames', vars, 'RowNames', stat_names);
 
   nshow = min(preview_rows, n_ob_sample);
+  preview = struct( ...
+    'Ex_t', [], 'Ex_ISDF', [], 'Diff', [], 'AbsDiff', [], ...
+    'RelSigned', [], 'RelAbs', []);
   if nshow > 0
     diff_p = prev_Ex_t(1:nshow) - prev_Ex_ISDF(1:nshow);
     abs_dp = abs(diff_p);
@@ -282,10 +278,12 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
         rel_a(ii) = abs_dp(ii) / abs_ex;
       end
     end
-    preview_tbl = table(prev_Ex_t(1:nshow), prev_Ex_ISDF(1:nshow), diff_p, abs_dp, rel_s, rel_a, ...
-      'VariableNames', {'Ex_t', 'Ex_ISDF', 'Diff', 'AbsDiff', 'Diff_over_abs_Ex_t', 'AbsDiff_over_abs_Ex_t'});
-  else
-    preview_tbl = table();
+    preview.Ex_t = prev_Ex_t(1:nshow);
+    preview.Ex_ISDF = prev_Ex_ISDF(1:nshow);
+    preview.Diff = diff_p;
+    preview.AbsDiff = abs_dp;
+    preview.RelSigned = rel_s;
+    preview.RelAbs = rel_a;
   end
 
   report = struct();
@@ -293,9 +291,12 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
   report.desc = isdf_data.desc;
   report.interp_scheme = isdf_data.interp_scheme;
   report.nisdf = isdf_data.nisdf;
-  report.band_summary = band_summary_tbl;
-  report.preview = preview_tbl;
-  report.stats = stats_tbl;
+  report.band_items = band_items;
+  report.band_vals = band_vals;
+  report.preview = preview;
+  report.stats_vars = stats_vars;
+  report.stats_rows = stats_rows;
+  report.stats_M = stats_M;
   report.n_samples = n_ob_sample;
   report.n_samples_rel = n_rel_samples;
   report.preview_rows = preview_rows;
@@ -316,13 +317,16 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id, outDir)
   report.max_E_HF_ISDF = struct('value', max_E_ISDF, 'ib', ib_mx_isdf, 'ik', ik_mx_isdf, 'ispin', is_mx_isdf);
   report.min_E_HF = struct('value', min_E_HF, 'ib', ib_mn_hf, 'ik', ik_mn_hf, 'ispin', is_mn_hf);
   report.min_E_HF_ISDF = struct('value', min_E_ISDF, 'ib', ib_mn_isdf, 'ik', ik_mn_isdf, 'ispin', is_mn_isdf);
+  report.n_mismatch = int32(n_mismatch);
+  report.max_abs_mismatch = double(max_abs_mismatch);
 
-  fpath = isdf.report.hf(report, outDir);
+  fpath = isdf.report.hf(report);
   report.report_file = fpath;
+  isdf.report.run_summary('hf', report);
   fprintf(1, 'isdf_validate_HF: wrote HF report to:\n  %s\n', fpath);
 
   if nargout <= 3
-    report = []; %#ok<NASGU>
+    report = [];
   end
 end
 

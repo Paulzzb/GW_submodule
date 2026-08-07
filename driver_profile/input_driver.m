@@ -4,73 +4,64 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/05/20 ZZ
+% Last modified: 2026/08/07 ZZ
 
 function input_driver(inputfile)
-% This is a driver function, given an inputfile, it will prepare and save all
-% required data for GW module calculation in storage_dir.
-% The code does the following step:
-% 1. Read the input file, generate a struct 'config'.
-% 2. Validate required parameters.
-% 3. If cached SAVE data exists in storage_dir, load it and fill new defaults;
-%    otherwise:
-%    a. Load groundstate data from groundstate_dir into a uniform struct 'data'.
-%    b. Set default values in 'config' from defaults and groundstate data.
-%    c. Construct GWgroundstate and GWOptions from 'data' and 'config'.
-%    d. For full-frequency (contour deformation), generate frequency grids.
-%    e. Save data, GWgroundstate, GWOptions and config to storage_dir.
-% 4. Build service-layer objects via service_driver.
-% 5. Display input and groundstate summary.
-  
+%INPUT_DRIVER  Prepare SAVE data and service-layer objects for a GW run.
+%
+%   Cache gate is SAVE/relay_stage.mat (expensive). Config is always rebuilt
+%   from the namelist + defaults (cheap) so CUTOFFS/ISDF edits take effect
+%   without deleting the stage; lattice/coulomb/ISDF are rebuilt in
+%   service_driver from that fresh config.
 
-  % Step 1: Read and parse
+  % Step 1: Read and parse namelist -> fresh config
   config = read_input_param(inputfile);
-  
+
   % Step 2: Validate required fields
   validate_required_params(config);
 
   def = filename_map();
   dir = config.CONTROL.storage_dir;
-  fNameGWinput = fullfile(dir, def.GWinput);
-  use_cache = isfile(fNameGWinput);
+  fNameStage = fullfile(dir, def.stage);
+  fNamedata = fullfile(dir, def.data);
+  fNameconfig = fullfile(dir, def.config);
+  use_stage = isfile(fNameStage) && isfile(fNamedata);
 
-  if use_cache
-    fprintf('input_driver: loading cached SAVE data from %s\n', dir);
-    % GWgroundstate = load(fNameGWinput, 'GWgroundstate').GWgroundstate;
-    cached = load(fullfile(dir, def.config), 'GWoptions', 'config');
-    config = cached.config;
-    data = load(fullfile(dir, def.data), 'data').data;
-    % Fill defaults for fields added after config.mat was saved.
-    config = set_default_param_value(config, data);
+  if use_stage
+    fprintf('input_driver: stage cache hit (%s); reloading data, rebuilding config\n', ...
+      fNameStage);
+    data = load(fNamedata, 'data').data;
   else
-    % Step 4: Load groundstate info, transform them into a uniform format
-    %         struct 'data'.
+    if isfile(fNameStage) && ~isfile(fNamedata)
+      warning('input_driver:StageWithoutData', ...
+        ['Found %s but missing %s; ignoring stage and rebuilding from groundstate.'], ...
+        fNameStage, fNamedata);
+    end
     dirin = config.CONTROL.groundstate_dir;
     typein = config.CONTROL.groundstate_type;
     data = load_groundstate_info(dirin, typein, config);
-
-    % Step 3: Set default values in 'config', error if there exists invalid values.
-    config = set_default_param_value(config, data);
-
-    % Full-frequency (contour deformation): frequency grids for gw.fullfreq_cd_* / qp.launcher.
-    if config.FREQUENCY.frequency_dependence == 2
-      config = generate_frequency(config);
-    end
-
-    % Step 4: save data to files
-    fNamedata = fullfile(dir, def.data);
-    fNameconfig = fullfile(dir, def.config);
-    if ~exist(dir, 'dir')
-      mkdir(dir);
-    end
-    config.ISDFCauchy = setISDFCauchy(data, config);
-    save(fNamedata, 'data', '-v7.3', '-nocompression');
-    save(fNameconfig, 'config', '-v7.3', '-nocompression');
   end
-  %
-  % Step 5:  use structure in service/ to construct 
+
+  % Always (re)derive config from namelist + data defaults — never reuse config.mat.
+  config = set_default_param_value(config, data);
+
+  % Open r-<prefix>.log before anything that may output.msg('r', ...), including
+  % generate_frequency. Otherwise a leftover FID from a previous run appends
+  % those lines to the end of the old report, which is then rotated to r-*_NN.
+  output.free();
+  display_input_summary(config);
+
+  if config.FREQUENCY.frequency_dependence == 2
+    config = generate_frequency(config);
+  end
+
+  if ~exist(dir, 'dir')
+    mkdir(dir);
+  end
+  config.ISDFCauchy = setISDFCauchy(data, config);
+  save(fNamedata, 'data', '-v7.3', '-nocompression');
+  save(fNameconfig, 'config', '-v7.3', '-nocompression');
+
   service_driver(data, config);
-  % Step 6: display input and groundstate information
-  display_input_summary(config)
 
 end % function

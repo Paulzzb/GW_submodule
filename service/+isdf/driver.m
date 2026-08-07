@@ -23,32 +23,38 @@ function driver(~, config)
   end
 
   isdf.free();
+  report_dir = filename_map().isdf_report_dir;
+  if exist(report_dir, 'dir') ~= 7
+    mkdir(report_dir);
+  end
+  isdf.report.run_summary('clear');
   isdf.report.cond('init');
 
   if do_vc
-    id_vc_new = local_run_isdf_type(config, cfg, 'vc');
+    id_vc_new = run_isdf_type(config, cfg, 'vc');
     if cfg.validate_hf
       isdf.validation.isdf_validation(id_vc_new);
     end
   end
 
   if do_vn
-    id_vn_new = local_run_isdf_type(config, cfg, 'vn');
+    id_vn_new = run_isdf_type(config, cfg, 'vn');
     if cfg.validate_hf
       isdf.validation.isdf_validation(id_vn_new);
     end
   end
 
   if do_nn
-    id_nn_new = local_run_isdf_type(config, cfg, 'nn');
+    id_nn_new = run_isdf_type(config, cfg, 'nn');
     if cfg.validate_hf
       isdf.validation.isdf_validation(id_nn_new);
     end
   end
 
+  isdf.report.run_summary('write');
 end
 
-function idnew = local_run_isdf_type(config, cfg, isdf_type)
+function idnew = run_isdf_type(config, cfg, isdf_type)
   % Go SC ISDF if enabled.
   if isfield(config, 'SUPERCELL')
     sc = config.SUPERCELL;
@@ -80,8 +86,17 @@ function idnew = local_run_isdf_type(config, cfg, isdf_type)
   isdf_data.nisdf = int32(max(1, ceil(nmu_target)));
   isdf.save2mod(isdf_data, id);
 
-  isdf.coeff.gen_coeff(cfg, id);
-  isdf.coeff.print_coarse_grid_report(id);
+  idx_mu = isdf.coeff.gen_coeff(cfg, id);
+  if ~isempty(idx_mu)
+    isdf.rsymm.init_from_indices(id, idx_mu);
+  end
+  isdf_data = isdf.get(id);
+  isdf.report.run_summary('seed', struct( ...
+    'desc', char(string(isdf_data.desc)), ...
+    'seed_id', int32(id), ...
+    'seed_nmu', int32(isdf_data.nisdf), ...
+    'method', char(string(isdf_data.interp_scheme))));
+  % isdf.coeff.print_coarse_grid_report(id);
   idnew = isdf.adaptive.launcher(id, cfg);
   local_dispatch_gen_tildeVq(idnew, config, cfg);
 end

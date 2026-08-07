@@ -11,8 +11,9 @@ function ensure_init(varargin)
 %
 %   output.ensure_init('report', path, 'verbose', n)
 %
-%   If a report file is already open (same path, or no new path given),
-%   only refreshes verbosity. Otherwise forwards to output.init.
+%   If a report file is already open at the same absolute path and the
+%   file still exists on disk, only refreshes verbosity. Otherwise
+%   forwards to output.init (reopens after free/cd/clean).
 
   p = inputParser;
   addParameter(p, 'report', '', @(x) ischar(x) || isstring(x));
@@ -22,17 +23,32 @@ function ensure_init(varargin)
   parse(p, varargin{:});
 
   s = state_('get');
-  report_path = char(string(p.Results.report));
+  report_path = abspath_(p.Results.report);
+  log_path = abspath_(p.Results.log);
 
   already = s.initialized && s.report_fid > 0;
+  % File may have been deleted (clean_case_outputs) while the FID was still
+  % open — on Linux that leaves a ghost inode; reopen in that case.
+  alive = isempty(s.report_path) || isfile(s.report_path);
   same_report = isempty(report_path) || strcmp(s.report_path, report_path);
 
-  if already && same_report
+  if already && alive && same_report
     if ~isempty(p.Results.verbose)
       output.verbose(p.Results.verbose);
     end
     return
   end
 
-  output.init(varargin{:});
+  args = {};
+  if ~isempty(report_path)
+    args = [args, {'report', report_path}]; %#ok<AGROW>
+  end
+  if ~isempty(log_path)
+    args = [args, {'log', log_path}]; %#ok<AGROW>
+  end
+  if ~isempty(p.Results.verbose)
+    args = [args, {'verbose', p.Results.verbose}]; %#ok<AGROW>
+  end
+  args = [args, {'screen', logical(p.Results.screen)}];
+  output.init(args{:});
 end
