@@ -4,7 +4,7 @@
   enable_k_points = .false.,
   output_dir = './',
   prefix = 'Si_gamma',
-  groundstate_dir = './qe.save',
+  groundstate_dir = '../Si_gamma/qe.save',
   groundstate_type = 'qe',
   storage_dir = './SAVE',
   outfile = 'GWoutput',
