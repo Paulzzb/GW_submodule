@@ -39,9 +39,7 @@ example/**/r-*.log
 example/**/l-*.log
 example/**/*.mat
 example/**/isdf_report/
-example/cases/**/qe.save/**
-!example/cases/**/qe.save/README.md
-!example/cases/Si_k/qe.save/**
+
 
 # ./GW/test/*.mat
 # Add mol and kssolv-scf result of Si8 into path
