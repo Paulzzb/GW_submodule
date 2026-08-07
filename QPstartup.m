@@ -21,17 +21,14 @@ disp(['GW module root path set to: ', CPATH]);
 % Add core folders to the MATLAB path.
 addpath(CPATH)
 add_mpaths_only([CPATH 'common/']);
-add_mpaths_only([CPATH 'driver_profile/']);
+add_mpaths_only([CPATH 'driver/']);
 add_mpaths_only([CPATH 'input/']);
-addpath(genpath([CPATH 'src_profile/']));
-add_mpaths_only([CPATH 'GW_profile/']);
+addpath(genpath([CPATH 'src/']));
+add_mpaths_only([CPATH 'util/']);
+add_mpaths_only([CPATH 'example/']);
 add_mpaths_only([CPATH 'test_profile/']);
-add_mpaths_only([CPATH 'tests/']);
-add_mpaths_only([CPATH 'util_profile/']);
-add_mpaths_only([CPATH 'tmp_profile/']);
 addpath(genpath([CPATH 'service/']))
 addpath(genpath([CPATH 'packages/']))
-addpath(genpath([CPATH 'database_profile/']))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Developer Hook] Insert your custom folders below
 % add_mpaths_only([CPATH 'mymodule/']);
