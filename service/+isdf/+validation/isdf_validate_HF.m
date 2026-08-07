@@ -72,11 +72,6 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id)
   st_RelSigned = isdf_validate_HF_stream_init();
   st_RelAbs = isdf_validate_HF_stream_init();
 
-  % Optional preview only: O(nb^2 * nibz * nspin), not O(nibz * nbz * nb^2).
-  preview_budget = double(numel(ib_list)) * double(numel(ob_list)) * double(nibz) * double(nspin);
-  preview_rows = min(max(preview_budget, 1), 1);
-  prev_Ex_t = nan(preview_rows, 1);
-  prev_Ex_ISDF = nan(preview_rows, 1);
   n_ob_sample = 0;
   diff_warn_tol = 1e-4;
   n_mismatch = 0;
@@ -161,10 +156,6 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id)
               st_AbsDiff = isdf_validate_HF_stream_push(st_AbsDiff, abs_diff_v);
               st_RelSigned = isdf_validate_HF_stream_push(st_RelSigned, diff_v / abs(Ex_t));
               st_RelAbs = isdf_validate_HF_stream_push(st_RelAbs, abs_diff_v / abs(Ex_t));
-            end
-            if n_ob_sample <= preview_rows
-              prev_Ex_t(n_ob_sample) = Ex_t;
-              prev_Ex_ISDF(n_ob_sample) = Ex_ISDF;
             end
             Esum2 = Esum2 + Ex_t^2;
             EsumISDF2 = EsumISDF2 + Ex_ISDF^2;
@@ -261,31 +252,6 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id)
       isdf_validate_HF_stream_finalize(streams{j});
   end
 
-  nshow = min(preview_rows, n_ob_sample);
-  preview = struct( ...
-    'Ex_t', [], 'Ex_ISDF', [], 'Diff', [], 'AbsDiff', [], ...
-    'RelSigned', [], 'RelAbs', []);
-  if nshow > 0
-    diff_p = prev_Ex_t(1:nshow) - prev_Ex_ISDF(1:nshow);
-    abs_dp = abs(diff_p);
-    tol_zero = max(eps('double'), 1e-30);
-    rel_s = nan(nshow, 1);
-    rel_a = nan(nshow, 1);
-    for ii = 1:nshow
-      abs_ex = abs(prev_Ex_t(ii));
-      if abs_ex >= tol_zero
-        rel_s(ii) = diff_p(ii) / abs_ex;
-        rel_a(ii) = abs_dp(ii) / abs_ex;
-      end
-    end
-    preview.Ex_t = prev_Ex_t(1:nshow);
-    preview.Ex_ISDF = prev_Ex_ISDF(1:nshow);
-    preview.Diff = diff_p;
-    preview.AbsDiff = abs_dp;
-    preview.RelSigned = rel_s;
-    preview.RelAbs = rel_a;
-  end
-
   report = struct();
   report.isdf_id = id;
   report.desc = isdf_data.desc;
@@ -293,13 +259,11 @@ function [Esum2, EsumISDF2, DiffEsum2, report] = isdf_validate_HF(id)
   report.nisdf = isdf_data.nisdf;
   report.band_items = band_items;
   report.band_vals = band_vals;
-  report.preview = preview;
   report.stats_vars = stats_vars;
   report.stats_rows = stats_rows;
   report.stats_M = stats_M;
   report.n_samples = n_ob_sample;
   report.n_samples_rel = n_rel_samples;
-  report.preview_rows = preview_rows;
   report.Esum2 = Esum2;
   report.EsumISDF2 = EsumISDF2;
   report.DiffEsum2 = DiffEsum2;

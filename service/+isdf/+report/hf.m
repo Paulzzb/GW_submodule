@@ -43,27 +43,6 @@ function fpath = hf(report)
   end
 
   output.msg(how, '');
-  output.msg(how, '--- Preview (first min(N, preview_rows) ob samples; stats use full online accumulation) ---');
-  pr = report.preview;
-  nprev = 0;
-  if isstruct(pr) && isfield(pr, 'Ex_t')
-    nprev = numel(pr.Ex_t);
-  end
-  if nprev > 0
-    output.msg(how, 'preview_rows budget: %d', double(report.preview_rows));
-    output.msg(how, '');
-    output.msg(how, '  %12s %12s %12s %12s %18s %18s', ...
-      'Ex_t', 'Ex_ISDF', 'Diff', 'AbsDiff', 'Diff/|Ex_t|', 'AbsDiff/|Ex_t|');
-    for i = 1:nprev
-      output.msg(how, '  %12.6g %12.6g %12.6g %12.6g %18.6g %18.6g', ...
-        pr.Ex_t(i), pr.Ex_ISDF(i), pr.Diff(i), pr.AbsDiff(i), ...
-        pr.RelSigned(i), pr.RelAbs(i));
-    end
-  else
-    output.msg(how, '(no ob samples: all skipped by occupation threshold)');
-  end
-
-  output.msg(how, '');
   output.msg(how, '--- Statistics (Mean / Std / Var / Max), ob layer ---');
   output.msg(how, 'N (total ob samples) = %d', double(report.n_samples));
   output.msg(how, 'N_rel (samples with |Ex_t| >= tol for relative stats) = %d', ...

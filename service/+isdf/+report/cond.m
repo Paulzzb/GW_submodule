@@ -19,6 +19,7 @@ function cond(action, varargin)
   def = filename_map();
   of = def.cond_report;
   how = ['o ' of];
+  ban = repmat('=', 1, 78);
 
   switch action
     case 'init'
@@ -36,6 +37,7 @@ function cond(action, varargin)
       loss_before_step1 = varargin{4};
       loss_after = varargin{5};
       final_nisdf = varargin{6};
+      output.msg(how, ban);
       output.msg(how, '--- adaptiveisdf ---');
       output.msg(how, 'origin_id: %d,     new_id: %d,     desc: %s,     final_nisdf: %d', ...
         round(double(coarse_id)), round(double(idnew)), char(string(desc)), round(double(final_nisdf)));
@@ -52,6 +54,7 @@ function cond(action, varargin)
       s_cut = double(isdf_data.svd_s_cut);
       facs = isdf_data.CCHq_trunc_factors;
 
+      output.msg(how, ban);
       output.msg(how, '--- gen_tildeVq ---');
       output.msg(how, 'id: %d  desc: %s  nisdf: %d  s_cut: %.4e', ...
         round(double(id)), char(string(isdf_data.desc)), round(nisdf), s_cut);
