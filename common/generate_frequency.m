@@ -19,8 +19,7 @@ res_method = config.FREQUENCY.cd_residual_method;
 int_method = config.FREQUENCY.cd_integration_method;
 
 if (config.FREQUENCY.frequency_dependence_method == 2)
-  
-  eta = config.FREQUENCY.eta;
+
   freq_cutoff = config.FREQUENCY.frequency_low_cutoff*ry2ev;
   delta_freq = config.FREQUENCY.delta_frequency*ry2ev;
   nimagfreq = config.FREQUENCY.number_imaginary_freqs;
@@ -33,7 +32,8 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
     case 0 % Berkeley WAY
       tmpfreq = 0.0;
       nfreq = 0;
-      % Generate the real frequency grid
+      % Generate the real frequency grid (real axis only; broadening is
+      % FREQUENCY.broadening in the chi denominators, not Im(grid_real)).
       while tmpfreq < freq_cutoff
         nfreq = nfreq+1;
         tmpfreq = tmpfreq + delta_freq;
@@ -41,7 +41,7 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
       nrealfreq = nfreq;
       grid_real = zeros(nfreq, 1);
       for i = 1:nfreq
-        grid_real(i) = complex(0.0 + (i-1)*delta_freq, eta);
+        grid_real(i) = (i-1)*delta_freq;
       end
 
       % Generate coefficient function for real frequency grid
@@ -50,8 +50,8 @@ if (config.FREQUENCY.frequency_dependence_method == 2)
         coeff_real_func{ifreq} = @(x) 0;
       end
       for ifreq = 1:nfreq-1
-        left = real(grid_real(ifreq));
-        right = real(grid_real(ifreq+1));
+        left = grid_real(ifreq);
+        right = grid_real(ifreq+1);
         coeff_real_func{ifreq+1} = @(x) coeff_real_func{ifreq+1}(x) + ...
           (x > left && x <= right) .* (x-left) ./(right-left);
         coeff_real_func{ifreq} = @(x) coeff_real_func{ifreq}(x) + ...

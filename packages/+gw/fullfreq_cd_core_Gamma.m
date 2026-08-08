@@ -101,7 +101,8 @@ if config.ISDF.isisdf
   s_ratio_nn = nn_data.svd_ratio;
 
   if on_real_axis
-    broadening_arg = config.FREQUENCY.broadening / ry2ev;  % eV
+    % FREQUENCY.broadening is eV; gen_Kq_Gamma expects eta in Ry.
+    broadening_arg = config.FREQUENCY.broadening / ry2ev;
     flagherm = false;
   else
     broadening_arg = [];  % eta = 0 in gen_Kq_Gamma
@@ -111,7 +112,7 @@ if config.ISDF.isisdf
   nm_Womega_nm = zeros(Nn, Nm, Nw);
   for ifreq = 1:Nw
     omega = omega_list(ifreq);
-    % gen_Kq_Gamma uses energies in Ry.
+    % omega_list from generate_frequency is in eV; gen_Kq_Gamma uses Ry.
     omega_ry = omega / ry2ev;
     Kq_ISDF = isdf.gen_Kq_Gamma( ...
       id_vc, iqibz, omega_ry, broadening_arg, isdf.cauchy_opts(config));
@@ -154,19 +155,23 @@ for iv = nv_list
     Mgvc(:, ic) = conj(double(SCATTER_Bamp(p)));
   end
   Mvc_cache{iv} = Mgvc;
-  Eden_cache{iv} = ev(iv) - ev(nc_list);
+  % ev is eV; store Eden = Ev-Ec in Ry for the chi loop.
+  Eden_cache{iv} = (ev(iv) - ev(nc_list)) / ry2ev;
 end
 
-eta = 0.025;
+if on_real_axis
+  % FREQUENCY.broadening is eV; chi denominators use Ry (same as Eden / omega below).
+  eta = double(config.FREQUENCY.broadening / ry2ev);
+  ishermW = false;
+else
+  eta = 0.0;
+  ishermW = true;
+end
 nm_Womega_nm = zeros(Nn, Nm, Nw);
 
 for ifreq = 1:Nw
-  omega = omega_list(ifreq);
-  if abs(real(omega)) < 1e-8
-    ishermW = true;
-  else
-    ishermW = false;
-  end
+  % omega_list is eV; convert so omega, Eden, eta are all Ry.
+  omega = omega_list(ifreq) / ry2ev;
 
   chi_acc = zeros(ng, ng);
   for iv = nv_list

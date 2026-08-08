@@ -4,21 +4,24 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/07/27 ZZ
+% Last modified: 2026/08/08 ZZ
 
-%RUN_ALL  Run the official Si regression cases under tests/cases/.
+%RUN_ALL  Run Si_gamma verification suites under example/cases/.
 %
-%   From repo root in MATLAB:
-%     cd tests
+%   From example/ in MATLAB:
 %     run_all
 %
-%   Physics dispatch:
-%     *gamma  → run_cohsex
-%     others  → run_gw_x  (input_driver + gw.x)
-%   Before each case: wipe SAVE/ and prior run artifacts so nothing is reused
-%   from a previous run (keeps ./test and ./qe.save).
-%   Skips a case if qe.save is not populated yet (prints SKIP).
-%   SrTiO3_k is deferred (large QE output; not in the default list).
+%   Suites (Si bulk / gamma; GS shared from cases/Si_gamma/qe.save):
+%     G1 ISDF methods (fdep=2):     Si_gamma, Si_gamma_qrcp, Si_gamma_kmeans
+%     G2 ISDF vs dense (fdep=2):    Si_gamma, Si_gamma_dir
+%     G3 Cauchy on/off:
+%         fdep=2:   Si_gamma_ff_cauchy, Si_gamma_ff_nocauchy
+%         fdep=-2:  Si_gamma_cohsex_cauchy, Si_gamma_cohsex_nocauchy
+%     Plus Si_k multi-k smoke.
+%
+%   Physics dispatch: name contains 'gamma' → run_cohsex; else → run_gw_x.
+%   Before each case: wipe SAVE/ and prior run artifacts.
+%   Collect energies afterwards with collect_qp_energies.
 
 tests_dir = fileparts(mfilename('fullpath'));
 if isempty(tests_dir)
@@ -27,15 +30,20 @@ end
 gw_root = fileparts(tests_dir);
 addpath(tests_dir);
 
+% G1: ISDF methods (fdep=2) | G2: + Si_gamma_dir | G3: Cauchy ff / cohsex
 cases = { ...
   'Si_gamma', ...
   'Si_gamma_qrcp', ...
   'Si_gamma_kmeans', ...
+  'Si_gamma_dir', ...
+  'Si_gamma_ff_cauchy', ...
+  'Si_gamma_ff_nocauchy', ...
+  'Si_gamma_cohsex_cauchy', ...
+  'Si_gamma_cohsex_nocauchy', ...
   'Si_k' ...
   };
-% SrTiO3_k deferred: QE save too large to ship with the repo.
 
-fprintf('=== tests/run_all ===\n');
+fprintf('=== example/run_all ===\n');
 fprintf('gw_root = %s\n', gw_root);
 
 n_ok = 0;
@@ -52,8 +60,6 @@ for i = 1:numel(cases)
     n_fail = n_fail + 1;
     continue
   end
-
-  gs_dir = fullfile(case_dir, 'qe.save');
 
   clean_case_outputs(case_dir);
 

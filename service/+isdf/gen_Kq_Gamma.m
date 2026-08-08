@@ -15,8 +15,9 @@ function Kq_ISDF = gen_Kq_Gamma(id_vc, iqibz, omega, broadening, cauchy)
 %
 %   id_vc       — ISDF slot for polarizability (typically desc 'vc')
 %   iqibz       — q IBZ index
-%   omega       — frequency in Ry (same as system Eo); default 0
-%   broadening  — eta in eV (converted to Ry); omit / [] → eta = 0
+%   omega       — frequency in Ry (same as system.Eo); default 0
+%   broadening  — eta in Ry (caller converts FREQUENCY.broadening eV → Ry);
+%                 omit / [] → eta = 0
 %   cauchy      — [] | struct from isdf.cauchy_opts (isCauchy/froErr/MaxIter)
 %
 % Chi path:
@@ -39,7 +40,7 @@ end
 if nargin < 4 || isempty(broadening)
   eta = 0;
 else
-  eta = double(broadening) / ry2ev;
+  eta = double(broadening);
 end
 if nargin < 5 || isempty(cauchy)
   cauchy = struct('isCauchy', false);
@@ -96,8 +97,8 @@ if use_cauchy
     optC.MaxIter = double(cauchy.MaxIter);
   end
   [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar(Phi, Psi, evOcc(:), evUnocc(:), optC);
-  % COmegaCstar uses 1/(e_v-e_c); direct loop uses 1/(e_c-e_v). Negate, then
-  % apply the same *2 (ij/ji) *2 (spin) as the direct path.
+  % Static limit of direct coeff = occ/den1-occ/den2 is -2/(Ev-Ec).
+  % COmegaCstar builds 1/(Ev-Ec); negate and *2 match that (then spin *2).
   chiq_ISDF = -chi_raw;
   chiq_ISDF = 2.0 * chiq_ISDF;
   if nspin == 1
@@ -111,17 +112,20 @@ else
     f_ik = system_data.f(iv, ikibz, ispin);
     e_ik = ev(iv, ikibz, ispin);
     occ = -f_c + f_ik;
-    if eta == 0.0
-      den = omega - e_ik + e_c;
+    Delta = e_ik - e_c;
+    if abs(eta) < 1e-14
+      den1 = omega - Delta;
+      den2 = omega + Delta;
     else
-      den = omega - e_ik + e_c + 1i * eta * sign(e_ik - e_c);
+      den1 = omega - Delta - 1i * eta;
+      den2 = omega + Delta + 1i * eta;
     end
-    valid = (abs(occ) >= 1e-5) & (abs(den) >= 1e-12);
+    valid = (abs(occ) >= 1e-5) & (abs(den1) >= 1e-12) & (abs(den2) >= 1e-12);
     if ~any(valid)
       continue;
     end
 
-    coeff = occ(valid) ./ den(valid);
+    coeff = occ(valid) ./ den1(valid) - occ(valid) ./ den2(valid);
     is = [iv, 1, 1, ispin];
     u_xalpha_is = isdf.get_u_xalpha(id_vc, is, iqrot);
     u_xalpha_os = vc_data.bundle_struct.WF_bundle(s2b, nrangec_row, 1, ispin);
@@ -129,9 +133,7 @@ else
     rho_weighted = rho_blk .* reshape(coeff, 1, []);
     chiq_ISDF = chiq_ISDF + (rho_weighted * rho_blk');
   end
-  % Factor 2: (ij) and (ji) when occupations are 0/1
-  chiq_ISDF = 2.0 * chiq_ISDF;
-  % Factor 2: spin-unpolarized (nspin == 1)
+  % Factor 2: spin-unpolarized (nspin == 1); both poles already in coeff.
   if nspin == 1
     chiq_ISDF = 2 * chiq_ISDF;
   end

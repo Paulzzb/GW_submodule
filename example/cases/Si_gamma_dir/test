@@ -3,7 +3,7 @@
   isbse = 0,
   enable_k_points = .false.,
   output_dir = './',
-  prefix = 'Si_gamma_kmeans',
+  prefix = 'Si_gamma_dir',
   groundstate_dir = '../Si_gamma/qe.save',
   groundstate_type = 'qe',
   storage_dir = './SAVE',
@@ -38,7 +38,7 @@ END &CUTOFFS
 END &FREQUENCY
 
 &ISDF
-  isisdf = 1,
+  isisdf = 0,
   compute_vc = .true.,
   compute_vn = .true.,
   compute_nn = .true.,
@@ -62,7 +62,7 @@ END &FREQUENCY
   exxmethod_type1 = '',
   exxmethod_type2 = '',
   exxmethod_type3 = '',
-  exxmethod = 'kmeans',
+  exxmethod = 'pseudo',
   seed = 0,
   init = 'random',
   weight = 'add',
