@@ -1,5 +1,5 @@
 &CONTROL
-  prefix = 'Si_gamma',
+  prefix = 'Si_k',
   isgw = 1,
   groundstate_dir = './qe.save',
   groundstate_type = 'qe',

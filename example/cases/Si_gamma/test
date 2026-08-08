@@ -13,9 +13,9 @@
 END &CONTROL
 
 &SYSTEM
-  number_bands_in_summation = 32,
-  energy_band_index_min = 13,
-  energy_band_index_max = 20,
+  number_bands_in_summation = 319,
+  energy_band_index_min = 1,
+  energy_band_index_max = 32,
 END &SYSTEM
 
 &CUTOFFS
@@ -42,15 +42,15 @@ END &FREQUENCY
   compute_vc = .true.,
   compute_vn = .true.,
   compute_nn = .true.,
-  isdf_ratio_type1 = 8.0,
-  isdf_ratio_type2 = 8.0,
-  isdf_ratio_type3 = 8.0,
+  isdf_ratio_type1 = 16.0,
+  isdf_ratio_type2 = 16.0,
+  isdf_ratio_type3 = 16.0,
   adaptive_threshold_type1 = 2e-4,
   adaptive_threshold_type2 = 2e-6,
   adaptive_threshold_type3 = 2e-6,
-  adaptive_num_add_type1 = 16,
-  adaptive_num_add_type2 = 16,
-  adaptive_num_add_type3 = 16,
+  adaptive_num_add_type1 = 32,
+  adaptive_num_add_type2 = 32,
+  adaptive_num_add_type3 = 32,
   adaptive_candidate_ratio_type1 = 2.0,
   adaptive_candidate_ratio_type2 = 2.0,
   adaptive_candidate_ratio_type3 = 2.0,
@@ -58,10 +58,10 @@ END &FREQUENCY
   adaptive_max_cond_type2 = 1e12,
   adaptive_max_cond_type3 = 1e12,
   adaptive_use_cond_guard = .true.,
-  adaptive_batch_size = 64,
-  exxmethod_type1 = 'qrcp',
+  adaptive_batch_size = 256,
+  exxmethod_type1 = '',
   exxmethod_type2 = '',
-  exxmethod_type3 = 'kmeans',
+  exxmethod_type3 = '',
   exxmethod = 'pseudo',
   seed = 0,
   init = 'random',
