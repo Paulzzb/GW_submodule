@@ -57,7 +57,7 @@ for i = 1:numel(cases)
 
   clean_case_outputs(case_dir);
 
-  is_gamma = ~isempty(regexp(name, 'gamma$', 'once'));
+  is_gamma = ~isempty(regexp(name, 'gamma', 'once'));
 
   try
     if is_gamma
