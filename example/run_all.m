@@ -54,13 +54,6 @@ for i = 1:numel(cases)
   end
 
   gs_dir = fullfile(case_dir, 'qe.save');
-  ready = isfile(fullfile(gs_dir, 'data-file-schema.xml')) || ...
-    ~isempty(dir(fullfile(gs_dir, 'wfc*.hdf5')));
-  if ~ready
-    fprintf('SKIP: groundstate not ready (%s)\n', gs_dir);
-    n_skip = n_skip + 1;
-    continue
-  end
 
   clean_case_outputs(case_dir);
 
