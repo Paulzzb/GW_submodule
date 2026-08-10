@@ -170,7 +170,7 @@ ISDF type suffixes:
 | <a name="frequency_dependence"></a>`frequency_dependence` | int | No | `0` | Frequency treatment (`0` = COHSEX / static-like; nonzero selects frequency-dependent paths) |
 | <a name="frequency_dependence_method"></a>`frequency_dependence_method` | int | No | `2` | Method for frequency dependence (used when frequency-dependent) |
 | <a name="frequency_low_cutoff"></a>`frequency_low_cutoff` | float | No | `-1.0` | Low-frequency cutoff (Ry). `-1` → <a href="#appendix-sys-freq">from system</a> |
-| <a name="broadening"></a>`broadening` | float | No | `0.018376` | Broadening for frequency-dependent paths (eV); converted to Ry inside `gen_Kq_Gamma` |
+| <a name="broadening"></a>`broadening` | float | No | `0.018376` | Broadening for frequency-dependent paths (eV). Callers (e.g. `gw.fullfreq_cd_core_Gamma`) convert to Ry before `isdf.gen_Kq_Gamma` / dense chi |
 | <a name="delta_frequency"></a>`delta_frequency` | float | No | `0.146997295433511` | Frequency grid step (Ry) |
 | <a name="number_imaginary_freqs"></a>`number_imaginary_freqs` | int | No | `15` | Number of imaginary frequencies |
 | <a name="eta"></a>`eta` | float | No | `1e-4` | Broadening |
