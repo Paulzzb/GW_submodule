@@ -101,15 +101,12 @@ function local_prepare_links(tests_dir, name)
   if ~any(strcmp(name, ratio_cases))
     return
   end
-  cmd = sprintf('bash %s --case %s', local_shell_quote(link_ckpt), local_shell_quote(name));
+  % Paths/case names here have no double-quotes; avoid fragile '' nesting.
+  cmd = sprintf('bash "%s" --case "%s"', link_ckpt, name);
   [st, out] = system(cmd);
   if st ~= 0
     warning('run_all:LinkCheckpoints', 'link_isdf_checkpoints failed for %s:\n%s', name, out);
   else
     fprintf('%s', out);
   end
-end
-
-function s = local_shell_quote(p)
-  s = ['''' strrep(p, '''', '''\'''''') ''''];
 end
