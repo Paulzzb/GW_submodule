@@ -6,7 +6,7 @@
   prefix = 'ff_isdf',
   groundstate_dir = '../qe.save',
   groundstate_type = 'qe',
-  storage_dir = '../SAVE',
+  storage_dir = './SAVE',
   outfile = 'GWoutput',
   log_level = 1,
   log_file = 'QPlog',
