@@ -28,10 +28,10 @@ END &CUTOFFS
 &FREQUENCY
   frequency_dependence = 2,
   frequency_dependence_method = 2,
-  frequency_low_cutoff = 20.0,
+  frequency_low_cutoff = 25.0,
   broadening = 0.01876
   delta_frequency = 0.146997295433511,
-  number_imaginary_freqs = 5,
+  number_imaginary_freqs = 25,
   cd_integration_method = 0,
   cd_integration_parameter = 2.0,
   cd_residual_method = 0,
