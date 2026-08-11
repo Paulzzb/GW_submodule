@@ -1,3 +1,0 @@
-UC_SAVE_DIR=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE \
-  K1=8 K2=8 K3=8 \
-  sbatch /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/s_demo_sc_scaling
