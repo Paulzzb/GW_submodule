@@ -9,7 +9,7 @@ Internal verification suites live under `tests/` (not this tree).
 
 ```text
 examples/
-  run_all.m / run_all_profiled.m / run_all_shared_save.sh
+  run_all.m / run_all_profiled.m / run_batch.sh
   run_cohsex.m
   cases/
     qe.save/              % shared QE groundstate
@@ -30,15 +30,16 @@ Each case namelist uses:
 ```matlab
 cd <repo>/examples
 run_all
-collect_qp_energies
 ```
 
-Or SLURM:
+Or SLURM / batch:
 
 ```bash
 cd examples
 mkdir -p log
-sbatch run_all_shared_save.sh
+sbatch run_batch.sh
+# or: bash run_batch.sh
 ```
 
 `run_all` clears shared `cases/SAVE` once, then runs ISDF cases before dense.
+QP tables land as `cases/<name>/qp*.dat`.

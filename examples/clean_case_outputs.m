@@ -4,29 +4,23 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/08/10 ZZ
+% Last modified: 2026/08/11 ZZ
 
 function clean_case_outputs(case_dir)
 %CLEAN_CASE_OUTPUTS  Remove prior computed outputs; keep namelist + groundstate.
 %
 %   clean_case_outputs(CASE_DIR)
 %
-%   Deletes CASE_DIR/SAVE/, CASE_DIR/isdf_report/, and shared root artifacts
-%   (logs / qp / Ex / relay). Leaves ./test and ./qe.save intact.
-%
-%   If CASE_DIR/SAVE is a symlink (shared hub SAVE), only the link is left
-%   alone — never rmdir into the target (would wipe Si_gamma/SAVE).
-%
-%   Safe before QPstartup: adds util/ so filename_map is visible.
+%   Deletes CASE_DIR/SAVE/, CASE_DIR/isdf_report/, and root artifacts
+%   (logs / qp*). Leaves ./test intact. Shared storage is cases/SAVE
+%   (cleared once in run_all); per-case SAVE is uncommon here.
 
-  tests_dir = fileparts(mfilename('fullpath'));
-  gw_root = fileparts(tests_dir);
+  examples_dir = fileparts(mfilename('fullpath'));
+  gw_root = fileparts(examples_dir);
   addpath(fullfile(gw_root, 'util'));
 
   save_dir = fullfile(case_dir, 'SAVE');
-  if local_is_symlink(save_dir)
-    fprintf('clean: keep SAVE symlink %s\n', save_dir);
-  elseif isfolder(save_dir)
+  if isfolder(save_dir)
     fprintf('clean: removing %s\n', save_dir);
     rmdir(save_dir, 's');
   end
@@ -38,7 +32,6 @@ function clean_case_outputs(case_dir)
     rmdir(report_dir, 's');
   end
 
-  % Root-level artifacts only (ISDF OF live under isdf_report/, already removed).
   patterns = { ...
     'qp.dat', ...
     'qp_*.dat', ...
@@ -62,18 +55,6 @@ function clean_case_outputs(case_dir)
       end
       fprintf('clean: removing %s\n', f);
       delete(f);
-    end
-  end
-end
-
-function tf = local_is_symlink(p)
-  tf = false;
-  try
-    tf = java.nio.file.Files.isSymbolicLink(java.nio.file.Paths.get(p));
-  catch
-    if isunix
-      [st, ~] = system(sprintf('test -L "%s"', p));
-      tf = (st == 0);
     end
   end
 end
