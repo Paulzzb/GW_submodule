@@ -1,0 +1,44 @@
+=== Profile summary (top 40 by TotalTime) ===
+
+Total[s] Self[s]  Calls    Function
+------------------------------------------------------------------------
+  44.461    0.000        1 run_demo_sc_scaling_profile
+  44.402    0.000        1 demo_sc_scaling
+  26.093    0.000        1 demo_isdf_scaling
+  20.923    0.000        2 QPstartup
+  15.319    0.000        1 demo_isdf_scaling>local_bootstrap_service
+  14.760    0.000        3 parallel_function
+  14.310    0.000        3 parallel_function>distributed_execution
+  11.424    0.000       14 QPstartup>add_mpaths_only
+  10.461    0.000       67 addpath
+  10.283    0.000       67 path
+   8.580    0.000        2 demo_isdf_scaling>local_build_helperqG
+   8.327    0.000      129 ParforEngine>ParforEngine.getCompleteIntervals
+   7.132    0.000        1 driver
+   6.899    0.000        2 restoredefaultpath
+   5.115    0.000     1376 ParforEngine>ParforEngine.addInterval
+   4.854    0.000     1379 optionallySerialize
+   4.814    0.000     1379 distcompserialize64
+   2.608    0.000      277 genpath
+   1.439    0.000        2 gen_coeff_from_fine_grid
+   1.428    0.000      134 general/private/parsedirs
+   1.398    0.000        1 demo_GW_scaling
+   1.351    0.000        1 load_formal_groundstate
+   1.186    0.000        2 SC_ISDF_r_sampling_to_lin
+   1.175    0.000     1536 ismember
+   1.143    0.000     1536 ismember>ismemberR2012a
+   0.883    0.000        1 gvec.gvec>gvec.gvec
+   0.849    0.000        1 @gvec/private/mill
+   0.706    0.000     1376 optionallyDeserialize
+   0.639    0.000     1376 distcompdeserialize
+   0.536    0.000        1 service_reset_persistent
+   0.462    0.000       69 ClientPathHelper>ClientPathHelper.pathChanged
+   0.451    0.000        1 driver
+   0.308    0.000        1 load_formal_groundstate>local_read_qe_xml_metada
+   0.304    0.000        4 prod
+   0.300    0.000     1376 parallel_function>distributed_execution/consume_
+   0.292    0.000        4 prod_mex
+   0.244    0.000        3 parallel_function>@(initData,F)createEngine(M,in
+   0.243    0.000        3 PoolOptions>PoolOptions.createEngine
+   0.220    0.000        1 RL_shell_construct
+   0.217    0.000        2 demo_isdf_scaling>local_mu_coul_contract

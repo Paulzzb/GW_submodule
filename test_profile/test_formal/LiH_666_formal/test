@@ -1,0 +1,61 @@
+&CONTROL
+  prefix = 'LiH',
+  isgw = 1,
+  groundstate_dir = '../../../../Materialtest/systems/LiH/1_1_1/LiH.save',
+  groundstate_type = 'formal',
+  storage_dir = './SAVE',
+  enable_k_points = .false.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 3456,
+  energy_band_index_min = 1,
+  energy_band_index_max = 3456,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = -2,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_cutoff = 15.0
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 2,
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .true.
+  compute_vn = .true.
+  compute_nn = .false.
+  isdf_ratio_type2 = 4.0
+  exxmethod = 'pseudo'
+  is_helper = .false.
+  inv_strategy = 'pseudo'
+  inv_param = 1e-12
+  inv_ratio = 0.75
+  order = 1
+  validate_hf = .false.
+END &ISDF
+
+&SUPERCELL
+  is_supercell = .true.
+  use_sc_isdf = .true.
+  k1 = 6
+  k2 = 6
+  k3 = 6
+  isdf_source_dir = '../../test_SC/LiH_111/SAVE'
+END &SUPERCELL
+
+&FORMAL
+  wf_seed = 42
+  eo_e0 = -2.0
+  eo_delta = 0.05
+  run_qp_cohsex = .true.
+END &FORMAL
+
+&COHSEX
+  exact_ch = .true.
+  Ex_use_which_isdf = 'vn'
+END &COHSEX

@@ -1,0 +1,44 @@
+=== Profile summary (top 40 by TotalTime) ===
+
+Total[s] Self[s]  Calls    Function
+------------------------------------------------------------------------
+6545.285    0.000        1 run_demo_sc_scaling_profile
+6545.199    0.000        1 demo_sc_scaling
+4418.457    0.000        1 demo_GW_scaling
+2106.189    0.000        1 demo_isdf_scaling
+1483.792    0.000        3 parallel_function
+1468.547    0.000        3 parallel_function>distributed_execution
+1403.331    0.000        2 demo_isdf_scaling>local_build_helperqG
+1249.384    0.000     1856 ParforEngine>ParforEngine.addInterval
+1246.551    0.000     1859 optionallySerialize
+1246.405    0.000     1859 distcompserialize64
+ 372.969    0.000        2 gen_coeff_from_fine_grid
+ 295.973    0.000        2 SC_ISDF_r_sampling_to_lin
+ 295.688    0.000    24000 ismember
+ 294.068    0.000    24000 ismember>ismemberR2012a
+ 239.970    0.000        1 demo_isdf_scaling>local_bootstrap_service
+ 225.360    0.000        1 driver
+ 112.187    0.000      174 ParforEngine>ParforEngine.getCompleteIntervals
+ 103.117    0.000     1856 optionallyDeserialize
+ 102.292    0.000     1856 distcompdeserialize
+  73.926    0.000    16001 WF_apply_symm
+  61.025    0.000        4 prod
+  60.899    0.000        4 prod_mex
+  56.179    0.000        2 demo_isdf_scaling>local_mu_coul_contract
+  32.962    0.000        2 gen_bundle
+  26.785    0.000     1856 parallel_function>distributed_execution/consume_
+  21.720    0.000        2 QPstartup
+  17.948    0.000        1 wf_m>wf_m.wf_m
+  15.127    0.000        3 parallel_function>@(initData,F)createEngine(M,in
+  15.126    0.000        3 PoolOptions>PoolOptions.createEngine
+  15.083    0.000        3 ParforEngine>ParforEngine.ParforEngine
+  15.035    0.000        3 ParforEngine>ParforEngine.buildParforController
+  11.921    0.000       14 QPstartup>add_mpaths_only
+  10.713    0.000       67 addpath
+  10.520    0.000       67 path
+   7.077    0.000        2 restoredefaultpath
+   5.924    0.000        1 driver
+   5.788    0.000        1 RL_shell_construct
+   4.679    0.000        1 load_formal_groundstate
+   2.983    0.000      285 genpath
+   1.515    0.000      134 general/private/parsedirs

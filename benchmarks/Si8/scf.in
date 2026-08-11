@@ -1,0 +1,53 @@
+&control
+   prefix = 'Si8'
+   calculation = 'scf'
+   restart_mode = 'from_scratch'
+   tstress = .false.
+   tprnfor = .false.
+   outdir = './'
+   wfcdir = './'
+   pseudo_dir = '../Si64'
+/
+&system
+   ibrav = 0
+   nat = 8
+   ntyp = 1
+   ecutwfc = 40.0
+!   ecutrho = 20.0
+   nosym = .TRUE.
+   nosym_evc = .true.
+   use_all_frac=.TRUE. 
+   occupations = "fixed",
+!    occupations = "smearing",
+!    smearing    = "gaussian",
+!    degauss     = 0.01
+   nbnd   = 80
+/
+&electrons
+   electron_maxstep = 100
+   conv_thr = 1.0d-8
+   mixing_mode = 'plain'
+   mixing_beta = 0.7
+   mixing_ndim = 8
+   diagonalization = 'david'
+   diago_david_ndim = 2
+   diago_full_acc = .true.
+/
+CELL_PARAMETERS bohr 
+     10.3344  0.0000  0.0000
+      0.0000 10.3344  0.0000
+      0.0000  0.0000 10.3344
+ATOMIC_SPECIES
+   Si  28.086  Si_ONCV_PBE-1.0.upf 
+ATOMIC_POSITIONS crystal 
+Si     0.000000000         0.000000000         0.000000000
+Si     0.000000000         0.500000000         0.500000000
+Si     0.500000000         0.500000000         0.000000000
+Si     0.500000000         0.000000000         0.500000000
+Si     0.750000000         0.250000000         0.750000000
+Si     0.250000000         0.250000000         0.250000000
+Si     0.250000000         0.750000000         0.750000000
+Si     0.750000000         0.750000000         0.250000000
+K_POINTS crystal 
+1
+0.0 0.0 0.0 1.0

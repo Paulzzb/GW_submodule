@@ -1,0 +1,28 @@
+#!/bin/bash -l
+#SBATCH -J gemm_lm
+#SBATCH -t 00:30:00
+#SBATCH -p normal
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 80
+#SBATCH -w compute 
+
+RUNMATLAB=matlab
+SCRIPT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
+if [ ! -d "$SCRIPT_DIR" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+cd "$SCRIPT_DIR" || exit 1
+mkdir -p "$SCRIPT_DIR/log"
+rm -f "$SCRIPT_DIR"/slurm*
+
+# Keep BLAS/OpenMP thread counts aligned with SLURM CPU allocation.
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-80}"
+export OPENBLAS_NUM_THREADS="${SLURM_CPUS_PER_TASK:-80}"
+export MKL_NUM_THREADS="${SLURM_CPUS_PER_TASK:-80}"
+export NUMEXPR_NUM_THREADS="${SLURM_CPUS_PER_TASK:-80}"
+
+$RUNMATLAB -nodisplay -nodesktop -nosplash \
+  -logfile "$SCRIPT_DIR/log/bench_gemm_largememory.log" \
+  -r "cd('$SCRIPT_DIR'); bench_gemm_largememory; exit"

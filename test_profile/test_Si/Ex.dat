@@ -1,0 +1,113 @@
+[test_Si] Ex benchmark report
+Generated: 2026-05-28 23:39:23
+case_dir: /data-storage/home/huwei/zzb/GW_double/test_profile/test_Si
+
+----------- config.ISDF -----------
+ inv_strategy           : pseudo
+ order                  : 1
+ isisdf                 : 1
+ compute_vc             : 0
+ compute_vn             : 1
+ compute_nn             : 1
+ isdf_ratio_type1       : 8
+ isdf_ratio_type2       : 8
+ isdf_ratio_type3       : 8
+ adaptive_threshold_type1 : 2e-05
+ adaptive_threshold_type2 : 2e-05
+ adaptive_threshold_type3 : 2e-05
+ adaptive_num_add_type1 : 1
+ adaptive_num_add_type2 : 1
+ adaptive_num_add_type3 : 1
+ adaptive_candidate_ratio_type1 : 2.5
+ adaptive_candidate_ratio_type2 : 2.5
+ adaptive_candidate_ratio_type3 : 2.5
+ adaptive_max_add_frac_type1 : 2
+ adaptive_max_add_frac_type2 : 2
+ adaptive_max_add_frac_type3 : 2
+ adaptive_max_cond_type1 : 1000000
+ adaptive_max_cond_type2 : 1000000
+ adaptive_max_cond_type3 : 1000000
+ adaptive_use_cond_guard : 0
+ adaptive_batch_size    : 256
+ exxmethod              : pseudo
+ is_helper              : 0
+ inv_param              : 1e-08
+ validate_hf            : 1
+ isdf_ratio             : 8
+ adaptive_weight_batch_size : 256
+ seed                   : 0
+ init                   : random
+ weight                 : add
+ sys                    : <struct>
+ debug_checks           : 0
+ debug_level            : error
+ debug_tags             : []
+
+[test_Si] Ex comparison by ik (eV), size [16 x 3] (ib x ik)
+  ||Ex_dir||_F  = 5.617684e+01
+  ||Ex_isdf||_F = 5.617676e+01
+  ||dEx||_F     = 1.202037e-03
+  rel||dEx||_F  = 2.139738e-05
+  wall_input      = 160.195 s
+  wall_ex_isdf    = 3.742 s
+  wall_ex_dir     = 0.621 s
+
+ik = 1
+    nb       Ex_dir      Ex_isdf          dEx
+     1    19.006740    19.007590     0.000850
+     2    13.153819    13.153602    -0.000217
+     3    13.153819    13.153615    -0.000204
+     4    13.153819    13.153638    -0.000181
+     5     5.957065     5.956958    -0.000108
+     6     5.957065     5.957123     0.000058
+     7     5.957065     5.956876    -0.000189
+     8     5.230703     5.230624    -0.000079
+     9     2.205419     2.205373    -0.000046
+    10     4.732427     4.732350    -0.000077
+    11     4.732427     4.732467     0.000040
+    12     2.051252     2.051236    -0.000016
+    13     2.051252     2.051223    -0.000029
+    14     2.051252     2.051235    -0.000016
+    15     0.996757     0.996731    -0.000026
+    16     2.095096     2.095086    -0.000010
+***
+
+ik = 2
+    nb       Ex_dir      Ex_isdf          dEx
+     1    17.411934    17.411985     0.000051
+     2    14.168854    14.169141     0.000287
+     3    13.088188    13.087987    -0.000201
+     4    13.088188    13.088113    -0.000075
+     5     5.797126     5.797076    -0.000050
+     6     5.323354     5.323240    -0.000114
+     7     5.323354     5.323335    -0.000019
+     8     2.125422     2.125527     0.000105
+     9     4.045711     4.045688    -0.000023
+    10     4.045711     4.045672    -0.000039
+    11     3.896525     3.896440    -0.000085
+    12     3.711187     3.711201     0.000014
+    13     3.711187     3.711129    -0.000058
+    14     3.560648     3.560663     0.000015
+    15     2.479175     2.479172    -0.000004
+    16     2.177532     2.177550     0.000019
+***
+
+ik = 3
+    nb       Ex_dir      Ex_isdf          dEx
+     1    15.888195    15.887773    -0.000421
+     2    15.888195    15.887841    -0.000354
+     3    12.991510    12.991638     0.000128
+     4    12.991510    12.991515     0.000005
+     5     5.110913     5.110924     0.000011
+     6     5.110910     5.110912     0.000002
+     7     4.097923     4.097883    -0.000039
+     8     4.097923     4.097938     0.000016
+     9     4.623961     4.624048     0.000087
+    10     4.623961     4.623836    -0.000124
+    11     3.586298     3.586348     0.000050
+    12     3.586303     3.586246    -0.000057
+    13     3.767979     3.768052     0.000073
+    14     3.767972     3.768012     0.000040
+    15     2.065129     2.065190     0.000061
+    16     2.065131     2.065114    -0.000017
+***

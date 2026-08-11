@@ -1,0 +1,49 @@
+&CONTROL
+  prefix = 'Si32',
+  isgw = 1,
+  groundstate_dir = '../Si32.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 8189,
+  energy_band_index_min = 1,
+  energy_band_index_max = 128,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = -1,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 2,
+  coulomb_cutoff = 50.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .false.
+  compute_vn = .true.
+  compute_nn = .false.
+  isdf_ratio = 7.0
+  isdf_ratio_type3 = 2.5
+  adaptive_threshold_type1 = 2.0e-5
+  adaptive_threshold_type2 = 2.0e-5
+  adaptive_num_add_type1 = 128
+  adaptive_num_add_type2 = 128
+  adaptive_candidate_ratio_type1 = 2.0
+  adaptive_candidate_ratio_type2 = 2.0
+  adaptive_max_add_frac_type1 = 2.0
+  adaptive_max_add_frac_type2 = 2.0
+  adaptive_batch_size = 512
+  exxmethod = 'coarse'
+  is_helper = .false.
+END &ISDF
+
+&COHSEX
+  exact_ch = .true.
+END &COHSEX

@@ -1,0 +1,44 @@
+=== Profile summary (top 40 by TotalTime) ===
+
+Total[s] Self[s]  Calls    Function
+------------------------------------------------------------------------
+1062.399    0.000        1 run_demo_sc_scaling_profile
+1062.312    0.000        1 demo_sc_scaling
+ 547.734    0.000        1 demo_isdf_scaling
+ 495.081    0.000        1 demo_GW_scaling
+ 396.017    0.000        3 parallel_function
+ 392.137    0.000        3 parallel_function>distributed_execution
+ 377.416    0.000        2 demo_isdf_scaling>local_build_helperqG
+ 327.488    0.000     1888 ParforEngine>ParforEngine.addInterval
+ 327.262    0.000     1891 optionallySerialize
+ 327.138    0.000     1891 distcompserialize64
+  80.789    0.000        2 gen_coeff_from_fine_grid
+  68.814    0.000        1 demo_isdf_scaling>local_bootstrap_service
+  67.451    0.000        2 SC_ISDF_r_sampling_to_lin
+  67.364    0.000    12288 ismember
+  66.902    0.000    12288 ismember>ismemberR2012a
+  56.383    0.000        1 driver
+  28.980    0.000      177 ParforEngine>ParforEngine.getCompleteIntervals
+  26.559    0.000     1888 optionallyDeserialize
+  26.278    0.000     1888 distcompdeserialize
+  24.693    0.000        2 QPstartup
+  16.372    0.000        4 prod
+  16.303    0.000        4 prod_mex
+  14.386    0.000       14 QPstartup>add_mpaths_only
+  13.660    0.000       67 addpath
+  13.468    0.000       67 path
+  12.522    0.000     8193 WF_apply_symm
+  12.178    0.000        2 demo_isdf_scaling>local_mu_coul_contract
+   8.037    0.000     1888 parallel_function>distributed_execution/consume_
+   7.919    0.000        2 gen_bundle
+   7.175    0.000        2 restoredefaultpath
+   3.994    0.000        1 wf_m>wf_m.wf_m
+   3.788    0.000        3 parallel_function>@(initData,F)createEngine(M,in
+   3.787    0.000        3 PoolOptions>PoolOptions.createEngine
+   3.754    0.000        3 ParforEngine>ParforEngine.ParforEngine
+   3.730    0.000        3 ParforEngine>ParforEngine.buildParforController
+   2.987    0.000      277 genpath
+   2.320    0.000        1 driver
+   2.261    0.000        1 load_formal_groundstate
+   2.183    0.000        1 RL_shell_construct
+   1.498    0.000      134 general/private/parsedirs

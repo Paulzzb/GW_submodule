@@ -1,0 +1,43 @@
+&CONTROL
+  prefix = 'SrTiO3_k',
+  isgw = 1,
+  groundstate_dir = './qe.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  enable_k_points = .true.
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  ! Placeholder band window — revise after QE data is in place.
+  number_bands_in_summation = 64,
+  energy_band_index_min = 1,
+  energy_band_index_max = 32,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 0,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_truncation_parameter = 5.0
+  coulomb_truncation_method = 2,
+  coulomb_cutoff = 15.0
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1
+  compute_vc = .true.
+  compute_vn = .true.
+  compute_nn = .true.
+  isdf_ratio_type1 = 4.0
+  isdf_ratio_type2 = 3.0
+  isdf_ratio_type3 = 4.0
+  exxmethod = 'coarse'
+  is_helper = .false.
+  validate_hf = .false.
+END &ISDF
+
+&COHSEX
+  exact_ch = .false.
+END &COHSEX

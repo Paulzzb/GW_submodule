@@ -1,0 +1,74 @@
+&CONTROL
+  isgw = 1,
+  isbse = 0,
+  enable_k_points = .false.,
+  output_dir = './',
+  prefix = 'cohsex_isdf',
+  groundstate_dir = '../qe.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  outfile = 'GWoutput',
+  log_level = 1,
+  log_file = 'QPlog',
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 319,
+  energy_band_index_min = 1,
+  energy_band_index_max = 32,
+END &SYSTEM
+
+&CUTOFFS
+  coulomb_truncation_method = 2,
+  coulomb_truncation_parameter = 5.0,
+  coulomb_cutoff = 15.0,
+  density_cutoff = -1,
+END &CUTOFFS
+
+&FREQUENCY
+  frequency_dependence = -2,
+END &FREQUENCY
+
+&ISDF
+  isisdf = 1,
+  compute_vc = .true.,
+  compute_vn = .true.,
+  compute_nn = .true.,
+  isdf_ratio_type1 = 12.0,
+  isdf_ratio_type2 = 24.0,
+  isdf_ratio_type3 = 16.0,
+  adaptive_threshold_type1 = 2e-4,
+  adaptive_threshold_type2 = 2e-6,
+  adaptive_threshold_type3 = 2e-6,
+  adaptive_num_add_type1 = 32,
+  adaptive_num_add_type2 = 32,
+  adaptive_num_add_type3 = 32,
+  adaptive_candidate_ratio_type1 = 2.0,
+  adaptive_candidate_ratio_type2 = 2.0,
+  adaptive_candidate_ratio_type3 = 2.0,
+  adaptive_max_cond_type1 = 1e12,
+  adaptive_max_cond_type2 = 1e12,
+  adaptive_max_cond_type3 = 1e12,
+  adaptive_use_cond_guard = .true.,
+  adaptive_batch_size = 256,
+  exxmethod_type1 = '',
+  exxmethod_type2 = '',
+  exxmethod_type3 = '',
+  exxmethod = 'qrcp',
+  seed = 0,
+  init = 'random',
+  weight = 'add',
+  is_helper = .true.,
+  validate_hf = .true.,
+  inv_strategy = 'dir',
+  inv_param = 1e-12,
+  inv_ratio = 0.75,
+  auto_inv_param = .false.,
+  order = 1,
+  iscauchy = .true.,
+END &ISDF
+
+&COHSEX
+  exact_ch = .false.,
+  ex_use_which_isdf = 'vn',
+END &COHSEX

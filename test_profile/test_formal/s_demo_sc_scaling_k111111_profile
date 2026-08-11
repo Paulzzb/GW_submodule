@@ -1,0 +1,56 @@
+#!/bin/bash -l
+#SBATCH -J demo_sc_k111111_prof
+#SBATCH -t 1200:00:00
+#SBATCH -p normal
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH --exclusive
+#SBATCH -w largememory
+#
+# LiH formal demo_sc_scaling [11 11 11] on largememory (exclusive node) + MATLAB profile.
+# Worker count: resolve_parpool_workers() reads SLURM_CPUS_ON_NODE / SLURM_CPUS_PER_TASK.
+# Override: sbatch --cpus-per-task=N ...  or  export PARPOOL_WORKERS=N
+#
+#   sbatch /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/s_demo_sc_scaling_k111111_profile
+
+set -euo pipefail
+
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+RUNMATLAB="${RUNMATLAB:-/public/software/MATLAB/R2023a/bin/matlab}"
+GW_ROOT="/data-storage/home/huwei/zzb/GW_double_test"
+FORMAL_DIR="${GW_ROOT}/test_profile/test_formal"
+UC_SAVE_DIR="${UC_SAVE_DIR:-${GW_ROOT}/test_profile/test_SC/LiH_111/SAVE}"
+OUT_DIR="${OUT_DIR:-${FORMAL_DIR}/LiH_111111_demo_scaling}"
+LOG_DIR="${FORMAL_DIR}/log"
+LOG_FILE="${LOG_DIR}/demo_sc_scaling_k11_11_11_profile.log"
+
+mkdir -p "$LOG_DIR" "$OUT_DIR"
+cd "$FORMAL_DIR" || exit 1
+
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+  rm -f "${FORMAL_DIR}"/slurm-demo_sc_k111111_prof*
+fi
+
+echo "=== demo_sc_scaling [11 11 11] profile run ==="
+echo "GW_ROOT      = $GW_ROOT"
+echo "UC_SAVE_DIR  = $UC_SAVE_DIR"
+echo "OUT_DIR      = $OUT_DIR"
+echo "SLURM_CPUS_PER_TASK = ${SLURM_CPUS_PER_TASK:-unset}"
+echo "SLURM_CPUS_ON_NODE  = ${SLURM_CPUS_ON_NODE:-unset}"
+echo "HOST_CPUS (nproc)   = $(nproc)"
+echo "LOG_FILE     = $LOG_FILE"
+echo "Started at   = $(date -Is)"
+echo "============================================"
+
+"$RUNMATLAB" -nodisplay -nodesktop -nosplash -logfile "$LOG_FILE" -r \
+  "addpath('${FORMAL_DIR}'); \
+   report=run_demo_sc_scaling_profile('${UC_SAVE_DIR}', [11 11 11], '${OUT_DIR}'); \
+   fprintf('FINISHED wall=%.3f s profile=%s\n', report.wall_s, report.profile_dir); \
+   exit;"
+
+echo "Finished at  = $(date -Is)"
+echo "Report: ${OUT_DIR}/demo_sc_scaling_report.txt"
+echo "Profile: ${OUT_DIR}/profile_demo_sc/index.html"
+echo "Log: $LOG_FILE"

@@ -1,0 +1,176 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xeCJK}
+\setCJKmainfont{SimSun}
+
+\title{COHSEX 计算中与积分相关参数的整理（中文）}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{目的}
+本文整理当前工程中 COHSEX（尤其是 \texttt{exact\_CH} 分支）里与离散积分、FFT 归一化、Coulomb 权重相关的参数与系数，帮助定位 ``数值看起来不对'' 的来源。
+
+\section{连续到离散的基准}
+设实空间均匀网格点数为 $N_r$，晶胞体积为 $\Omega$，则
+\[
+\Delta V=\frac{\Omega}{N_r}.
+\]
+离散积分通常写为
+\[
+\int_{\Omega} f(\mathbf r)\, d\mathbf r
+\;\approx\;
+\sum_{\mathbf r} f_{\mathbf r}\,\Delta V.
+\]
+连续 delta 在离散网格上的等价关系应满足
+\[
+\sum_{\mathbf r'} \Delta V\,\delta^{(d)}_{\mathbf r\mathbf r'} f_{\mathbf r'}
+=f_{\mathbf r},
+\quad
+\delta^{(d)}_{\mathbf r\mathbf r'}=\frac{\delta^K_{\mathbf r\mathbf r'}}{\Delta V}.
+\]
+
+\section{代码中出现的关键量与物理含义}
+\subsection{体积与网格}
+\begin{itemize}
+  \item \texttt{d\_lat\_data.DL\_vol}: 实空间晶胞体积 $\Omega$（代码多处命名为 \texttt{DL\_vol} 或 \texttt{vol}）。
+  \item \texttt{fft\_data.nr} 或 \texttt{nr\_fine}: 实空间网格点总数 $N_r$。
+  \item \texttt{d\_lat\_data.DL\_vol / fft\_data.nr}: 单点体积 $\Delta V$。
+\end{itemize}
+
+\subsection{FFT 归一化约定（本项目）}
+在 \texttt{GW/common/do\_FFT.m} 中：
+\begin{itemize}
+  \item \texttt{sign=1} 对应 \texttt{ifftn}；
+  \item \texttt{sign=-1} 对应 \texttt{fftn}。
+\end{itemize}
+因此，物理量从实空间到 G 空间、或反向恢复时，经常需要手工乘除体积或网格数进行归一化补偿（例如 \texttt{get\_wavefunc\_real.m} 和 \texttt{gen\_tildeVq.m}）。
+
+\subsection{Coulomb 权重}
+\texttt{GW/service/+coulomb/vcoul.m} 中：
+\begin{itemize}
+  \item \texttt{q\_weight} 定义为 $d3q\_factor/(2\pi)^3$，并已把 BZ 体积离散权重吸收进 \texttt{vcoul};
+  \item \texttt{vcoul0} 对 $q\to0$ 特殊处理。
+\end{itemize}
+这意味着后续公式若再显式乘一次相同的 q-space 权重，可能重复计权。
+
+\section{COHSEX 主流程里“积分相关系数”清单}
+以下对应 \texttt{GW/packages/gw\_cohsex\_multi\_k.m}：
+\begin{enumerate}
+  \item 能量单位：\texttt{ev = system\_data.Eo * ry2ev}（Ry 到 eV）。
+  \item 非 \texttt{exact\_CH} 分支：$\Sigma^{\mathrm{COH}}$ 通过
+  \[
+  \rho^\dagger \tilde W \rho
+  \]
+  直接在 ISDF 采样空间累计（隐含了采样定义中的归一化约定）。
+  \item \texttt{exact\_CH} 分支：
+  \begin{itemize}
+    \item 先由 \texttt{helperqG\_vc} 反算 \texttt{helperqR\_vc}；
+    \item 再通过 $K^{-1}$ 与分块方式构造 $W(q;r,r)$（代码中 \texttt{Wqrr}）；
+    \item 最后做
+    \[
+    \Sigma^{\mathrm{COH}}_{nk}
+    \sim
+    \sum_r W(q;r,r)\,|\psi_{nk}(r)|^2 \,\Delta V.
+    \]
+  \end{itemize}
+\end{enumerate}
+
+\section{当前最容易出错的地方（建议重点核对）}
+\subsection{(A) $\Delta V$ 是否重复乘}
+在 \texttt{exact\_CH} 分支里，代码同时出现：
+\begin{itemize}
+  \item \texttt{coeff\_delta = DL\_vol / nr}（构造 \texttt{Wqrr} 时）；
+  \item \texttt{tmp = sum(Wqrr .* abs(wf).*\!abs(wf)) * DL\_vol / nr\_fine}（最终期望值时再乘一次）。
+\end{itemize}
+如果 \texttt{Wqrr} 已经带了 $\Delta V$，最终再乘一次会多出一个 $\Delta V$ 因子。
+
+\subsection{(B) FFT 反变换的归一化是否与正向一致}
+\texttt{gen\_tildeVq.m} 正向使用
+\[
+\texttt{helperqG} \leftarrow \texttt{ifftn(helperqR)} \times DL\_vol.
+\]
+若反向恢复 \texttt{helperqR} 时用的是 \texttt{fftn}/\texttt{DL\_vol}，需确认是否还应乘/除 $N_r$，以保证前后互逆到机器精度。
+
+\subsection{(C) 波函数归一化约定}
+\texttt{get\_wavefunc\_real.m} 有
+\[
+\texttt{fftbox = (nfftgrid/vol) * ifftn(...)}.
+\]
+建议实测：
+\[
+\sum_r |\psi(r)|^2,\quad
+\sum_r |\psi(r)|^2 \Delta V
+\]
+哪一个接近 1。此项决定最终公式里应否显式再乘 $\Delta V$。
+
+\subsection{(D) Coulomb 权重是否重复}
+\texttt{vcoul} 已含 q-space 权重；后续若又按 \texttt{nqbz} 或 \texttt{RL\_vol} 额外加权，需核对是否重复。
+
+\section{建议的最小自洽检查}
+\begin{enumerate}
+  \item \textbf{FFT往返测试}：随机 \texttt{helperqR} 经过正向/反向后相对误差 $\ll 10^{-10}$。
+  \item \textbf{波函数归一化测试}：确认规范是 ``$\sum |\psi|^2=1$'' 还是 ``$\sum |\psi|^2\Delta V=1$''。
+  \item \textbf{单 q、单 band 对照}：对同一组输入，比较
+  \[
+  \rho^\dagger \tilde W \rho
+  \quad\text{vs}\quad
+  \sum_r |\psi|^2 W(r,r)\Delta V
+  \]
+  差异是否仅在数值误差范围内。
+  \item \textbf{$\Delta V$ 敏感性}：人为去掉/增加一处 $\Delta V$，观察量级变化是否正好按预期缩放。
+\end{enumerate}
+
+\section{本次 Si2（test\_nok）调试记录与结论}
+\subsection{运行设置}
+本次在 \texttt{GW/test\_profile/test\_nok} 下运行；该目录使用 \texttt{Si.save}，其
+\texttt{data-file-schema.xml} 中 \texttt{nat=2}，对应 Si2 晶胞。为了覆盖
+\texttt{exact\_CH} 调试路径，分别执行了：
+\begin{itemize}
+  \item 默认 \texttt{test\_gw\_cohsex\_multi\_k}（\texttt{isisdf=0}，noISDF 路径）；
+  \item \texttt{isisdf=1} 并先运行 \texttt{isdf.driver} 生成 \texttt{vc/vn/nn} 槽位；
+  \item \texttt{exact\_CH} 两种模式：\texttt{legacy} 与 \texttt{dv\_once\_half}。
+\end{itemize}
+
+\subsection{关键数值结果（Frobenius 范数）}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Case & $\|E_{\mathrm{sx\_x}}\|_F$ & $\|E_{\mathrm{coh}}\|_F$ & $\|E_{\mathrm{qp}}\|_F$ \\
+\midrule
+noISDF（默认） & $2.248869\times10^{-1}$ & $7.943206\times10^{-1}$ & $2.296559$ \\
+exact\_CH, legacy & $2.260923\times10^{-1}$ & $5.254613\times10^{-7}$ & $2.681360$ \\
+exact\_CH, dv\_once\_half & $2.260923\times10^{-1}$ & $1.555119\times10^{-5}$ & $2.681371$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{debug 打印的直接证据}
+\begin{itemize}
+  \item 波函数归一化：\texttt{norm\_plain}$\approx 5.919\times 10^1$，
+  \texttt{norm\_dv}$\approx 1$，说明当前规范是
+  $\sum_r |\psi(r)|^2 \Delta V \approx 1$。
+  \item \texttt{ratio(legacy/half)}$\approx 3.3789\times10^{-2}$，在 band 上几乎不变。
+  该量级与 $2\Delta V$ 一致（本例 $\Delta V=\Omega/N_r\approx 0.0168945$），
+  表明 \texttt{legacy} 相对 \texttt{dv\_once\_half} 含有额外的体积因子尺度差。
+\end{itemize}
+
+\subsection{工程决策（本次修改）}
+为便于持续对照与回滚，本次在 \texttt{gw\_cohsex\_multi\_k.m} 中：
+\begin{itemize}
+  \item 新增 \texttt{COHSEX.exact\_ch\_mode}（\texttt{legacy}/\texttt{dv\_once}/\texttt{dv\_once\_half}）；
+  \item 新增 \texttt{COHSEX.exact\_ch\_debug} 打印归一化与模式比值；
+  \item 默认模式设为 \texttt{dv\_once\_half}；
+  \item 原关键公式保留为注释（不删除），用于后续审阅与交叉验证。
+\end{itemize}
+
+\section{简要结论}
+COHSEX 数值偏差最常见来源不是“公式本身错”，而是\textbf{离散权重与 FFT 归一化在不同模块间不一致}。当前代码里最可疑的是 \texttt{exact\_CH} 分支中 $\Delta V$ 可能重复进入（\texttt{Wqrr} 构造一次、最终求和再一次）。
+
+\end{document}
+

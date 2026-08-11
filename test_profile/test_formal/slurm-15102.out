@@ -1,0 +1,35 @@
+/usr/bin/id: cannot find name for user ID 1155
+/usr/bin/id: cannot find name for group ID 1156
+/usr/bin/id: cannot find name for user ID 1155
+=== demo_sc_scaling [8 8 8] profile run ===
+GW_ROOT      = /data-storage/home/huwei/zzb/GW_double_test
+UC_SAVE_DIR  = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE
+OUT_DIR      = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_888_demo_scaling
+SLURM_CPUS_PER_TASK = unset
+SLURM_CPUS_ON_NODE  = 96
+HOST_CPUS (nproc)   = 1
+LOG_FILE     = /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/log/demo_sc_scaling_k8_8_8_profile.log
+Started at   = 2026-06-14T00:49:44+0800
+============================================
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2023 The MathWorks, Inc.
+                  R2023a (9.14.0.2206163) 64-bit (glnxa64)
+                             February 22, 2023
+
+Warning: X does not support locale en_US.UTF-8
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+[run_demo_sc_scaling_profile] resolve_parpool_workers -> 96
+[run_demo_sc_scaling_profile] UC=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/SAVE k=[8 8 8] workers=96 out=/data-storage/home/huwei/zzb/GW_double_test/test_profile/test_formal/LiH_888_demo_scaling
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 96 workers.
+[run_demo_sc_scaling_profile] parpool NumWorkers=96
+GW module root path set to: /data-storage/home/huwei/zzb/GW_double_test/
+[FORMAL] unit cell /data-storage/home/huwei/zzb/GW_double_test/test_profile/test_SC/LiH_111/../../../../Materialtest/systems/LiH/1_1_1/LiH.save -> supercell [8 8 8], fft [160 160 160], nb=4096, ng=91047, ne=4096, nsym=1 (no symmetry)
+demo_sc_scaling: UC [20 20 20] -> SC [160 160 160], nb 8 -> 4096, ng 3959 -> 91047
+GW module root path set to: /data-storage/home/huwei/zzb/GW_double_test/
+[parallel.driver] reuse existing pool (96 workers)
+slurmstepd: error: *** JOB 15102 ON largememory CANCELLED AT 2026-06-14T00:59:42 ***

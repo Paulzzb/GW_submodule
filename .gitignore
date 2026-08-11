@@ -1,0 +1,47 @@
+*.mat
+*.asv
+*.html
+*QPenergy
+QPen*
+
+# Platform-specific MEX binaries (built on demand by QPstartup / isdf.*.build_*_mex)
+*.mex*
+
+*log
+*.txt
+
+
+!GW/example_profile/TMP_files/groundstate.mat
+
+# test_profile: ignore generated checkpoints and report-like text outputs
+test_profile/**/*.mat
+test_profile/**/adaptiveisdf_id*.txt
+test_profile/**/isdf_validate_HF*.txt
+test_profile/**/HF_ratio*.txt
+test_profile/**/adapt_ratio*.txt
+test_profile/**/coarse_FFT_direct.txt
+test_profile/**/*report*.txt
+test_profile/**/*报告*.txt
+test_profile/**/*log*.txt
+
+# tests/: generated SAVE / logs / QE binaries (keep namelist + README)
+tests/**/SAVE/
+tests/**/r-*.log
+tests/**/l-*.log
+tests/**/*.mat
+tests/cases/**/qe.save/**
+!tests/cases/**/qe.save/README.md
+
+# example/: same policy for QE binaries; keep README placeholders.
+# Si_k ships a small (~1MB) qe.save for multi-k smoke; gamma/large GS stay local.
+example/**/SAVE/
+example/**/r-*.log
+example/**/l-*.log
+example/**/*.mat
+example/**/isdf_report/
+
+
+# ./GW/test/*.mat
+# Add mol and kssolv-scf result of Si8 into path
+# !./GW/test/data/Si8/IntermediateFiles/molinfo.mat
+# !./GW/test/data/Si8/IntermediateFiles/scinfo.mat
