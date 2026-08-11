@@ -29,6 +29,7 @@ add_mpaths_only([CPATH 'examples/']);
 add_mpaths_only([CPATH 'tests/']);
 addpath(genpath([CPATH 'service/']))
 addpath(genpath([CPATH 'packages/']))
+add_mpaths_only([CPATH 'interfaces/']);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % [Developer Hook] Insert your custom folders below
 % add_mpaths_only([CPATH 'mymodule/']);

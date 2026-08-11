@@ -19,6 +19,7 @@ function service_driver(data, config)
   stage_path = fullfile(storage_dir, def.stage);
 
   isdf.debug.init_from_config(config);
+  isdf.adaptive.adaptive_checkpoint_path('set', storage_dir);
   parallel.driver(data, config);
 
   if isfile(stage_path)

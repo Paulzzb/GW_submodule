@@ -36,6 +36,8 @@ function report = service_reset_persistent(opts)
     @() isdf.get_u_xalpha('reset'), 'isdf.get_u_xalpha(''reset'')';
     @() isdf.get_rho_xalpha('reset'), 'isdf.get_rho_xalpha(''reset'')';
     @() isdf.debug.clear(), 'isdf.debug.clear';
+    @() isdf.adaptive.adaptive_checkpoint_path('clear'), ...
+      'isdf.adaptive.adaptive_checkpoint_path(''clear'')';
     @() parallel.free(), 'parallel.free';
     @() timing.free(), 'timing.free';
     @() output.free(), 'output.free';

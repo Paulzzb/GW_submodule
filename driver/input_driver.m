@@ -58,7 +58,7 @@ function input_driver(inputfile)
   if ~exist(dir, 'dir')
     mkdir(dir);
   end
-  config.ISDFCauchy = setISDFCauchy(data, config);
+  config.ISDFCauchy = isdf.Cauchy.setISDFCauchy(data, config);
   save(fNamedata, 'data', '-v7.3', '-nocompression');
   save(fNameconfig, 'config', '-v7.3', '-nocompression');
 
