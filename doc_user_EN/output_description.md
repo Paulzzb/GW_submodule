@@ -1,9 +1,11 @@
-# Output Description
+# Output description
 
 This document summarizes the major output files produced by the current QP calculation framework.
 
 Related docs: [`README.md`](README.md), [`class_reference.md`](class_reference.md).  
 File-name constants are defined in `util/filename_map.m`.
+
+中文版：[`../doc_user_ZH/output_description.md`](../doc_user_ZH/output_description.md)
 
 ---
 
@@ -15,7 +17,7 @@ File-name constants are defined in `util/filename_map.m`.
 | `CONTROL.output_dir` (e.g. `./`) | `r-<prefix>.log`, `qp.dat` | `display_input_summary` / `qp.fout` |
 | Working case directory | `isdf_report/o-ISDF_*` | ISDF report writers |
 
-Default `storage_dir` is `./QP.save/` if omitted; examples usually set `./SAVE`.
+Default `storage_dir` is `./SAVE/`; examples usually set `./SAVE` explicitly.
 
 ---
 
@@ -43,11 +45,11 @@ Persist DFT input so later stages can restart without re-reading QE HDF5.
 
 **Description:**  
 Parsed namelist plus defaults (`set_default_param_value`).  
-Blocks typically include `CONTROL`, `SYSTEM`, `CUTOFFS`, `FREQUENCY`, `ISDF`, `COHSEX`, and optional `SUPERCELL` / `FORMAL`.
+Blocks typically include `CONTROL`, `SYSTEM`, `CUTOFFS`, `FREQUENCY`, `ISDF`, `COHSEX`.
 
 **Important:**  
 `input_driver` **always rebuilds** `config` from the namelist.  
-Editing CUTOFFS / ISDF / FREQUENCY in the namelist takes effect on the next `input_driver` call even if the stage cache is kept.
+Editing CUTOFFS / ISDF / FREQUENCY takes effect on the next `input_driver` call even if the stage cache is kept.
 
 Parameter overview: [`GW_input_description.md`](GW_input_description.md).
 
@@ -76,7 +78,7 @@ If `relay_stage.mat` exists but `data.mat` is missing, `input_driver` warns and 
 
 **Path:** `<output_dir>/qp.dat` (falls back to `storage_dir` if `output_dir` unset)  
 **Writer:** `qp.fout` (called by `qp.launcher`)  
-**Class / struct:** result struct `E` — see [`class_reference.md`](class_reference.md#e-return-value-of-qplauncher)
+**Class / struct:** result struct `E` — see [`class_reference.md`](class_reference.md)
 
 **Description:**  
 Human-readable quasiparticle energy table.
@@ -88,7 +90,7 @@ Human-readable quasiparticle energy table.
 
 ### Static / COHSEX-style header
 
-Used when `frequency_dependence` is not `2` (e.g. `-1`, `-2`):
+Used when `frequency_dependence` is not `2` (e.g. `-2`):
 
 ```plaintext
    n         Emf          Eo           X        SX-X          CH         Sig         Vxc        Eqp0
@@ -121,50 +123,7 @@ Two lines per band: real parts on the first line, imaginary parts of SX-X / CH /
 
 ---
 
-## 5. `r-<prefix>.log`
-
-**Path:** `<output_dir>/r-<prefix>.log`  
-**Writer:** `service/+output` (opened by `display_input_summary` during `input_driver`)
-
-**Description:**  
-Main run report / log (Yambo-style OF naming).
-
-- Default `prefix = 'QP'` → `r-QP.log`
-- Examples: `r-Si_gamma.log`, `r-Si2_uc.log`
-- Existing files are rotated: `r-Si_gamma_01.log`, …
-
-Verbosity follows `CONTROL.log_level` (`0`–`2`).  
-`CONTROL.log_file` is a legacy exclusive-log option; the live report used by current drivers is `r-<prefix>.log`.
-
-Messaging API (for developers): `output.msg`, `output.warn`, `output.err`, `output.section`, `output.push`, …
-
----
-
-## 6. ISDF reports and checkpoints
-
-### 6.1 Text reports
-
-**Directory:** `./isdf_report/` (relative to the case working directory)  
-**Names** (`filename_map`):
-
-| Pattern | Role |
-|---------|------|
-| `o-ISDF_cond` | Conditioning / condition-number report |
-| `o-ISDF_HF_id%d` | Hartree–Fock validation report for ISDF id |
-| `o-ISDF_adaptive_id%d` | Adaptive ISDF progress / diagnostics |
-
-Enabled when ISDF is on (`ISDF.isisdf`) and the corresponding validation / adaptive paths run.
-
-### 6.2 Adaptive checkpoints
-
-**Path:** `<storage_dir>/isdf_adaptive_checkpoint_<desc>_idN.mat`  
-(e.g. `vc` / `vn` / `nn`)
-
-Used to resume expensive adaptive ISDF constructions.
-
----
-
-## 7. In-memory result `E`
+## 5. In-memory result `E`
 
 Not a file by itself, but the primary MATLAB return value:
 
@@ -179,8 +138,50 @@ Details: [`class_reference.md`](class_reference.md).
 
 ---
 
+## 6. `r-<prefix>.log`
+
+**Path:** `<output_dir>/r-<prefix>.log`  
+**Writer:** `service/+output` (opened by `display_input_summary` during `input_driver`)
+
+**Description:**  
+Main run report / log (Yambo-style OF naming).
+
+- Default `prefix = 'QP'` → `r-QP.log`
+- Examples: `r-Si_gamma.log`, `r-Si2_uc.log`
+- Existing files are rotated: `r-Si_gamma_01.log`, …
+
+Verbosity follows `CONTROL.log_level` (`0`–`2`).  
+`CONTROL.log_file` is a legacy exclusive-log option; the live report used by current drivers is `r-<prefix>.log`.
+
+---
+
+## 7. ISDF reports and checkpoints
+
+### 7.1 Text reports
+
+**Directory:** `./isdf_report/` (relative to the case working directory)  
+**Names** (`filename_map`):
+
+| Pattern | Role |
+|---------|------|
+| `o-ISDF_cond` | Conditioning / condition-number report |
+| `o-ISDF_HF_id%d` | Hartree–Fock validation report for ISDF id |
+| `o-ISDF_adaptive_id%d` | Adaptive ISDF progress / diagnostics |
+
+Enabled when ISDF is on (`ISDF.isisdf`) and the corresponding validation / adaptive paths run.
+
+### 7.2 Adaptive checkpoints
+
+**Path:** `<storage_dir>/isdf_adaptive_checkpoint_<desc>_idN.mat`  
+(e.g. `vc` / `vn` / `nn`)
+
+Used to resume expensive adaptive ISDF constructions.
+
+---
+
 ### Changing log
 
 | Date | Name | Changes |
 |------|------|---------|
+| 2026-08-11 | ZZ | Split into `doc_user_ZH` / `doc_user_EN` |
 | 2026-08-08 | Zhengbang | Rewrite for SAVE / qp.dat / r-*.log layout |

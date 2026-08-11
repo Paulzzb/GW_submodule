@@ -3,6 +3,8 @@
 用户通常只需关心 `qp.launcher` / `qp_driver` 返回的 `E`，以及写出的文本表 `qp.dat`。  
 列含义与文件布局详见 [`output_description.md`](output_description.md)。
 
+English version: [`../doc_user_EN/class_reference.md`](../doc_user_EN/class_reference.md)
+
 ---
 
 ## `E`（`qp.launcher` 返回值）
@@ -40,4 +42,5 @@ E = qp_driver('./SAVE');
 
 | Date | Name | Changes |
 |------|------|---------|
+| 2026-08-11 | ZZ | 拆分为 `doc_user_ZH` / `doc_user_EN` |
 | 2026-08-11 | ZZ | 用户版：仅保留 `E` / `qp.dat` |

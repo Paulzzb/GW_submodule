@@ -3,6 +3,8 @@
 填写 case 目录下的 `test`（namelist）时用本文。只列跑通展示算例常用的参数。  
 默认能量单位：**Ry**（`FREQUENCY.broadening` 除外，见下表）。
 
+English version: [`../doc_user_EN/GW_input_description.md`](../doc_user_EN/GW_input_description.md)
+
 ISDF 类型后缀：
 
 | 后缀 | 对 | 含义 |
@@ -20,15 +22,15 @@ ISDF 类型后缀：
 | 参数 | 默认 | 说明 |
 |------|------|------|
 | `groundstate_dir` | （必填） | 基态目录，如 `'./qe.save'` |
-| `groundstate_type` | `'qe'` | 当前暂只支持`'qe'` |
-| `storage_dir` | `'./QP.save/'` | 中间量目录；示例常用 `'./SAVE'` |
+| `groundstate_type` | `'qe'` | 当前暂只支持 `'qe'` |
+| `storage_dir` | `'./SAVE/'` | 中间量目录；示例常用 `'./SAVE'` |
 | `output_dir` | `'./'` | 报告与 `qp.dat` 所在目录 |
 | `prefix` | `'QP'` | 报告文件前缀 → `r-<prefix>.log` |
 | `log_level` | `1` | 日志详细程度 |
 | `enable_k_points` | `0` | 多 k；Gamma 展示算例为 `.false.` / `0` |
 | `isgw` | `1` | 启用 GW |
-| `isbse` | `0` | BSE（当前展示路径不用） |
-'
+| `isbse` | `0` | BSE（当前不支持） |
+
 ---
 
 ## `&SYSTEM`
@@ -48,7 +50,7 @@ ISDF 类型后缀：
 | `coulomb_truncation_method` | `2` | `0` 无截断；`2` 球截断（常用） |
 | `coulomb_truncation_parameter` | `5.0` | 截断参数（Ry；method `2` 时为球半径） |
 | `coulomb_cutoff` | `-1.0` | Coulomb/G 截断（Ry）；`-1` → 用基态波函数截断 |
-| `density_cutoff` | `-1` | 密度截断（Ry）；`-1` → 约 2× 波函数截断 |
+| `density_cutoff` | `-1` | 密度截断（Ry）；`-1` → 约 2× 波函数截断；当前无用 |
 
 截断取值敏感，改动前请对照基态与示例。
 
@@ -61,7 +63,7 @@ ISDF 类型后缀：
 | `frequency_dependence` | `0` | **`-2`** COHSEX（Gamma）；**`2`** 全频 CD（Gamma）。展示算例主要用这两档 |
 | `frequency_dependence_method` | `2` | 全频时的方法选择 |
 | `frequency_low_cutoff` | `-1.0` | 低频截止（Ry）；`-1` → 由能带估计 |
-| `broadening` | `0.018376` | 全频展宽（**eV**） |
+| `broadening` | `0.25` | 全频展宽（**eV**） |
 | `delta_frequency` | `≈0.147` | 实频网格步长（Ry） |
 | `number_imaginary_freqs` | `15` | 虚频点数 |
 | `cd_integration_parameter` | `2.0` | CD 积分参数（Ry） |
@@ -98,7 +100,7 @@ ISDF 类型后缀：
 
 | 参数 | 默认 | 说明 |
 |------|------|------|
-| `exact_ch` | `false` | 是否用精确 COH 路径（在可用时） |
+| `exact_ch` | `false` | 是否用精确 COH 求和（仅支持 `isisdf=1`） |
 | `ex_use_which_isdf` | `'vn'` | 交换用哪路 ISDF：`'vn'` 或 `'nn'` |
 
 在 `frequency_dependence = -2` 时本块才主要相关。

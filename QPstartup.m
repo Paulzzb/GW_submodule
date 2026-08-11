@@ -26,7 +26,7 @@ add_mpaths_only([CPATH 'input/']);
 addpath(genpath([CPATH 'src/']));
 add_mpaths_only([CPATH 'util/']);
 add_mpaths_only([CPATH 'examples/']);
-add_mpaths_only([CPATH 'tests/']);
+% add_mpaths_only([CPATH 'tests/']);
 addpath(genpath([CPATH 'service/']))
 addpath(genpath([CPATH 'packages/']))
 add_mpaths_only([CPATH 'interfaces/']);

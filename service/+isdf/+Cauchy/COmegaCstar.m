@@ -25,7 +25,11 @@ function [results, time, relError, iter] = COmegaCstar(Phi, Psi, evOcc, evUnocc,
     output.err('No band gap in current system, Cauchy integral not applicable.');
   end
   k = (sqrt(M / m) - 1) / (sqrt(M / m) + 1);
-  [K, ~] = isdf.Cauchy.ellipk(k);
+  % [K, ~] = isdf.Cauchy.ellipk(k);
+  % K(k): Driscoll ellipkkp(L) with L = -log(k)/pi  (same L as ellipjc below)
+  L0 = -log(k) / pi;
+  [K, ~] = isdf.Cauchy.ellipkkp(L0);
+
 
   results = zeros(n, n);
   discretePoints = [-K, K];

@@ -51,6 +51,10 @@ elif [[ "${1:-}" == "--case" ]]; then
   fi
 fi
 
+# Links live inside <case>/SAVE/, so hub is two levels up:
+#   <case>/SAVE/file -> ../../Si_gamma/SAVE/file
+# (NOT ../Si_gamma/... which wrongly resolves under <case>/Si_gamma/.)
+
 link_glob_from_hub() {
   local dest_save="$1"
   shift
@@ -60,15 +64,20 @@ link_glob_from_hub() {
     echo "WARN: hub SAVE missing: $HUB_SAVE (skip file links)"
     return 0
   fi
-  local pat f base
+  local pat f base rel
   for pat in "${patterns[@]}"; do
     shopt -s nullglob
     for f in "${HUB_SAVE}/"${pat}; do
       [[ -e "$f" || -L "$f" ]] || continue
       base="$(basename "$f")"
+      rel="../../Si_gamma/SAVE/${base}"
       rm -f "${dest_save}/${base}"
-      ln -sfn "../Si_gamma/SAVE/${base}" "${dest_save}/${base}"
-      echo "OK  $(basename "$(dirname "$dest_save")")/SAVE/${base} -> ../Si_gamma/SAVE/${base}"
+      ln -sfn "$rel" "${dest_save}/${base}"
+      if [[ ! -e "${dest_save}/${base}" ]]; then
+        echo "ERROR: broken link ${dest_save}/${base} -> ${rel}" >&2
+        exit 1
+      fi
+      echo "OK  $(basename "$(dirname "$dest_save")")/SAVE/${base} -> ${rel}"
     done
     shopt -u nullglob
   done
@@ -81,15 +90,19 @@ link_vn_from_exact() {
     echo "WARN: 162416_exact SAVE missing: $EXACT_162416_SAVE"
     return 0
   fi
-  local f base
+  local f base rel
   shopt -s nullglob
   for f in "${EXACT_162416_SAVE}/"isdf_adaptive_checkpoint_*vn*; do
     [[ -e "$f" || -L "$f" ]] || continue
-    # do not follow if exact itself somehow pointed elsewhere incorrectly
     base="$(basename "$f")"
+    rel="../../Si_gamma_162416_exact/SAVE/${base}"
     rm -f "${dest_save}/${base}"
-    ln -sfn "../Si_gamma_162416_exact/SAVE/${base}" "${dest_save}/${base}"
-    echo "OK  $(basename "$(dirname "$dest_save")")/SAVE/${base} -> ../Si_gamma_162416_exact/SAVE/${base}"
+    ln -sfn "$rel" "${dest_save}/${base}"
+    if [[ ! -e "${dest_save}/${base}" ]]; then
+      echo "ERROR: broken link ${dest_save}/${base} -> ${rel}" >&2
+      exit 1
+    fi
+    echo "OK  $(basename "$(dirname "$dest_save")")/SAVE/${base} -> ${rel}"
   done
   shopt -u nullglob
 }

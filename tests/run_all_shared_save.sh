@@ -19,7 +19,9 @@
 #
 # Steps:
 #   1. Soft-link Si_gamma_{ff,cohsex}_* /SAVE → ../Si_gamma/SAVE
-#   2. matlab -batch run_all_profiled  (profile on + profsave)
+#   2. Soft-link ISDF adaptive checkpoints for 16* ratio cases
+#   3. matlab -batch run_all_profiled  (profile on + profsave)
+#   4. Always remove all SAVE-related softlinks (success or failure)
 #
 # Requires: hub Si_gamma first in run_all.m. clean_case_outputs keeps SAVE
 # symlinks (does not wipe hub through the link).
@@ -40,6 +42,21 @@ LOG_DIR="${SCRIPT_DIR}/log"
 LOG_FILE="${LOG_DIR}/run_all_shared_save.log"
 
 mkdir -p "$LOG_DIR" "$PROFILE_DIR"
+
+unlink_all_save_symlinks() {
+  echo
+  echo "=== unlink all SAVE softlinks ==="
+  bash "${SCRIPT_DIR}/link_shared_save.sh" --unlink || true
+  bash "${SCRIPT_DIR}/link_isdf_checkpoints.sh" --unlink || true
+  # drop empty SAVE dirs left after removing file symlinks
+  find "${SCRIPT_DIR}/cases" -type d -name SAVE -empty -delete 2>/dev/null || true
+  local n
+  n="$(find "${SCRIPT_DIR}/cases" -type l \( -name SAVE -o -path '*/SAVE/*' \) 2>/dev/null | wc -l | tr -d ' ')"
+  echo "remaining SAVE symlinks under cases/: ${n}"
+}
+
+# Always clean links on exit (MATLAB failure, Ctrl-C, normal finish).
+trap unlink_all_save_symlinks EXIT
 
 if ! command -v "$MATLAB_BIN" >/dev/null 2>&1; then
   echo "ERROR: MATLAB not found: ${MATLAB_BIN}" >&2

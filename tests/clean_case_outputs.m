@@ -17,11 +17,13 @@ function clean_case_outputs(case_dir)
 %   If CASE_DIR/SAVE is a symlink (shared hub SAVE), only the link is left
 %   alone — never rmdir into the target (would wipe Si_gamma/SAVE).
 %
-%   Safe before QPstartup: adds util/ so filename_map is visible.
+%   Safe before QPstartup: adds util/ only if filename_map is not on the path.
 
   tests_dir = fileparts(mfilename('fullpath'));
   gw_root = fileparts(tests_dir);
-  addpath(fullfile(gw_root, 'util'));
+  if isempty(which('filename_map'))
+    addpath(fullfile(gw_root, 'util'));
+  end
 
   save_dir = fullfile(case_dir, 'SAVE');
   if local_is_symlink(save_dir)
@@ -72,12 +74,8 @@ function tf = local_is_symlink(p)
     tf = java.nio.file.Files.isSymbolicLink(java.nio.file.Paths.get(p));
   catch
     if isunix
-      [st, ~] = system(sprintf('test -L %s', local_shell_quote(p)));
+      [st, ~] = system(sprintf('test -L "%s"', p));
       tf = (st == 0);
     end
   end
-end
-
-function s = local_shell_quote(p)
-  s = ['''' strrep(p, '''', '''\'''''') ''''];
 end

@@ -11,8 +11,9 @@ function [K,Kp] = ellipkkp(L)
 %   Recall that the elliptic modulus k is related to the parameter
 %   M by M = k^2.
 % 
-%   Copyright (c)1999 by Toby Driscoll. 
-%   $Id: ellipkkp.m 298 2009-09-15 14:36:37Z driscoll $ 
+%   Copyright (c)1999 by Toby Driscoll.
+%   $Id: ellipkkp.m 298 2009-09-15 14:36:37Z driscoll $
+%   Vendored from the Schwarz-Christoffel Toolbox; see NOTICE in this folder.
 
 %   ELLIPKKP uses the method of the arithmetic-geometric mean described
 %   in 17.6 of M. Abramowitz and I.A. Stegun, "Handbook of Mathematical

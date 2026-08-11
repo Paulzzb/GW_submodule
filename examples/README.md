@@ -4,7 +4,7 @@ Small Gamma-Si showcase: same groundstate, compare **ISDF** vs **dense** for
 full-frequency (`fdep=2`) and COHSEX (`fdep=-2`). Timing and accuracy are
 the point — each case keeps its own `SAVE/` so setup cost is not shared away.
 
-User guide: [`../doc_user/README.md`](../doc_user/README.md).  
+User guide: [`../doc_user_EN/README.md`](../doc_user_EN/README.md) · [`../doc_user_ZH/README.md`](../doc_user_ZH/README.md).  
 Internal verification suites live under `tests/` (not this tree).
 
 ## Layout

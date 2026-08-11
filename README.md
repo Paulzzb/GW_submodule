@@ -1,128 +1,70 @@
-## PIGW 
-This is the distribution of the PIGW code.
-This code originated from a module in KSSOLV (see 10.1021/acs.jpca.1c03762) for reference, and is now well-separated from KSSOLV.
+# A MATLAB toolbox for low-rank planewave GW calculation
 
-## Installation
-Quick installation instructions for the impatient:
-`./configure [options]`
-` make all`
-"make" alone prints a list of acceptable targets. Binaries go in bin/.
+A MATLAB toolbox for **low-rank** planewave **GW** calculations (COHSEX and full-frequency paths), with ISDF-based compression.
 
-## Want to know more?
-For more information, see the Yambo [main web-site](https://www.yambo-code.eu/)
-Yambo is also a flagship code of the MaX Centre of Excellence [MaX web-site](https://www.max-centre.eu)
+It originated as a module inside [KSSOLV](https://doi.org/10.1021/acs.jpca.1c03762) and is now a **standalone** codebase.
 
-For specific documentation visit the [educational web-site](https://www.yambo-code.eu/wiki/) and related subsections
-* [Getting started](https://www.yambo-code.eu/wiki/index.php?title=Tutorials)
-* [Download](https://www.yambo-code.eu/wiki/index.php?title=Download)
-* [Install](https://www.yambo-code.eu/wiki/index.php?title=Installation)
+---
 
-For support please refer to the Yambo [forum web-site](https://www.yambo-code.eu/forum) 
+## Status (beta)
 
-## License
-All the material included in this distribution is free software; you can redistribute it and/or modify it under the terms of the BSD 3-Clause License.
+This is a **beta / test** release. Many parts are still under active development and may change without notice. Interfaces and defaults are not fully stabilized yet — sorry about that.
 
-These programs are distributed in the hope that they will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the BSD 3-Clause License for more details (see LICENSE file).
+---
 
-## AUTHORS
-Please refer to the AUTHORS file
+## Quick start
 
-## ACKNOWLEDGEMENTS
+From the repository root in MATLAB:
 
-In all source files the developers are included with their initials.
-<!-- Zhengbang Zhou is the main developer currently responsible for the code development. -->
+```matlab
+QPstartup
+```
 
-For acknowledging this work please refer to the following article:
+Then see the small demos under [`examples/`](examples/README.md), or the user guides:
+
+- English: [`doc_user_EN/README.md`](doc_user_EN/README.md)
+- 中文: [`doc_user_ZH/README.md`](doc_user_ZH/README.md)
+
+---
+
+## Paper reproduction (Benchmarks)
+
+To reproduce systems from the paper, see [`benchmarks/`](benchmarks/README.md).
+
+That tree ships **Quantum ESPRESSO inputs only** (no `*.save` / wavefunctions). Run QE yourself, then point this code at the resulting save directory. For a tiny end-to-end demo on a laptop, prefer `examples/` instead.
+
+---
+
+## Citation
+
+If you use this code, please cite:
 
 - Z. Zhou, H. Ma, W. Wu, W. Gao, J. Yang, M. Shao, and W. Hu,
-  "A fast low-rank inversion algorithm of dielectric matrix in GW approximation",
-  arXiv:2403.12340 (2024).
-  https://arxiv.org/abs/2403.12340
+  “A fast low-rank inversion algorithm of dielectric matrix in GW approximation,”
+  [arXiv:2403.12340](https://arxiv.org/abs/2403.12340) (2024).
 
-For more info please refer to the AUTHORS file
+---
 
+## Contact
 
-## Known Issues
-Please refer to the ISSUES file
+Questions and bug reports: **zbzhou21@m.fudan.edu.cn**
 
-## Code structure
-Yambo is composed of the following components:
+---
 
-* driver
-* services
-* apps
-* controllers
-* plugins
+## Third-party elliptic routines
 
-## Services
+Cauchy ISDF uses Jacobi / complete elliptic integrals, which are implemented in
+**Tobin A. Driscoll’s Schwarz–Christoffel Toolbox** (`ellipkkp`, `ellipjc`; BSD-3-Clause).
+These are **not** original to this project. See
+[`service/+isdf/+Cauchy/NOTICE`](service/+isdf/+Cauchy/NOTICE).
 
-In the following the different libraries are grouped on the basis of the dependence level. Each group
-depends only on lower level groups.
+Where only the real complete integral \(K(k)\) is needed, MATLAB’s built-in
+`ellipke(k^2)` is numerically equivalent; this tree uses the vendored
+`ellipkkp` for consistency with `ellipjc`.
 
-Each group is listed as folder and strings that label routines and modules. All paths refer to services.
+---
 
-### Level 0
-* core: <none> 
-* stderr: STDERR 
-* strings: STRINGS 
-* cloud: CLOUD 
-* shell_operations: SH
-* units: UNITS 
-* numerics: NUM 
-* vectors_and_matrices: V, M
-* parallel/core: PARALLEL, PAR
+## License
 
-### Level 1
-* parsing_and_init: PARSER, it
-
-### Level 2
-* openmp: OPENMP
-* bosons: bosons 
-* timing: TIMING
-* communication: COM, MSG
-
-### Level 3
-* memory: memory, MEM 
-* debug: debug 
-* parallel: PARALLEL (no modules, just operations)
-* output: OF 
-* GPUs: GPU
-* io: IO_srv,DESC
-* linear_algebra: LA, SLK, PAR_MATRIX, linear_algebra
-* lattices: LAT, KPT, DL, RL
-* service/FFT: FFT 
-* service/xc_functions: XC
-* service/pseudo_potentials: PP, pseudo
-* service/wave_functions: WF
-* service/electrons: EL, electrons [**io to complete**] 
-* service/Kleinman-Bylander: PP_KB 
-* service/interpolate: INTERPOLATION
-* service/observables: OBSERVABLE
-
-### Level 4
-* io_more: **temporary, to be removed**
-* controllers: SERVICES
-
-## PACKAGEs
-
-## APPs
-
-All paths below refer to apps folder
-
-### Level 0 (in services)
-* frequencies: FREQUENCIES
-* cloud: CLOUD_apps
-* RIM: RIM [**io_RIM and io_RIM_W** to check]
-* dipoles: DIPOLES [**io folder to rename**]
-
-### Level \infty (engines) ###
-* acfdt: ACFDT 
-
-## Controllers
-They are the closing components. At the end of the compilation they connect all services/apps/packages.
-
-## Tested compilers 
-* gcc/13.2.0/openmpi-5.0.5
-* gcc/13.2.0/mpich-4.2.2
-
+BSD 3-Clause. See [`LICENSE`](LICENSE). Contributors: see [`AUTHORS`](AUTHORS).
+Third-party notices: [`service/+isdf/+Cauchy/NOTICE`](service/+isdf/+Cauchy/NOTICE).

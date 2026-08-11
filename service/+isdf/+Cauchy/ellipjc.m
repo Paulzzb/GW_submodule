@@ -9,8 +9,9 @@ function [sn,cn,dn] = ellipjc(u,L,flag)
 %   expected to lie within the rectangle |Re U| < K, 0 < Im U <
 %   Kp, where [K,Kp] = ELLIPK(L).
 %   
-%   Copyright (c) 1999 by Toby Driscoll. 
+%   Copyright (c) 1999 by Toby Driscoll.
 %   $Id: ellipjc.m 298 2009-09-15 14:36:37Z driscoll $
+%   Vendored from the Schwarz-Christoffel Toolbox; see NOTICE in this folder.
 
 %   The built-in ELLIPJ can't handle compelx arguments, and
 %   standard transformations to handle this would require ELLIPJ
