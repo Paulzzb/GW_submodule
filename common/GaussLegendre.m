@@ -5,7 +5,8 @@
 % Authors (see AUTHORS file for details): ZZ
 %
 % Last modified: 2025/06/13 ZZ
-
+% %%% Note: This should be a sub-function of generate_frequency
+% %%%       This will generate G-L type of quadrature nodes on imag-axis. 
 function [weight, nodes] = GaussLegendre(n, tol)
 %     [weight, nodes] = GaussLegendre(n, tol)
 % Generate the Gauss quadrature rule on [-1, 1]

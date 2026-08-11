@@ -42,7 +42,7 @@ function KPT_qindx(k, q)
       % 
       G0 = kibz - qbz - kpbz;
       G0 = int32( round(G0) );
-      indG0 = find_gvec_in_glist( G0, r_lat_m.Ggrid_RLU, fft_m.fftgrid );
+      indG0 = lattice.find_gvec_in_glist( G0, r_lat_m.Ggrid_RLU, fft_m.fftgrid );
       r_lat_m.qindx_S(ikibz, iqbz, 2) = indG0;
     end
   end
@@ -66,7 +66,7 @@ function KPT_qindx(k, q)
       % 
       G0 = kbz - qibz - kbz_ok;
       G0 = int32( round(G0) );
-      indG0 = find_gvec_in_glist( G0, r_lat_m.Ggrid_RLU, fft_m.fftgrid );
+      indG0 = lattice.find_gvec_in_glist( G0, r_lat_m.Ggrid_RLU, fft_m.fftgrid );
       r_lat_m.qindx_X(iqibz, ikbz, 2) = indG0;
     end
   end
