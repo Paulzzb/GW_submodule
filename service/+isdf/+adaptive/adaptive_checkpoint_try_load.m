@@ -22,7 +22,8 @@ function [loaded, idnew] = adaptive_checkpoint_try_load(coarse_id)
 
   fpath = isdf.adaptive.adaptive_checkpoint_path(coarse_id, expected_desc);
   if exist(fpath, 'file') ~= 2
-    legacy = isdf.adaptive.adaptive_checkpoint_legacy_path(coarse_id);
+    legacy = fullfile(fileparts(fpath), ...
+      sprintf('isdf_adaptive_checkpoint_id%d.mat', int32(coarse_id)));
     if exist(legacy, 'file') ~= 2
       return
     end

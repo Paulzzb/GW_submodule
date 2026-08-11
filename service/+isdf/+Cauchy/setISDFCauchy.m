@@ -1,6 +1,6 @@
 function opt = setISDFCauchy(data, config)
 
-def = default_ISDFCauchy();
+def = isdf.Cauchy.default_ISDFCauchy();
 
 opt = def;
 
