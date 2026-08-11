@@ -168,7 +168,7 @@ function [Esx_x, Ecoh] = cohsex_Gamma(config)
           tmp1 = tildeWq_nn * rho_left_nn;
           sex_t = sum(conj(rho_left_nn) .* tmp1, 1);
           sex_t = real(sex_t);
-          tmp = sum(sex_t);
+          tmp = 0.5 * sum(sex_t);
         end
         Sigma_coh(indib, 1) = Sigma_coh(indib, 1) + tmp;
       end
