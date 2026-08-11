@@ -1,0 +1,39 @@
+! SCF companion for the 5-atom cell in data-file-schema.xml
+! Format mirrors scf.in; geometry/ecut from the save (not the 2x2x2 supercell).
+&control
+   prefix = 'STO2'
+   calculation = 'scf'
+   pseudo_dir = '../STO3_8'
+/
+&system
+   ibrav = 0
+   nat = 5
+   ntyp = 3
+   nbnd = 100
+   ecutwfc = 40.0
+   ecutrho = 160.0
+   occupations = 'fixed'
+   nosym = .false.
+/
+&electrons
+   electron_maxstep = 100
+   conv_thr = 1.0d-8
+   diago_full_acc = .true.
+/
+CELL_PARAMETERS bohr
+   7.45500  0.00000  0.00000
+ 0.00000    7.45500  0.00000
+ 0.00000  0.00000    7.45500
+ATOMIC_SPECIES
+   Sr  28.086  Sr_ONCV_PBE-1.0.upf
+   Ti  28.086  Ti_ONCV_PBE-1.0.upf
+   O   28.086  O_ONCV_PBE-1.0.upf
+ATOMIC_POSITIONS crystal
+Sr    0.0000000000000000    0.0000000000000000    0.0000000000000000
+Ti    0.2500000000000000    0.2500000000000000    0.2500000000000000
+O     0.2500000000000000    0.0000000000000000    0.2500000000000000
+O     0.2500000000000000    0.2500000000000000    0.0000000000000000
+O     0.0000000000000000    0.2500000000000000    0.2500000000000000
+K_POINTS crystal
+1
+0.0 0.0 0.0 1.0
