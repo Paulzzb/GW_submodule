@@ -24,15 +24,14 @@ switch lower(typein)
     data = load_qe_groundstate(dirin);
   case 'formal'
     if isempty(config)
-      error('load_groundstate_info:formal', ...
+      output.err('load_groundstate_info:formal', ...
         'groundstate_type=''formal'' requires config (call from input_driver).');
     end
-    error('load_groundstate_info:formal', ...
+    output.err('load_groundstate_info:formal', ...
       'groundstate_type=''formal'' is not supported in this version.');
     data = load_formal_groundstate(dirin, config);
   otherwise
-    msg = sprintf('Unsupported groundstate type: %s', typein);
-    output.err(msg);
+    output.err('Unsupported groundstate type: %s', typein);
 end
 
 end

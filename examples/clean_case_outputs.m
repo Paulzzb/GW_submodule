@@ -12,12 +12,15 @@ function clean_case_outputs(case_dir)
 %   clean_case_outputs(CASE_DIR)
 %
 %   Deletes CASE_DIR/SAVE/, CASE_DIR/isdf_report/, and root artifacts
-%   (logs / qp*). Leaves ./test intact. Shared storage is cases/SAVE
-%   (cleared once in run_all); per-case SAVE is uncommon here.
+%   (logs / qp*). Leaves ./test intact.
+%
+%   Safe before QPstartup: adds util/ only if filename_map is not on the path.
 
   examples_dir = fileparts(mfilename('fullpath'));
   gw_root = fileparts(examples_dir);
-  addpath(fullfile(gw_root, 'util'));
+  if isempty(which('filename_map'))
+    addpath(fullfile(gw_root, 'util'));
+  end
 
   save_dir = fullfile(case_dir, 'SAVE');
   if isfolder(save_dir)

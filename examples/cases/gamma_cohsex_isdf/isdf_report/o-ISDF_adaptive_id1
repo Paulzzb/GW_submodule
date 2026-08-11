@@ -1,0 +1,46 @@
+=== adaptiveisdf phase-1 report (coarse ISDF id = 1) ===
+Generated: 2026-08-11 20:29:23
+Elapsed wall time (tic/toc): from function start through rebuild, orbit summary, and this report: 22.045927000 s
+
+=== Adaptive ISDF Update Report ===
+Backend            : adaptive_double
+Arithmetic         : double
+ISDF desc          : vn
+Coarse ISDF id     : 1
+Initial Nisdf      : 2
+Initial bundle size: 0
+Added points       : 390
+Final Nisdf        : 392
+Final bundle size  : 0
+Iterations         : 13
+Initial loss       : 9.00477441e+00
+Final loss         : 7.63464041e-13
+Relative loss      : 8.47843607e-14
+Threshold          : 2.00000000e-06
+num_add            : 32
+candidate ratio    : 2.00000000e+00
+ISDF ratio         : 2.40000000e+01
+max cond           : 1.00000000e+12
+use cond guard     : 1
+Nisdf cap          : 5.43058008e+02
+Naddmax            : 542
+param source       : config
+Stop reason        : reach_threshold
+Schur skips        : 47
+Stepwise loss/loss0 after each +Nadd= 32 update:
+  Step 1: loss = 3.87002685e+00, loss/loss0 = 4.29774992e-01
+  Step 2: loss = 2.91788844e+00, loss/loss0 = 3.24037928e-01
+  Step 3: loss = 1.14191969e+00, loss/loss0 = 1.26812693e-01
+  Step 4: loss = 4.00489193e-01, loss/loss0 = 4.44752056e-02
+  Step 5: loss = 1.78596800e-01, loss/loss0 = 1.98335674e-02
+  Step 6: loss = 6.77685481e-02, loss/loss0 = 7.52584630e-03
+  Step 7: loss = 2.74459651e-02, loss/loss0 = 3.04793478e-03
+  Step 8: loss = 1.37024780e-02, loss/loss0 = 1.52169032e-03
+  Step 9: loss = 6.69758159e-03, loss/loss0 = 7.43781164e-04
+  Step 10: loss = 2.55757281e-03, loss/loss0 = 2.84024085e-04
+  Step 11: loss = 8.91910732e-04, loss/loss0 = 9.90486482e-05
+  Step 12: loss = 8.05591004e-05, loss/loss0 = 8.94626526e-06
+  Step 13: loss = 7.63464041e-13, loss/loss0 = 8.47843607e-14
+===================================
+
+=== end adaptiveisdf phase-1 report ===

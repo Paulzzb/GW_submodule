@@ -18,7 +18,7 @@
 #   bash run_batch.sh
 #   bash run_batch.sh /path/to/matlab
 #
-# Cases share cases/qe.save and cases/SAVE (see namelist storage_dir).
+# Cases share cases/qe.save only; each case uses local storage_dir=./SAVE.
 
 set -euo pipefail
 

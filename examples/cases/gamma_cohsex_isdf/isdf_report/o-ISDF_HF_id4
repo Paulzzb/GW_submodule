@@ -1,0 +1,41 @@
+=== ISDF validate HF report (isdf id = 4) ===
+Generated: 2026-08-11 20:26:08
+description: vn
+interp_scheme: adaptive
+nisdf: 512
+
+--- Band-resolved summary (E_HF vs E_HF_ISDF) ---
+Definition: per (ib, ik_ibz, ispin), E_HF and E_HF_ISDF sum over all ob paths.
+
+  sum(E_HF)                                         2.24301167e+01
+  sum(E_HF_ISDF)                                    2.24301168e+01
+  sum(E_HF) - sum(E_HF_ISDF)                        -1.09012841e-07
+  mean(E_HF) (over nb*nibz*nspin cells)             7.00941146e-02
+  mean(E_HF_ISDF) (over nb*nibz*nspin cells)        7.00941149e-02
+  sum(|E_HF - E_HF_ISDF|)                           4.19725725e-07
+  max(|E_HF - E_HF_ISDF|)                           7.00076806e-08
+  ||vec(E_HF - E_HF_ISDF)||_2                       1.15594558e-07
+  ||vec(E_HF - E_HF_ISDF)||_2 / ||vec(E_HF)||_2     2.57346748e-08
+  E_HF minimum                                      0.00000000e+00 at (ib=33, ik=1, ispin=1)
+  E_HF maximum                                      1.37086013e+00 at (ib=1, ik=1, ispin=1)
+  E_HF_ISDF minimum                                 0.00000000e+00 at (ib=33, ik=1, ispin=1)
+  E_HF_ISDF maximum                                 1.37086012e+00 at (ib=1, ik=1, ispin=1)
+
+--- Statistics (Mean / Std / Var / Max), ob layer ---
+N (total ob samples) = 512
+N_rel (samples with |Ex_t| >= tol for relative stats) = 494
+
+                   Ex_t        Ex_ISDF           Diff        AbsDiff Diff_over_abs_Ex_t AbsDiff_over_abs_Ex_t
+  Mean        0.0452655      0.0452655   -2.20504e-10    3.05357e-09   -3.03644e-09    1.06351e-07
+  Std         0.0645772      0.0645772      5.624e-09    4.72598e-09    1.83787e-07    1.49844e-07
+  Var        0.00417022     0.00417022    3.16294e-17    2.23349e-17    3.37776e-14    2.24533e-14
+  Max           0.45119        0.45119    1.67238e-08    6.38826e-08    8.65113e-07    1.71432e-06
+
+Note: Diff = Ex_t - Ex_ISDF; relative columns use only samples with |Ex_t| >= tol (N_rel may differ from N).
+
+--- Global energy sums (accumulated over ob paths) ---
+Sum Ex_t^2 (direct):      3.068380891701e+00
+Sum Ex_ISDF^2:            3.068380902956e+00
+Sum (Ex_t - Ex_ISDF)^2:   1.562366893301e-14
+
+=== end of report ===

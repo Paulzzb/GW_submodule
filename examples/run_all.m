@@ -11,13 +11,13 @@
 %   From examples/ in MATLAB:
 %     run_all
 %
-%   Cases (shared GS cases/qe.save, shared storage cases/SAVE):
+%   Cases (shared GS cases/qe.save; each case has its own ./SAVE):
 %     gamma_ff_isdf      fdep=2,  isisdf=1
 %     gamma_ff_dir       fdep=2,  isisdf=0
 %     gamma_cohsex_isdf  fdep=-2, isisdf=1
 %     gamma_cohsex_dir   fdep=-2, isisdf=0
 %
-%   Order: ISDF first (builds shared SAVE / stage), then dense.
+%   Per-case storage so timing includes full setup (no shared SAVE reuse).
 
 examples_dir = fileparts(mfilename('fullpath'));
 if isempty(examples_dir)
@@ -36,13 +36,6 @@ cases = { ...
 fprintf('=== examples/run_all ===\n');
 fprintf('gw_root = %s\n', gw_root);
 
-% Shared storage_dir = '../SAVE' → examples/cases/SAVE
-shared_save = fullfile(examples_dir, 'cases', 'SAVE');
-if isfolder(shared_save)
-  fprintf('clean: removing shared %s\n', shared_save);
-  rmdir(shared_save, 's');
-end
-
 n_ok = 0;
 n_fail = 0;
 
@@ -57,7 +50,7 @@ for i = 1:numel(cases)
     continue
   end
 
-  % Per-case logs / qp / isdf_report (does not touch shared cases/SAVE)
+  % Per-case SAVE / logs / qp / isdf_report
   clean_case_outputs(case_dir);
 
   try

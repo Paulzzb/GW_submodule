@@ -1,0 +1,19 @@
+=== isdf.report.cond ===
+Generated: 2026-08-11 20:25:44
+dir: isdf_report
+
+==============================================================================
+--- adaptiveisdf ---
+origin_id: 1,     new_id: 2,     desc: vc,     final_nisdf: 836
+loss_before_step1: 4.9472e-01,     loss_after_complete: 4.9472e-01
+
+==============================================================================
+--- adaptiveisdf ---
+origin_id: 3,     new_id: 4,     desc: vn,     final_nisdf: 512
+loss_before_step1: 2.8281e-11,     loss_after_complete: 2.8281e-11
+
+==============================================================================
+--- adaptiveisdf ---
+origin_id: 5,     new_id: 6,     desc: nn,     final_nisdf: 1617
+loss_before_step1: 4.3645e-02,     loss_after_complete: 4.3645e-02
+

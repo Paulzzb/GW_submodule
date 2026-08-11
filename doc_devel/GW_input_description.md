@@ -6,7 +6,7 @@ a:hover { text-decoration: underline; }
 # GWOptions Input File Description
 
 This document describes all supported input blocks and parameters used to configure the GWOptions framework.
-Parameter names and defaults follow `input/allowed_param_list.m` and `input/default_param_values.m`.
+Parameter names and defaults follow `util/allowed_param_list.m` and `util/default_param_values.m`.
 
 **Default energy unit is Ry, ALWAYS.**
 **This could be really delicate!!!! Since codes use different unit for their cutoffs.**

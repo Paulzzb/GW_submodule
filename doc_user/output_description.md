@@ -26,11 +26,10 @@ Default `storage_dir` is `./QP.save/` if omitted; examples usually set `./SAVE`.
 **Variable:** `data`
 
 **Description:**  
-Ground-state struct loaded from KSSOLV / QE / formal paths.  
-See [`class_reference.md`](class_reference.md#data-ground-state-struct).
+Ground-state struct loaded via `interfaces/load_groundstate_info` (typically QE `*.save`).
 
 **Purpose:**  
-Persist DFT input so Stage II can be restarted without re-reading QE HDF5, and so ISDF rebuilds in `qp_driver` can reload wavefunction metadata when needed.
+Persist DFT input so later stages can restart without re-reading QE HDF5.
 
 **Format:** MATLAB `-v7.3` (no compression).
 
@@ -50,7 +49,7 @@ Blocks typically include `CONTROL`, `SYSTEM`, `CUTOFFS`, `FREQUENCY`, `ISDF`, `C
 `input_driver` **always rebuilds** `config` from the namelist.  
 Editing CUTOFFS / ISDF / FREQUENCY in the namelist takes effect on the next `input_driver` call even if the stage cache is kept.
 
-Full parameter list: [`../doc/GW_input_description.md`](../doc/GW_input_description.md).
+Parameter overview: [`GW_input_description.md`](GW_input_description.md).
 
 ---
 
@@ -176,7 +175,7 @@ E = qp_driver('./SAVE');
 ```
 
 Fields: `Eqp`, `Ex`, `Esx_x`, `Ecoh`, `Eqp0` (empty), `fout` (path to `qp.dat`).  
-Details: [`class_reference.md`](class_reference.md#e-return-value-of-qplauncher).
+Details: [`class_reference.md`](class_reference.md).
 
 ---
 
