@@ -12,6 +12,7 @@ function [rhoG, gvecrho] = construct_rhoG(data, config)
 %     rhoG: density in reciprocal space
 %     gvecrho: reciprocal space grid information, @gvec class.
 
+warning("This function is currently useless.")
 sys = data.sys;
 cutoff = config.CUTOFFS.density_cutoff;
 
@@ -34,6 +35,8 @@ gvecrho = gvec(gvecinput);
 fftbox = data.rhor;
 scal = sys.vol ./ n123;
 fftbox = do_FFT(fftbox, nfftgrid, -1);
-rhoG = scal * get_from_fftbox(gvecrho.idxnz, fftbox, nfftgrid);
+
+error("Replace this line with functions in fft modules");
+% rhoG = scal * get_from_fftbox(gvecrho.idxnz, fftbox, nfftgrid);
 
 end % EOF
