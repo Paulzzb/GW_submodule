@@ -4,7 +4,7 @@
 %
 % Authors (see AUTHORS file for details): ZZ
 %
-% Last modified: 2026/06/11
+% Last modified: 2026/08/12 ZZ
 
 function driver(~, config)
 
@@ -88,7 +88,18 @@ function idnew = run_isdf_type(config, cfg, isdf_type)
     'seed_nmu', int32(isdf_data.nisdf), ...
     'method', char(string(isdf_data.interp_scheme))));
   % isdf.coeff.print_coarse_grid_report(id);
-  idnew = isdf.adaptive.launcher(id, cfg);
+
+  % Only 'pseudo' uses adaptive refinement; qrcp/kmeans/coarse already
+  % selected the final sampling set in gen_coeff (+ init_from_indices).
+  method = lower(strtrim(char(string(isdf_data.interp_scheme))));
+  if strcmp(method, 'pseudo')
+    idnew = isdf.adaptive.launcher(id, cfg);
+  else
+    idnew = id;
+    output.msg('rs', ...
+      'ISDF id=%d desc=%s: skip adaptive (method=%s); use seed as final slot.', ...
+      int32(id), char(string(isdf_data.desc)), method);
+  end
   local_dispatch_gen_tildeVq(idnew, config, cfg);
 end
 

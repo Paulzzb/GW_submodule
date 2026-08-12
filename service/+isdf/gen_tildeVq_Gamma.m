@@ -6,7 +6,7 @@
 %
 % Last modified: 2026/06/11 
 
-function tildeVq = gen_tildeVq_Gamma(id, config)
+function gen_tildeVq_Gamma(id, config)
 %GEN_TILDEVQ_GAMMA  Gamma-only tildeVq builder (mu-batched MCHq).
 %
 %   tildeVq = isdf.gen_tildeVq_Gamma(id)
