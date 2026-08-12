@@ -6,7 +6,7 @@
 %
 % Last modified: 2026/04/02
 
-function tildeVq = gen_tildeVq(id, cfg_isdf)
+function gen_tildeVq(id, cfg_isdf)
 % GEN_TILDEVQ  SVD-based tildeVq with X*V*X' form.
 %
 % Accumulates MCHq/CCHq over the BZ, forms truncated C^{-1/2}, stores CCHq
