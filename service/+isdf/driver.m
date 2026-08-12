@@ -94,11 +94,16 @@ function idnew = run_isdf_type(config, cfg, isdf_type)
   method = lower(strtrim(char(string(isdf_data.interp_scheme))));
   if strcmp(method, 'pseudo')
     idnew = isdf.adaptive.launcher(id, cfg);
+    % Has been done in adaptive.launcher
+    % isdf_data.assigned = true;
+    % isdf.save2mod(isdf_data, idnew);
   else
     idnew = id;
     output.msg('rs', ...
       'ISDF id=%d desc=%s: skip adaptive (method=%s); use seed as final slot.', ...
       int32(id), char(string(isdf_data.desc)), method);
+    isdf_data.assigned = true;
+    isdf.save2mod(isdf_data, idnew);
   end
   local_dispatch_gen_tildeVq(idnew, config, cfg);
 end
