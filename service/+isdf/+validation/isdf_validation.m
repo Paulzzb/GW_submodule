@@ -23,8 +23,12 @@ function [Esum2, EsumISDF2, DiffEsum2] = isdf_validation(id)
   switch isdf_data.interp_scheme
     case "coarse"
       interp_scheme = "coarse";
-    case {"adaptive", "adaptive_sc", "coarse_sc", "supercell"}
+    case "adaptive"
       interp_scheme = "adaptive";
+    case "qrcp"
+      interp_scheme = "qrcp";
+    case "kmeans"
+      interp_scheme = "kmeans";
     otherwise
       error('isdf:isdf_validation:InvalidInterpScheme', ...
         'Invalid interp_scheme: %s', isdf_data.interp_scheme);
