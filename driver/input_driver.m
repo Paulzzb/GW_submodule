@@ -60,7 +60,7 @@ function input_driver(inputfile)
   end
   config.ISDFCauchy = isdf.Cauchy.setISDFCauchy(data, config);
   save(fNamedata, 'data', '-v7.3', '-nocompression');
-  save(fNameconfig, 'config', '-v7.3', '-nocompression');
+  save(fNameconfig, 'config');
 
   service_driver(data, config);
 
