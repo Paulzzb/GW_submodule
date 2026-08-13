@@ -1,9 +1,0 @@
-=== isdf.report.cond ===
-Generated: 2026-08-11 20:29:00
-dir: isdf_report
-
-==============================================================================
---- adaptiveisdf ---
-origin_id: 1,     new_id: 2,     desc: vn,     final_nisdf: 392
-loss_before_step1: 8.6889e+00,     loss_after_complete: 7.6346e-13
-

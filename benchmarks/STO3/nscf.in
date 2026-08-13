@@ -1,8 +1,8 @@
 ! Reconstructed from data-file-schema.xml (this is what produced the save)
 ! Cell: 5-atom SrTiO3, a = 7.455 bohr; calculation = nscf; nbnd = 1800; Gamma-only
-! Note: folder scf.in is a 2x2x2 supercell (nat=40, a=14.91) — NOT this save.
+! ecutwfc = 80 Ry (aligned with STO3_8). QE prefix remains STO3 → STO3.save.
 &control
-   prefix = 'STO2'
+   prefix = 'STO3'
    calculation = 'nscf'
    restart_mode = 'from_scratch'
    wf_collect = .true.
@@ -16,8 +16,8 @@
    nat = 5
    ntyp = 3
    nbnd = 1800
-   ecutwfc = 40.0
-   ecutrho = 160.0
+   ecutwfc = 80.0
+   ecutrho = 320.0
    occupations = 'fixed'
    nosym = .false.
 /

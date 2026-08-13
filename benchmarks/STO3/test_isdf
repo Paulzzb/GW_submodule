@@ -1,0 +1,56 @@
+&CONTROL
+  prefix = 'STO3',
+  isgw = 1,
+  groundstate_dir = './STO3.save',
+  groundstate_type = 'qe',
+  storage_dir = './SAVE',
+  output_dir = './isdf',
+  enable_k_points = .false.,
+END &CONTROL
+
+&SYSTEM
+  number_bands_in_summation = 1799,
+  energy_band_index_min = 1,
+  energy_band_index_max = 40,
+END &SYSTEM
+
+&FREQUENCY
+  frequency_dependence = 2,
+  frequency_dependence_method = 2,
+  frequency_low_cutoff = 80.0,
+  delta_frequency = 0.25,
+  number_imaginary_freqs = 20,
+END &FREQUENCY
+
+&CUTOFFS
+  coulomb_cutoff = 80.0,
+  coulomb_truncation_method = 2,
+  coulomb_truncation_parameter = 5.0,
+END &CUTOFFS
+
+&ISDF
+  isisdf = 1,
+  compute_vc = .true.,
+  compute_vn = .true.,
+  compute_nn = .true.,
+  isdf_ratio_type1 = 12.0,
+  isdf_ratio_type2 = 24.0,
+  isdf_ratio_type3 = 16.0,
+  exxmethod = 'qrcp',
+  seed = 0,
+  init = 'random',
+  weight = 'add',
+  is_helper = .true.,
+  validate_hf = .true.,
+  inv_strategy = 'dir',
+  inv_param = 1e-12,
+  inv_ratio = 0.75,
+  auto_inv_param = .false.,
+  order = 1,
+  iscauchy = .true.,
+END &ISDF
+
+&COHSEX
+  exact_ch = .false.,
+  ex_use_which_isdf = 'vn',
+END &COHSEX
