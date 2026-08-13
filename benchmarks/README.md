@@ -15,11 +15,11 @@ UPFs: Si in `Si64/`, STO in `STO3_8/`. Each case: `scf.in` → `nscf.in` → `pp
 
 ```bash
 mkdir -p log
-sbatch slurm_qe_gs_small.sh    # Si8, STO3
-sbatch slurm_qe_gs_large.sh    # Si64, STO3_8
-sbatch slurm_gw_small.sh       # default: test_isdf → ./isdf/qp.dat
-sbatch slurm_gw_large.sh
-NAMELIST=test_dir sbatch slurm_gw_small.sh   # dense → ./direct/qp.dat
+sbatch qe_small.sh             # Si8, STO3
+sbatch qe_large.sh             # Si64, STO3_8
+sbatch gw_small.sh             # default: test_isdf → ./isdf/qp.dat
+sbatch gw_large.sh
+NAMELIST=test_dir sbatch gw_small.sh   # dense → ./direct/qp.dat
 ```
 
 Overrides: `CASES=…`, `NPROC=…`, `PW=…`, `MATLAB_BIN=…`.
@@ -30,6 +30,7 @@ Overrides: `CASES=…`, `NPROC=…`, `PW=…`, `MATLAB_BIN=…`.
 cd benchmarks/Si8
 # old QE: stdin redirect; do not rely on "pw.x -in"
 pw.x < scf.in > scf.out && pw.x < nscf.in > nscf.out && pw2bgw.x < pp_in > pp.out
+cp -f vxc.dat Si8.save/        # required: loader reads *.save/vxc.dat
 ```
 
 ```matlab

@@ -73,9 +73,22 @@ for case in $CASES; do
   echo "[$case] pw2bgw (vxc.dat) ..."
   $MPI "$PW2BGW" < pp_in > pp.out
 
-  echo "[$case] done. save dirs:"
-  ls -d ./*.save 2>/dev/null || echo "  (no *.save found — check prefix/outdir in scf/nscf)"
-  ls -lh vxc.dat 2>/dev/null || echo "  (no vxc.dat — check pp.out)"
+  # pw2bgw writes vxc.dat in cwd; MATLAB reads groundstate_dir/vxc.dat (*.save/).
+  save_dir="$(ls -d ./*.save 2>/dev/null | head -n 1 || true)"
+  if [[ -z "${save_dir:-}" ]]; then
+    echo "ERROR: no *.save after pw2bgw" >&2
+    exit 1
+  fi
+  if [[ ! -f vxc.dat ]]; then
+    echo "ERROR: no ./vxc.dat after pw2bgw — check pp.out" >&2
+    exit 1
+  fi
+  cp -f vxc.dat "$save_dir/vxc.dat"
+  echo "[$case] copied vxc.dat → $save_dir/"
+
+  echo "[$case] done:"
+  ls -ld "$save_dir"
+  ls -lh "$save_dir/vxc.dat"
 done
 
 cd "$ROOT"
