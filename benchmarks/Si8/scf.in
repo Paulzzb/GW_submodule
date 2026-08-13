@@ -13,14 +13,9 @@
    nat = 8
    ntyp = 1
    ecutwfc = 40.0
-!   ecutrho = 20.0
    nosym = .TRUE.
    nosym_evc = .true.
-   use_all_frac=.TRUE. 
    occupations = "fixed",
-!    occupations = "smearing",
-!    smearing    = "gaussian",
-!    degauss     = 0.01
    nbnd   = 80
 /
 &electrons
@@ -29,8 +24,7 @@
    mixing_mode = 'plain'
    mixing_beta = 0.7
    mixing_ndim = 8
-   diagonalization = 'david'
-   diago_david_ndim = 2
+   diagonalization = 'cg'
    diago_full_acc = .true.
 /
 CELL_PARAMETERS bohr 

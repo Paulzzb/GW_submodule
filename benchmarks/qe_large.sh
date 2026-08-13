@@ -17,6 +17,7 @@
 # Override binaries / MPI:
 #   PW=pw.x PW2BGW=pw2bgw.x NPROC=128 sbatch slurm_qe_gs_large.sh
 #   CASES="Si64" sbatch slurm_qe_gs_large.sh
+#   PW_FLAGS= sbatch ...          # clear default -ndiag 1 if needed
 
 set -euo pipefail
 
@@ -32,12 +33,15 @@ PW="${PW:-pw.x}"
 PW2BGW="${PW2BGW:-pw2bgw.x}"
 NPROC="${NPROC:-${SLURM_NTASKS:-64}}"
 MPI="${MPI:-mpirun -np ${NPROC}}"
+# Serial subspace diag: avoids ScaLAPACK cholesky failures on old builds.
 CASES="${CASES:-Si64 STO3_8}"
 
 echo "[$(date)] QE ground-state (large cells)"
 echo "  ROOT=$ROOT"
-echo "  PW=$PW  PW2BGW=$PW2BGW  MPI=$MPI"
+echo "  PW=$PW  PW2BGW=$PW2BGW  MPI=$MPI "
 echo "  CASES=$CASES"
+echo "  which PW: $(command -v "$PW" 2>/dev/null || echo NOT_FOUND)"
+# Old QE: stdin redirect (pw.x < in), not "pw.x -in".
 
 for case in $CASES; do
   case_dir="$ROOT/$case"
@@ -47,7 +51,8 @@ for case in $CASES; do
   fi
   echo
   echo "===== [$case] $(date) ====="
-  cd "$case_dir"
+  cd "$case_dir" || exit 1
+  echo "[$case] pwd=$(pwd)"
 
   for f in scf.in nscf.in pp_in; do
     if [[ ! -f "$f" ]]; then
@@ -57,13 +62,15 @@ for case in $CASES; do
   done
 
   echo "[$case] scf ..."
-  $MPI "$PW" -in scf.in > scf.out
+  $MPI "$PW" < scf.in > scf.out
+  echo "[$case] scf done, scf.out=$(wc -c < scf.out) bytes"
 
   echo "[$case] nscf ..."
-  $MPI "$PW" -in nscf.in > nscf.out
+  mpirun -np 4 pw.x < nscf.in > nscf.out
+  echo "[$case] nscf done, nscf.out=$(wc -c < nscf.out) bytes"
 
   echo "[$case] pw2bgw (vxc.dat) ..."
-  $MPI "$PW2BGW" -in pp_in > pp.out
+  $MPI "$PW2BGW" < pp_in > pp.out
 
   echo "[$case] done. save dirs:"
   ls -d ./*.save 2>/dev/null || echo "  (no *.save found — check prefix/outdir in scf/nscf)"
