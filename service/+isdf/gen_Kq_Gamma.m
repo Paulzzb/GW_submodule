@@ -77,10 +77,10 @@ use_cauchy = (abs(eta) < 1e-14) && isfield(cauchy, 'isCauchy') ...
 
 if use_cauchy
   % COmegaCstar is static (Ω_ij = e_v - e_c). Nonzero omega → direct path.
-  if abs(omega) > 1e-12
+  if abs(real(omega)) > 1e-12
     output.msg('v1s', ...
       'Cauchy requested but omega~=0; using direct chi sum.');
-    use_cauchy = false;
+    % use_cauchy = false;
   end
 end
 
@@ -96,7 +96,7 @@ if use_cauchy
   if isfield(cauchy, 'MaxIter') && ~isempty(cauchy.MaxIter)
     optC.MaxIter = double(cauchy.MaxIter);
   end
-  [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar(Phi, Psi, evOcc(:), evUnocc(:), optC);
+  [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar_omega(Phi, Psi, evOcc(:), evUnocc(:), optC, omega);
   % Static limit of direct coeff = occ/den1-occ/den2 is -2/(Ev-Ec).
   % COmegaCstar builds 1/(Ev-Ec); negate and *2 match that (then spin *2).
   chiq_ISDF = -chi_raw;
