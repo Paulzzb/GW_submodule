@@ -22,9 +22,10 @@ function Kq_ISDF = gen_Kq_Gamma(id_vc, iqibz, omega, broadening, cauchy)
 %
 % Chi path:
 %   eta ~= 0  → always direct iv-loop (real-axis)
-%   eta == 0  → if cauchy.isCauchy, use isdf.Cauchy.COmegaCstar (static Ω);
-%               otherwise direct loop. Imag-axis fullfreq passes broadening=[]
-%               so Cauchy is eligible when enabled.
+%   eta == 0  → if cauchy.isCauchy, use isdf.Cauchy.COmegaCstar_omega
+%               (static / imag-axis; Re(omega)~=0); otherwise direct loop.
+%               Imag-axis fullfreq passes broadening=[] so Cauchy is eligible
+%               when enabled.
 %
 %   K_q = chi_q^{-1} + V~_q   (after SVD truncation factors on chi)
 
@@ -76,7 +77,7 @@ use_cauchy = (abs(eta) < 1e-14) && isfield(cauchy, 'isCauchy') ...
   && logical(cauchy.isCauchy);
 
 if use_cauchy
-  % COmegaCstar is static (Ω_ij = e_v - e_c). Nonzero omega → direct path.
+  % COmegaCstar_omega requires Re(omega)~=0 (imag-axis / static).
   if abs(real(omega)) > 1e-12
     output.msg('v1s', ...
       'Cauchy requested but omega~=0; using direct chi sum.');
@@ -96,11 +97,18 @@ if use_cauchy
   if isfield(cauchy, 'MaxIter') && ~isempty(cauchy.MaxIter)
     optC.MaxIter = double(cauchy.MaxIter);
   end
-  [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar_omega(Phi, Psi, evOcc(:), evUnocc(:), optC, omega);
-  % Static limit of direct coeff = occ/den1-occ/den2 is -2/(Ev-Ec).
-  % COmegaCstar builds 1/(Ev-Ec); negate and *2 match that (then spin *2).
+  % One pole: ~ 1/(Ω - ω); pair ±ω → 1/(ω-Ω) - 1/(ω+Ω) after negate.
+  % Static ω=0: double the single pole (= -2/Ω after negate).
+  [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar_omega( ...
+    Phi, Psi, evOcc(:), evUnocc(:), optC, omega);
   chiq_ISDF = -chi_raw;
-  chiq_ISDF = 2.0 * chiq_ISDF;
+  if abs(imag(omega)) > 1e-13
+    [chi_raw, ~, ~] = isdf.Cauchy.COmegaCstar_omega( ...
+      Phi, Psi, evOcc(:), evUnocc(:), optC, -omega);
+    chiq_ISDF = chiq_ISDF - chi_raw;
+  else
+    chiq_ISDF = 2.0 * chiq_ISDF;
+  end
   if nspin == 1
     chiq_ISDF = 2 * chiq_ISDF;
   end
