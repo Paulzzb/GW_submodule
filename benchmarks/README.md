@@ -28,6 +28,7 @@ Overrides: `CASES=…`, `NPROC=…`, `PW=…`, `MATLAB_BIN=…`.
 
 ```bash
 cd benchmarks/Si8
+# old QE: stdin redirect; do not rely on "pw.x -in"
 pw.x < scf.in > scf.out && pw.x < nscf.in > nscf.out && pw2bgw.x < pp_in > pp.out
 ```
 
