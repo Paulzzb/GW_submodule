@@ -1,7 +1,7 @@
-! SCF companion for the 5-atom cell in data-file-schema.xml
-! Format mirrors scf.in; geometry/ecut from the save (not the 2x2x2 supercell).
+! SCF for 5-atom SrTiO3 (folder STO3). QE prefix STO3 → STO3.save.
+! ecutwfc = 80 Ry (same as STO3_8). Pseudopotentials from ../STO3_8.
 &control
-   prefix = 'STO2'
+   prefix = 'STO3'
    calculation = 'scf'
    pseudo_dir = '../STO3_8'
 /
@@ -10,8 +10,8 @@
    nat = 5
    ntyp = 3
    nbnd = 100
-   ecutwfc = 40.0
-   ecutrho = 160.0
+   ecutwfc = 80.0
+   ecutrho = 320.0
    occupations = 'fixed'
    nosym = .false.
 /

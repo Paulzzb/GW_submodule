@@ -1,5 +1,5 @@
 &input_pw2bgw
-   prefix = 'STO2'
+   prefix = 'STO3'
    real_or_complex = 2
    wfng_flag = .false.
    wfng_file = 'wfn.complex'

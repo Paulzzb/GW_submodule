@@ -1,5 +1,5 @@
 &control
-   prefix = 'STO2'
+   prefix = 'STO3'
    calculation = 'scf'
    restart_mode = 'from_scratch'
    wf_collect = .true.

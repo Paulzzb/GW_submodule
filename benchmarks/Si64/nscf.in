@@ -13,7 +13,7 @@
    nat = 64
    ntyp = 1
    nbnd = 16384
-   ecutwfc = 50.0
+   ecutwfc = 40.0
    nosym = .true.
 !   ecutrho = 20.0
 !   use_all_frac=.TRUE.
