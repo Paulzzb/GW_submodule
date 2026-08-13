@@ -1,47 +1,65 @@
-*.mat
+# MATLAB / editor
 *.asv
 *.html
+*.mex*
 *QPenergy
 QPen*
 
-# Platform-specific MEX binaries (built on demand by QPstartup / isdf.*.build_*_mex)
-*.mex*
+# Generic GW run products
+*.mat
+SAVE/
+isdf_report/
+isdf/
+direct/
+qp.dat
+qp_*.dat
+qp.dir
+qp.ben
+qp.isdf
+Ecoh.*
+r-*.log
+l-*.log
 
-*log
-*.txt
+# QE stdout / crash (inputs and UPF stay tracked)
+scf.out
+nscf.out
+pp.out
+CRASH
 
+# ---------------------------------------------------------------------------
+# benchmarks/: QE GS is local; only namelists / UPF / SLURM / README are kept
+# ---------------------------------------------------------------------------
+benchmarks/**/*.save/
+benchmarks/**/vxc.dat
+benchmarks/**/wfn*
+benchmarks/**/rho.complex
+benchmarks/log/
 
-!GW/example_profile/TMP_files/groundstate.mat
+# ---------------------------------------------------------------------------
+# tests/: large QE dumps stay local; keep README placeholders.
+# Already-tracked small Si_gamma / Si_k qe.save files remain in the index.
+# ---------------------------------------------------------------------------
+tests/cases/**/qe.save/**
+!tests/cases/**/qe.save/README.md
+tests/**/vxc.dat
+tests/**/wfn*
+tests/**/rho.complex
 
-# test_profile: ignore generated checkpoints and report-like text outputs
-test_profile/**/*.mat
+# ---------------------------------------------------------------------------
+# examples/: shared examples/cases/qe.save is shipped — do not ignore it.
+# Per-case run products are covered by the generic rules above.
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# test_profile/: local scratch (not the public examples/tests trees)
+# ---------------------------------------------------------------------------
+test_profile/**/*.save/
+test_profile/**/vxc.dat
+test_profile/**/*report*.txt
+test_profile/**/*报告*.txt
 test_profile/**/adaptiveisdf_id*.txt
 test_profile/**/isdf_validate_HF*.txt
 test_profile/**/HF_ratio*.txt
 test_profile/**/adapt_ratio*.txt
 test_profile/**/coarse_FFT_direct.txt
-test_profile/**/*report*.txt
-test_profile/**/*报告*.txt
 test_profile/**/*log*.txt
-
-# tests/: generated SAVE / logs / QE binaries (keep namelist + README)
-tests/**/SAVE/
-tests/**/r-*.log
-tests/**/l-*.log
-tests/**/*.mat
-tests/cases/**/qe.save/**
-!tests/cases/**/qe.save/README.md
-
-# example/: same policy for QE binaries; keep README placeholders.
-# Si_k ships a small (~1MB) qe.save for multi-k smoke; gamma/large GS stay local.
-example/**/SAVE/
-example/**/r-*.log
-example/**/l-*.log
-example/**/*.mat
-example/**/isdf_report/
-
-
-# ./GW/test/*.mat
-# Add mol and kssolv-scf result of Si8 into path
-# !./GW/test/data/Si8/IntermediateFiles/molinfo.mat
-# !./GW/test/data/Si8/IntermediateFiles/scinfo.mat
